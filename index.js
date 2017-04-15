@@ -1,6 +1,6 @@
 const commandLineArgs = require('command-line-args');
 
-const Scanner = require('./lib/Scanner').Scanner;
+const Scanner = require('./lib/TorrentScanner').TorrentScanner;
 
 const LopConsole = require('./lib/LopConsole');
 let logger = new LopConsole();
@@ -8,8 +8,12 @@ let logger = new LopConsole();
 const OPERATION_SCAN = 'scan';
 const optionDefinitions = [
   { name: 'operation', type: String, defaultOption: true },
-  { name: 'target', alias: 't', type: String },
-  { name: 'verbose', alias: 'v', type: Boolean }
+  // { name: 'verbose', alias: 'v', type: Boolean },
+
+  // for scanner:
+  { name: 'target', alias: 't', type: String, group:'Scanner' },
+  { name: 'data',   alias: 'd', type: String, group:'Scanner' },
+  { name: 'tdata',              type: String, group:'Scanner' },
 ];
 
 const options = commandLineArgs(optionDefinitions);
