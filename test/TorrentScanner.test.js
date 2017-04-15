@@ -7,25 +7,25 @@ const path = require('path');
 describe('TorrentScanner', function(){
 
   it('simple scan', function(done){
-    let target = __dirname + '/fixtures';
+    let target = __dirname + '/fixtures/t1';
 
     let expectedTagets = [
-      __dirname+ '/fixtures',
-      __dirname+ '/fixtures/t1'
+      target,
+      target+ '/subfolder'
     ];
     let expectedFiles = [
-      __dirname+ "/fixtures/Sheltered [rutracker.org].t5364696.torrent:41955",
-      __dirname+ "/fixtures/[NNM-Club.me]_Q3 2015.torrent:97896",
-      __dirname+ "/fixtures/gog_sheltered_2.1.0.2.sh:271816803",
-      __dirname+ "/fixtures/t1/test1.txt:1"
+      target+ "/Sheltered [rutracker.org].t5364696.torrent:41955",
+      target+ "/[NNM-Club.me]_Q3 2015.torrent:97896",
+      target+ "/gog_sheltered_2.1.0.2.sh:271816803",
+      target+ "/subfolder/test1.txt:1"
     ];
     let expectedFolders = [
-      __dirname+ "/fixtures/t1:-1"
+      target+ "/subfolder:-1"
     ];
 
     let expectedTorrents = [
-      __dirname+ "/fixtures/Sheltered [rutracker.org].t5364696.torrent",
-      __dirname+ "/fixtures/[NNM-Club.me]_Q3 2015.torrent",
+      target+ "/Sheltered [rutracker.org].t5364696.torrent",
+      target+ "/[NNM-Club.me]_Q3 2015.torrent",
     ];
 
     let targets = [];
