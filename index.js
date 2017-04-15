@@ -8,23 +8,28 @@ let logger = new LopConsole();
 
 
 const OPERATION_SCAN = 'scan';
+const OPERATION_ANALYZE = 'analyze';
 
 /**
  *
  */
 const optionDefinitions = [
-  { name: 'operation', type: String, defaultOption: true , description:'Operation. one of \'scan\', TODO '},
+  { name: 'operation', type: String, defaultOption: true ,
+    description:'Operation. one of \'scan\', \'analyze\' TODO '},
   // { name: 'verbose', alias: 'v', type: Boolean },
-  { name: 'help', alias: 'h', type: Boolean, description:'print help' },
+  { name: 'help', alias: 'h', type: Boolean,
+    description:'print help' },
 
   // for scanner:
-  { name: 'target', alias: 't', type: String, group:'scanner', description:'scan folder' },
+  { name: 'target', alias: 't', type: String,
+    description:'scan folder' },
 
-  { name: 'data',   alias: 'd', type: String, group:'scanner',
-    defaultValue: 'tmp/files.bin', description: 'file to save indexed content' },
+  { name: 'data',   alias: 'd', type: String,
+    defaultValue: 'tmp/files.bin', description: 'file to save/load indexed content' },
 
-  { name: 'tdata',              type: String, group:'scanner',
-    defaultValue: 'tmp/torrents.bin'  , description: 'file to save torrent file list' },
+  { name: 'tdata',              type: String,
+    defaultValue: 'tmp/torrents.bin'  , description: 'file to save/load torrent file list' },
+
 ];
 
 
@@ -32,19 +37,23 @@ const optionDefinitions = [
 const options = commandLineArgs(optionDefinitions);
 
 // console.log(options);
-if(options.help || !options._none.operation){
+if(options.help || !options.operation){
   usage();
   return;
 }
 
-switch(options._none.operation){
+switch(options.operation){
 
   case OPERATION_SCAN:
-    startScan(options.scanner);
+    startScan(options);
+    break;
+
+  case OPERATION_ANALYZE:
+    startAnalyze(options);
     break;
 
   default:
-    console.error('Unknown operation: %s', options._none.operation);
+    console.error('Unknown operation: %s', options.operation);
 }
 
 
@@ -60,13 +69,18 @@ function usage(){
     {
       header: 'Options',
       optionList: optionDefinitions,
-      group:'_none'
-    },
-    {
-      header: 'Scanner options',
-      optionList: optionDefinitions,
-      group:'scanner'
+      // group:'_none'
     }
+    // {
+    //   header: 'Scanner options',
+    //   optionList: optionDefinitions,
+    //   group:'scanner'
+    // },
+    // {
+    //   header: 'Analyzer options',
+    //   optionList: optionDefinitions,
+    //   group:'analyzer'
+    // }
   ]
   const usageTxt = getUsage(sections);
   console.log(usageTxt);
@@ -105,4 +119,13 @@ function startScan(options){
   scanner.on('end', function(){
     logger.log('Finished in %s sec', logger.elapsedLOP() );
   });
+}
+
+
+
+/**
+ *
+ */
+function startAnalyze(options){
+
 }
