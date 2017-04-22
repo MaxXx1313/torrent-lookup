@@ -89,7 +89,7 @@ describe('Analyzer', function(){
     var analyzer = new Analyzer();
     var getData = analyzer._grabTorrentData; // fn
 
-    let location = '/test';
+    let location = '/test/sometorrent.torrent';
     let input1 = {
       "encoding": "UTF-8",
       "info": {
@@ -170,23 +170,29 @@ describe('Analyzer', function(){
 
     it('_addToHash', function(){
 
-      let location = '/test';
+      let torrentLocation = '/test/sometorrent.torrent';
+
       let inputArr = [{
         dir:'folder1/Russian/mods/russian/scripts/screens',
         base:'UpdateRussianDialog.lua',
         length: 11160987,
-        torrent: location
-      },
-      {
+        torrent: torrentLocation
+      }, {
+        dir:'',
+        base: "gog_sheltered_2.1.0.2.sh",
+        length: 271816803,
+        torrent: torrentLocation
+      }, {
         dir:'folder1/Азия и Закавказье',
         base:'aze20151005.nm7',
         length: 26458135,
-        torrent: location
+        torrent: torrentLocation
       }];
 
       let expected = {
         'UpdateRussianDialog.lua:11160987': [inputArr[0]],
-        'aze20151005.nm7:26458135': [inputArr[1]]
+        'gog_sheltered_2.1.0.2.sh:271816803': [inputArr[1]],
+        'aze20151005.nm7:26458135': [inputArr[2]]
       };
 
       inputArr.forEach(input=>{
@@ -200,13 +206,14 @@ describe('Analyzer', function(){
 
       it('simple', function(){
         let filesToMatch = [
-          '/home/maksim/Projects/tlookup3/test/fixtures/t1/gog_sheltered_2.1.0.2.sh',
-          '/home/maksim/Downloads/Q3 2015/Содружество и Скандинавия/earth20151005.nm7',
-          '/home/maksim/somenonexisted'
+          ['/home/maksim/Projects/tlookup3/test/fixtures/t1/gog_sheltered_2.1.0.2.sh', 271816803],
+          ['/home/maksim/Downloads/Q3 2015/Содружество и Скандинавия/earth20151005.nm7', 1717822],
+          ['/home/maksim/somenonexisted', 123]
         ];
 
+        console.log(analyzer._hash);
         filesToMatch.forEach(file=>{
-          let mapping = analyzer._matchFile(file);
+          let mapping = analyzer._matchFile(file[0], file[1]);
 
           console.log(mapping);
 
