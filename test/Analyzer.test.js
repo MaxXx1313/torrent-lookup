@@ -10,12 +10,12 @@ describe('Analyzer', function(){
   let target = __dirname + '/fixtures/t2';
 
 
-  it('simple scan', function(){
+  it('simple analyze', function(){
       var analyzer = new Analyzer({
         data:  target+ '/files.bin',
         tdata: target+ '/torrents.bin',
       });
-      analyzer.analyze();
+      return analyzer.analyze();
   });
 
 
