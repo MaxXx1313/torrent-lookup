@@ -154,5 +154,38 @@ describe('Analyzer', function(){
 
 
 
+
+  it('_addToHash', function(){
+
+    let location = '/test';
+    let inputArr = [{
+      dir:'folder1/Russian/mods/russian/scripts/screens',
+      base:'UpdateRussianDialog.lua',
+      length: 11160987,
+      torrent: location
+    },
+    {
+      dir:'folder1/Азия и Закавказье',
+      base:'aze20151005.nm7',
+      length: 26458135,
+      torrent: location
+    }];
+
+    let expected = {
+      'UpdateRussianDialog.lua:11160987': [inputArr[0]],
+      'aze20151005.nm7:26458135': [inputArr[1]]
+    };
+
+    var analyzer = new Analyzer();
+    inputArr.forEach(input=>{
+      analyzer._addToHash(input);
+    });
+    assert.deepEqual(analyzer._hash, expected);
+
+
+  });
+
+
+
 });
 
