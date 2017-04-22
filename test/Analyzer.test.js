@@ -201,8 +201,8 @@ describe('Analyzer', function(){
       it('simple', function(){
         let filesToMatch = [
           '/home/maksim/Projects/tlookup3/test/fixtures/t1/gog_sheltered_2.1.0.2.sh',
-          '../'.repeat(7) + '/home/maksim/Downloads/Q3 2015/Содружество и Скандинавия/earth20151005.nm7',
-          '../'.repeat(5) + '/home/maksim/somenonexisted'
+          '/home/maksim/Downloads/Q3 2015/Содружество и Скандинавия/earth20151005.nm7',
+          '/home/maksim/somenonexisted'
         ];
 
         filesToMatch.forEach(file=>{
