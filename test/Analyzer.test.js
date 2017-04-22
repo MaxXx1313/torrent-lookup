@@ -42,17 +42,16 @@ describe('Analyzer', function(){
 
       var analyzer = new Analyzer();
 
-      try{
-        analyzer.loadTorrentFile(__dirname + '/fixtures/t1' + '/nonexistedFile.torrent');
-      }catch(e){
+      assert.throws(function(){
 
+        analyzer.loadTorrentFile(__dirname + '/fixtures/t1' + '/nonexistedFile.torrent');
         // console.log(e);
 
+      }, function(e) {
         assert.equal( e.code, 'ENOENT' );
-        return;
-      }
+        return true;
+      });
 
-      assert.fail('Should catch the error');
 
 
   });
