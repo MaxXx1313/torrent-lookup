@@ -19,11 +19,11 @@ describe('Analyzer', function(){
   });
 
 
-  it('loadTorrentFile - single file', function(){
+  it('_loadTorrentFile - single file', function(){
 
       var analyzer = new Analyzer();
 
-      var data = analyzer.loadTorrentFile(__dirname + '/fixtures/t1' + '/Sheltered [rutracker.org].t5364696.torrent');
+      var data = analyzer._loadTorrentFile(__dirname + '/fixtures/t1' + '/Sheltered [rutracker.org].t5364696.torrent');
 
       var expected = [{
         dir: '',
@@ -38,13 +38,13 @@ describe('Analyzer', function(){
   });
 
 
-  it('loadTorrentFile - no file', function(){
+  it('_loadTorrentFile - no file', function(){
 
       var analyzer = new Analyzer();
 
       assert.throws(function(){
 
-        analyzer.loadTorrentFile(__dirname + '/fixtures/t1' + '/nonexistedFile.torrent');
+        analyzer._loadTorrentFile(__dirname + '/fixtures/t1' + '/nonexistedFile.torrent');
         // console.log(e);
 
       }, function(e) {
@@ -57,11 +57,11 @@ describe('Analyzer', function(){
   });
 
 
-  it('loadTorrentFile - many files', function(){
+  it('_loadTorrentFile - many files', function(){
 
       var analyzer = new Analyzer();
 
-      var data = analyzer.loadTorrentFile(__dirname + '/fixtures/t1' + '/[NNM-Club.me]_Q3 2015.torrent');
+      var data = analyzer._loadTorrentFile(__dirname + '/fixtures/t1' + '/[NNM-Club.me]_Q3 2015.torrent');
 
       // console.log(data);
       var expected_first_three = [
