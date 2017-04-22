@@ -152,37 +152,69 @@ describe('Analyzer', function(){
 
   });
 
-
-
-
-  it('_addToHash', function(){
-
-    let location = '/test';
-    let inputArr = [{
-      dir:'folder1/Russian/mods/russian/scripts/screens',
-      base:'UpdateRussianDialog.lua',
-      length: 11160987,
-      torrent: location
-    },
-    {
-      dir:'folder1/Азия и Закавказье',
-      base:'aze20151005.nm7',
-      length: 26458135,
-      torrent: location
-    }];
-
-    let expected = {
-      'UpdateRussianDialog.lua:11160987': [inputArr[0]],
-      'aze20151005.nm7:26458135': [inputArr[1]]
-    };
+  it('pushRelative', function(){
 
     var analyzer = new Analyzer();
-    inputArr.forEach(input=>{
-      analyzer._addToHash(input);
+
+    assert.equal( analyzer.pushRelative('/a/b/c1.txt'), '/a/b/c1.txt', 'first item should be absolute path' );
+    assert.equal( analyzer.pushRelative('c2.txt'),      '/a/b/c2.txt' );
+    assert.equal( analyzer.pushRelative('../c3.txt'),   '/a/c3.txt' );
+    assert.equal( analyzer.pushRelative('b/c4.txt'),    '/a/b/c4.txt' );
+
+  });
+
+
+  describe('Matching stuff', function(){
+
+    var analyzer = new Analyzer();
+
+    it('_addToHash', function(){
+
+      let location = '/test';
+      let inputArr = [{
+        dir:'folder1/Russian/mods/russian/scripts/screens',
+        base:'UpdateRussianDialog.lua',
+        length: 11160987,
+        torrent: location
+      },
+      {
+        dir:'folder1/Азия и Закавказье',
+        base:'aze20151005.nm7',
+        length: 26458135,
+        torrent: location
+      }];
+
+      let expected = {
+        'UpdateRussianDialog.lua:11160987': [inputArr[0]],
+        'aze20151005.nm7:26458135': [inputArr[1]]
+      };
+
+      inputArr.forEach(input=>{
+        analyzer._addToHash(input);
+      });
+      assert.deepEqual(analyzer._hash, expected);
+
     });
-    assert.deepEqual(analyzer._hash, expected);
 
+    describe('_matchFile', function(){
 
+      it('simple', function(){
+        let filesToMatch = [
+          '/home/maksim/Projects/tlookup3/test/fixtures/t1/gog_sheltered_2.1.0.2.sh',
+          '../'.repeat(7) + '/home/maksim/Downloads/Q3 2015/Содружество и Скандинавия/earth20151005.nm7',
+          '../'.repeat(5) + '/home/maksim/somenonexisted'
+        ];
+
+        filesToMatch.forEach(file=>{
+          let mapping = analyzer._matchFile(file);
+
+          console.log(mapping);
+
+          // assert.deepEqual(analyzer._hash, expected);
+        });
+      });
+
+    });
   });
 
 
