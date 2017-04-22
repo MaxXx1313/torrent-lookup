@@ -9,10 +9,15 @@ describe('Analyzer', function(){
 
   let target = __dirname + '/fixtures/t2';
 
+
   it('simple scan', function(){
-
-
+      var analyzer = new Analyzer({
+        data:  target+ '/files.bin',
+        tdata: target+ '/torrents.bin',
+      });
+      analyzer.analyze();
   });
+
 
   it('loadTorrentFile - single file', function(){
 
@@ -27,7 +32,27 @@ describe('Analyzer', function(){
         torrent: __dirname + '/fixtures/t1/Sheltered [rutracker.org].t5364696.torrent'
       }];
       // console.log(data);
-      assert.deepEqual( data, expected);
+      assert.deepEqual( data, expected );
+
+
+  });
+
+
+  it('loadTorrentFile - no file', function(){
+
+      var analyzer = new Analyzer();
+
+      try{
+        analyzer.loadTorrentFile(__dirname + '/fixtures/t1' + '/nonexistedFile.torrent');
+      }catch(e){
+
+        // console.log(e);
+
+        assert.equal( e.code, 'ENOENT' );
+        return;
+      }
+
+      assert.fail('Should catch the error');
 
 
   });
@@ -56,7 +81,7 @@ describe('Analyzer', function(){
           torrent: __dirname+ '/fixtures/t1/[NNM-Club.me]_Q3 2015.torrent' }
       ];
 
-      assert.deepEqual( data.slice(0,3), expected_first_three);
+      assert.deepEqual( data.slice(0,3), expected_first_three );
   });
 
 

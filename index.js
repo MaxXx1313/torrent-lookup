@@ -1,7 +1,9 @@
 const commandLineArgs = require('command-line-args');
 const getUsage = require('command-line-usage');
+const assert = require('assert');
 
 const Scanner = require('./lib/TorrentScanner').TorrentScanner;
+const Analyzer = require('./lib/Analyzer').Analyzer;
 
 const LopConsole = require('./lib/LopConsole');
 let logger = new LopConsole();
@@ -34,29 +36,6 @@ const optionDefinitions = [
 
 
 
-const options = commandLineArgs(optionDefinitions);
-
-// console.log(options);
-if(options.help || !options.operation){
-  usage();
-  return;
-}
-
-switch(options.operation){
-
-  case OPERATION_SCAN:
-    startScan(options);
-    break;
-
-  case OPERATION_ANALYZE:
-    startAnalyze(options);
-    break;
-
-  default:
-    console.error('Unknown operation: %s', options.operation);
-}
-
-
 /**
  * Print usage
  */
@@ -87,15 +66,40 @@ function usage(){
 }
 
 
+
+////////////////////////////////////////////////////
+
+
+const options = commandLineArgs(optionDefinitions);
+
+// console.log(options);
+if(options.help || !options.operation){
+  usage();
+  return;
+}
+
+switch(options.operation){
+
+  case OPERATION_SCAN:
+    startScan(options);
+    break;
+
+  case OPERATION_ANALYZE:
+    startAnalyze(options);
+    break;
+
+  default:
+    console.error('Unknown operation: %s', options.operation);
+}
+
+
+
 /**
  *
  */
 function startScan(options){
 
-  if(!options.target){
-    console.log('location must be set');
-    return;
-  }
+  assert.ok(options.target);
 
   let scanner = new Scanner(options);
 
@@ -127,5 +131,6 @@ function startScan(options){
  *
  */
 function startAnalyze(options){
-
+  var analyzer = new Analyzer(options);
+  analyzer.analyze();
 }
