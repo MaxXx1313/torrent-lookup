@@ -4,37 +4,10 @@ const Transmission = require('../lib/push/Transmission').Transmission;
 
 describe('Transmission', function(){
 
-  it('ping', function(){
+  let t = new Transmission();
 
-    /*
-    let expected = {
-      arguments: {
-         activeTorrentCount: 3,
-         'cumulative-stats':
-          {
-            downloadedBytes: 300992964275,
-            filesAdded: 5654,
-            secondsActive: 22516515,
-            sessionCount: 205,
-            uploadedBytes: 455158229680
-          },
-         'current-stats': {
-            downloadedBytes: 0,
-            filesAdded: 0,
-            secondsActive: 3297,
-            sessionCount: 1,
-            uploadedBytes: 0
-          },
-          downloadSpeed: 0,
-          pausedTorrentCount: 234,
-          torrentCount: 237,
-          uploadSpeed: 0
-      },
-      result: 'success'
-    };
-    */
+  it('rpcRequest', function(){
 
-    let t = new Transmission();
     return t.rpcRequest('session-stats')
     .then(data=>{
       // console.log(data.body)
@@ -43,6 +16,22 @@ describe('Transmission', function(){
     })
 
   });
+
+
+
+  it('torrentAdd', function(){
+
+    let file = __dirname + '/fixtures/t1/Sheltered [rutracker.org].t5364696.torrent';
+    let location = __dirname + '/fixtures/t1/gog_sheltered_2.1.0.2.sh';
+
+    return t.torrentAdd(file, location, {paused:true})
+      .then(result=>{
+        // console.log(result);
+        assert.ok(result.id);
+        assert.ok(result.name);
+
+      });
+  })
 
 
 

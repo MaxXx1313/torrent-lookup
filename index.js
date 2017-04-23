@@ -5,6 +5,7 @@ const assert = require('assert');
 const Scanner = require('./lib/TorrentScanner').TorrentScanner;
 const Analyzer = require('./lib/Analyzer').Analyzer;
 const debounce = require('./lib/tools').debounce;
+const PushManager = require('./lib/push/PushManager').PushManager;
 
 const LopConsole = require('./lib/LopConsole');
 let logger = new LopConsole();
@@ -12,6 +13,7 @@ let logger = new LopConsole();
 
 const OPERATION_SCAN = 'scan';
 const OPERATION_ANALYZE = 'analyze';
+const OPERATION_PUSH = 'push';
 
 /**
  *
@@ -29,6 +31,12 @@ const optionDefinitions = [
 
   { name: 'data',   alias: 'd', type: String,
     defaultValue: '/tmp', description: 'folder to save data' },
+
+  { name: 'client',   alias: 'c', type: String,
+    description: 'client app to push torrents' },
+
+  { name: 'host',   alias: 'w', type: String,
+    description: 'client app endpoint (vary from clients' },
 ];
 
 
@@ -45,8 +53,17 @@ function usage(){
     {
       header: 'Operation',
       content:[
-        'scan - scan files',
-        'analyze - analyze the result files'
+        '[bold]{scan} - scan files',
+        '[bold]{analyze} - analyze the result files',
+        '[bold]{push} - push torrents to app'
+      ]
+    },
+    {
+      header: 'Clients',
+      content:[
+        'Most clients require remote access to be enabled!',
+        '',
+        '[bold]{t} or [bold]{transmission} - Transmission app',
       ]
     },
     {
@@ -91,11 +108,15 @@ if(options.help || !options.operation){
 switch(options.operation){
 
   case OPERATION_SCAN:
-    startScan(options);
+    scanFiles(options);
     break;
 
   case OPERATION_ANALYZE:
-    startAnalyze(options);
+    analyzeTorrents(options);
+    break;
+
+  case OPERATION_PUSH:
+    pushTorrents(options);
     break;
 
   default:
@@ -107,7 +128,7 @@ switch(options.operation){
 /**
  *
  */
-function startScan(options){
+function scanFiles(options){
 
   assert.ok(options.target);
 
@@ -142,7 +163,7 @@ function startScan(options){
 /**
  *
  */
-function startAnalyze(options){
+function analyzeTorrents(options){
   // assert.ok(options.data)
   // assert.ok(options.tdata)
   tick();
@@ -153,6 +174,27 @@ function startAnalyze(options){
     logger.log(' Done in %s ms', tick() );
   });
 }
+
+
+
+
+/**
+ *
+ */
+
+function pushTorrents(options){
+  assert.ok(options.client, 'Client must be set. use -c|--client to make it');
+
+  tick();
+  let client = new PushManager(options.client, options);
+  _bindEventListeners(client);
+  client.pushAll().then(()=>{
+    logger.log(' Done in %s ms', tick() );
+  });
+}
+
+
+
 
 function _bindEventListeners(target){
 
