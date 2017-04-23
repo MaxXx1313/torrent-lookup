@@ -256,6 +256,19 @@ describe('Analyzer', function(){
       assert.deepEqual(analyzer._mapping, expected);
     });
 
+
+    it('_makeDecision #1', function(){
+      let expected = [{
+        torrent:torrentLocation,
+        saveTo : '/home/maksim/Projects/tlookup3/test/fixtures/t1'
+      }];
+
+
+      let maps = analyzer._makeDecision();
+      assert.deepEqual(maps, expected);
+
+    });
+
   });
 
 
