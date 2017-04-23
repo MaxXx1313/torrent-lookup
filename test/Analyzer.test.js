@@ -269,6 +269,45 @@ describe('Analyzer', function(){
 
     });
 
+
+    it('_makeDecision #2', function(){
+      let mapping = {
+        '/downloads/torrent1.torrent' : [
+            {
+              dir:'dir1',
+              base: "file1.txt",
+              length: 1,
+              torrent: '/downloads/torrent1.torrent',
+
+              match:[
+                '/downloads/data1',
+                '/downloads/data2'
+              ]
+            }, {
+              dir:'dir2',
+              base: "file2.txt",
+              length: 1,
+              torrent: '/downloads/torrent1.torrent',
+
+              match:[
+                '/downloads/data2'
+              ]
+            }
+        ]
+      };
+
+      let expected = [{
+        torrent : '/downloads/torrent1.torrent',
+        saveTo: '/downloads/data2'
+      }];
+
+      let a = new Analyzer();
+      a._mapping = mapping;
+      let maps = a._makeDecision();
+      assert.deepEqual(maps, expected);
+
+    });
+
   });
 
 
