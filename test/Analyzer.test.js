@@ -168,11 +168,8 @@ describe('Analyzer', function(){
 
     var analyzer = new Analyzer();
 
-    it('_addToHash', function(){
-
-      let torrentLocation = '/test/sometorrent.torrent';
-
-      let inputArr = [{
+    let torrentLocation = '/test/sometorrent.torrent';
+    let inputArr = [{
         dir:'folder1/Russian/mods/russian/scripts/screens',
         base:'UpdateRussianDialog.lua',
         length: 11160987,
@@ -188,6 +185,9 @@ describe('Analyzer', function(){
         length: 26458135,
         torrent: torrentLocation
       }];
+
+
+    it('_addToHash', function(){
 
       let expected = {
         'UpdateRussianDialog.lua:11160987': [inputArr[0]],
@@ -211,14 +211,38 @@ describe('Analyzer', function(){
           ['/home/maksim/somenonexisted', 123]
         ];
 
-        console.log(analyzer._hash);
+        let foundItems = [
+          inputArr[0],
+          {
+            dir:'',
+            base: "gog_sheltered_2.1.0.2.sh",
+            length: 271816803,
+            torrent: torrentLocation,
+            match:[
+              path.dirname( filesToMatch[0][0] )
+            ]
+          },
+          inputArr[2]
+        ];
+        let expected = {
+          'UpdateRussianDialog.lua:11160987': [foundItems[0]],
+          'gog_sheltered_2.1.0.2.sh:271816803': [foundItems[1]],
+          'aze20151005.nm7:26458135': [foundItems[2]]
+        };
+
+
+
+        // console.log(analyzer._hash);
         filesToMatch.forEach(file=>{
           let mapping = analyzer._matchFile(file[0], file[1]);
 
-          console.log(mapping);
+          // console.log(mapping);
 
           // assert.deepEqual(analyzer._hash, expected);
         });
+        assert.deepEqual(analyzer._hash, expected);
+
+
       });
 
     });
