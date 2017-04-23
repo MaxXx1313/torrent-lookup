@@ -131,6 +131,7 @@ function startScan(options){
 
   scanner.on('end', function(){
     logger.log('Finished in %s sec', logger.elapsedLOP() );
+    logger.log('  Scanned %s files, found %s torrent files', scanner._stats.files, scanner._stats.torrents );
   });
 }
 

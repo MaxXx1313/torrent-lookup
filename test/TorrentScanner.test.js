@@ -29,6 +29,10 @@ describe('TorrentScanner', function(){
       target+ "/Sheltered [rutracker.org].t5364696.torrent",
       target+ "/[NNM-Club.me]_Q3 2015.torrent",
     ];
+    let statsExpected = {
+      files: 2,
+      torrents:2
+    };
 
     let targets = [];
     let files = [];
@@ -66,6 +70,8 @@ describe('TorrentScanner', function(){
       assert.deepEqual(files, expectedFiles, 'match files');
       assert.deepEqual(torrents, expectedTorrents, 'match torrent files');
       assert.deepEqual(folders, expectedFolders, 'match folders');
+
+      assert.deepEqual(scanner._stats, statsExpected, 'match statistic');
 
       done();
     }
@@ -117,6 +123,7 @@ describe('TorrentScanner', function(){
     let scanner = new TorrentScanner();
 
     let tests = [
+      ['/home/maksim/Projects/tlookup3/test/fixtures/t1/.skippedfolder', true],
       ['/subfolder/.config/asd', true],
       ['/subfolder/asd.config/asd', false],
 
