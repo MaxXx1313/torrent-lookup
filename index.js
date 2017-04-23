@@ -4,9 +4,9 @@ const assert = require('assert');
 
 const Scanner = require('./lib/TorrentScanner').TorrentScanner;
 const Analyzer = require('./lib/Analyzer').Analyzer;
-const debounce = require('./lib/tools').debounce;
-const PushManager = require('./lib/push/PushManager').PushManager;
+const PushManager = require('./lib/PushManager').PushManager;
 
+const debounce = require('./lib/tools').debounce;
 const LopConsole = require('./lib/LopConsole');
 let logger = new LopConsole();
 

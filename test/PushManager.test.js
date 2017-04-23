@@ -1,6 +1,6 @@
 
 const assert = require('assert');
-const PushManager = require('../lib/push/PushManager').PushManager;
+const PushManager = require('../lib/PushManager').PushManager;
 
 describe('PushManager', function(){
 
