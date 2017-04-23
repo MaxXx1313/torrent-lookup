@@ -204,6 +204,11 @@ describe('Analyzer', function(){
         length: 271816803,
         torrent: torrentLocation
       }, {
+        dir:'Q3 2015/Содружество и Скандинавия',
+        base:'earth20151005.nm7',
+        length: 1717822,
+        torrent: torrentLocation
+      }, {
         dir:'folder1/Азия и Закавказье',
         base:'aze20151005.nm7',
         length: 26458135,
@@ -228,10 +233,20 @@ describe('Analyzer', function(){
 
         // next is added:
         match:[
-          path.dirname( filesToMatch[0][0] )
+          path.join( filesToMatch[0][0], '..' )
+        ]
+      }, {
+        dir:'Q3 2015/Содружество и Скандинавия',
+        base:'earth20151005.nm7',
+        length: 1717822,
+        torrent: torrentLocation,
+
+        // next is added:
+        match:[
+          path.join( filesToMatch[1][0], '../../..' )
         ]
       },
-      inputArr[2]
+      inputArr[3]
     ];
 
 
@@ -240,7 +255,8 @@ describe('Analyzer', function(){
       let expected = {
         'UpdateRussianDialog.lua:11160987': [inputArr[0]],
         'gog_sheltered_2.1.0.2.sh:271816803': [inputArr[1]],
-        'aze20151005.nm7:26458135': [inputArr[2]]
+        'earth20151005.nm7:1717822': [inputArr[2]],
+        'aze20151005.nm7:26458135': [inputArr[3]]
       };
 
       inputArr.forEach(input=>{
@@ -256,7 +272,8 @@ describe('Analyzer', function(){
       let expected = {
         'UpdateRussianDialog.lua:11160987': [foundItems[0]],
         'gog_sheltered_2.1.0.2.sh:271816803': [foundItems[1]],
-        'aze20151005.nm7:26458135': [foundItems[2]]
+        'earth20151005.nm7:1717822': [foundItems[2]],
+        'aze20151005.nm7:26458135': [foundItems[3]]
       };
 
 
