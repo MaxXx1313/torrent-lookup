@@ -4,6 +4,7 @@ const assert = require('assert');
 
 const Scanner = require('./lib/TorrentScanner').TorrentScanner;
 const Analyzer = require('./lib/Analyzer').Analyzer;
+const debounce = require('./lib/tools').debounce;
 
 const LopConsole = require('./lib/LopConsole');
 let logger = new LopConsole();
@@ -112,10 +113,11 @@ function startScan(options){
 
   let scanner = new Scanner(options);
 
+
   scanner.scan(options.target);
-  scanner.on('scan', function(location){
-    logger.logLOP(location);
-  });
+  scanner.on('scan', debounce(function(location){
+      logger.logLOP(location);
+  }, 1000));
 
   // TODO: if progress:
   scanner.on('start', function(){
