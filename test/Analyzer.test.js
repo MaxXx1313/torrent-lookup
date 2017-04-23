@@ -17,11 +17,27 @@ describe('Analyzer', function(){
         tdata: target+ '/torrents.bin',
         rdata: target+ '/result.json',
       });
+
+      let eventsExpected = [
+        'Hashing data',
+        'Matching files',
+        'Hashing',
+        'Analyzing',
+        'Saving'
+      ];
+      let events = [];
+      let addEvent = function(msg){events.push(msg);};
+
+      analyzer.on('opStatus', addEvent);
+
       return analyzer.analyze()
         .then(()=>{
           var data = fs.readFileSync(target+ '/result.json');
           var dataExpected = fs.readFileSync(target+ '/result.expected.json');
+
           assert.deepEqual( JSON.parse(data.toString()), JSON.parse(dataExpected.toString()) );
+
+          assert.deepEqual( events, eventsExpected );
         });
   });
 

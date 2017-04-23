@@ -27,10 +27,10 @@ const optionDefinitions = [
     description:'scan folder' },
 
   { name: 'data',   alias: 'd', type: String,
-    defaultValue: 'tmp/files.bin', description: 'file to save/load indexed content' },
+    defaultValue: '/tmp/files.bin', description: 'file to save/load indexed content' },
 
   { name: 'tdata',              type: String,
-    defaultValue: 'tmp/torrents.bin'  , description: 'file to save/load torrent file list' },
+    defaultValue: '/tmp/torrents.bin'  , description: 'file to save/load torrent file list' },
 
 ];
 
@@ -44,6 +44,13 @@ function usage(){
     {
       header: 'tlookup',
       content: 'Scan files and match torrent files'
+    },
+    {
+      header: 'Operation',
+      content:[
+        'scan - scan files',
+        'analyze - analyze the result files'
+      ]
     },
     {
       header: 'Options',
@@ -66,6 +73,12 @@ function usage(){
 }
 
 
+let _tic_time = 0;
+function tick(){
+  let t = _tic_time;
+  _tic_time = Date.now();
+  return _tic_time - t;
+}
 
 ////////////////////////////////////////////////////
 
@@ -131,6 +144,22 @@ function startScan(options){
  *
  */
 function startAnalyze(options){
+  // assert.ok(options.data)
+  // assert.ok(options.tdata)
+  tick();
   var analyzer = new Analyzer(options);
-  analyzer.analyze();
+  _bindEventListeners(analyzer);
+  analyzer.analyze().then(()=>{
+
+    logger.log(' Done in %s ms', tick() );
+  });
 }
+
+function _bindEventListeners(target){
+
+  target.on('opStatus', function(status){
+    logger.log('  ' + status);
+  });
+
+}
+
