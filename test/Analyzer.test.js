@@ -311,6 +311,13 @@ describe('Analyzer', function(){
   });
 
 
+  it('_saveJson', function(){
+    let a = new Analyzer();
+    a._decision = [1,2,3];
+    return a.saveTo(target+'/decision.json');
+  });
+
+
 
 });
 
