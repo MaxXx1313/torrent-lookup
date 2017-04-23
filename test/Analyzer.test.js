@@ -15,7 +15,10 @@ describe('Analyzer', function(){
         data:  target+ '/files.bin',
         tdata: target+ '/torrents.bin',
       });
-      return analyzer.analyze();
+      return analyzer.analyze()
+        .then(()=>{
+
+        });
   });
 
 
@@ -293,12 +296,18 @@ describe('Analyzer', function(){
                 '/downloads/data2'
               ]
             }
+        ],
+        '/downloads/torrent2.torrent' : [
+          // no matter
         ]
       };
 
       let expected = [{
         torrent : '/downloads/torrent1.torrent',
         saveTo: '/downloads/data2'
+      },{
+        torrent : '/downloads/torrent2.torrent',
+        saveTo: undefined
       }];
 
       let a = new Analyzer();
