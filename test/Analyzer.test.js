@@ -2,6 +2,7 @@
 const Analyzer = require('../lib/Analyzer').Analyzer;
 const assert = require('assert');
 const path = require('path');
+const fs = require('fs');
 
 
 describe('Analyzer', function(){
@@ -14,10 +15,13 @@ describe('Analyzer', function(){
       var analyzer = new Analyzer({
         data:  target+ '/files.bin',
         tdata: target+ '/torrents.bin',
+        rdata: target+ '/result.json',
       });
       return analyzer.analyze()
         .then(()=>{
-
+          var data = fs.readFileSync(target+ '/result.json');
+          var dataExpected = fs.readFileSync(target+ '/result.expected.json');
+          assert.deepEqual( JSON.parse(data.toString()), JSON.parse(dataExpected.toString()) );
         });
   });
 
