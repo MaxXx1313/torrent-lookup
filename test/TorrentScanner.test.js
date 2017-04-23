@@ -13,7 +13,7 @@ describe('TorrentScanner', function(){
 
     let expectedTagets = [
       target,
-      target+ '/subfolder'
+      target+ '/subfolder',
     ];
     let expectedFiles = [
       target+ "/Sheltered [rutracker.org].t5364696.torrent:41955",
@@ -109,6 +109,28 @@ describe('TorrentScanner', function(){
       permitFolder(target+'/subfolder/test1.txt');
     });
     assert.equal( permitFolder(nonexistedfolder), true);
+  });
+
+
+  it('_isExcluded', function(){
+
+    let scanner = new TorrentScanner();
+
+    let tests = [
+      ['/subfolder/.config/asd', true],
+      ['/subfolder/asd.config/asd', false],
+
+      ['/subfolder/node_modules/asd', true],
+      ['/subfolder/nodemodules', false],
+
+    ];
+
+    tests.forEach(test=>{
+
+      assert.equal(scanner._isExcluded(test[0]), test[1]);
+
+    });
+
   });
 
 });
