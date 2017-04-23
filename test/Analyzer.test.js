@@ -13,9 +13,10 @@ describe('Analyzer', function(){
 
   it('simple analyze', function(){
       var analyzer = new Analyzer({
-        data:  target+ '/files.bin',
-        tdata: target+ '/torrents.bin',
-        rdata: target+ '/result.json',
+        data: target,
+        ddata: '/files.bin',
+        tdata: '/torrents.bin',
+        rdata: '/result.json',
       });
 
       let eventsExpected = [

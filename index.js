@@ -27,11 +27,7 @@ const optionDefinitions = [
     description:'scan folder' },
 
   { name: 'data',   alias: 'd', type: String,
-    defaultValue: '/tmp/files.bin', description: 'file to save/load indexed content' },
-
-  { name: 'tdata',              type: String,
-    defaultValue: '/tmp/torrents.bin'  , description: 'file to save/load torrent file list' },
-
+    defaultValue: '/tmp', description: 'folder to save data' },
 ];
 
 
