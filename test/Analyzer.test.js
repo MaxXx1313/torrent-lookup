@@ -187,6 +187,30 @@ describe('Analyzer', function(){
       }];
 
 
+
+    let filesToMatch = [
+      ['/home/maksim/Projects/tlookup3/test/fixtures/t1/gog_sheltered_2.1.0.2.sh', 271816803],
+      ['/home/maksim/Downloads/Q3 2015/Содружество и Скандинавия/earth20151005.nm7', 1717822],
+      ['/home/maksim/somenonexisted', 123]
+    ];
+
+    let foundItems = [
+      inputArr[0],
+      {
+        dir:'',
+        base: "gog_sheltered_2.1.0.2.sh",
+        length: 271816803,
+        torrent: torrentLocation,
+
+        // next is added:
+        match:[
+          path.dirname( filesToMatch[0][0] )
+        ]
+      },
+      inputArr[2]
+    ];
+
+
     it('_addToHash', function(){
 
       let expected = {
@@ -202,50 +226,36 @@ describe('Analyzer', function(){
 
     });
 
-    describe('_matchFile', function(){
 
-      it('simple', function(){
-        let filesToMatch = [
-          ['/home/maksim/Projects/tlookup3/test/fixtures/t1/gog_sheltered_2.1.0.2.sh', 271816803],
-          ['/home/maksim/Downloads/Q3 2015/Содружество и Скандинавия/earth20151005.nm7', 1717822],
-          ['/home/maksim/somenonexisted', 123]
-        ];
+    it('_matchFile', function(){
 
-        let foundItems = [
-          inputArr[0],
-          {
-            dir:'',
-            base: "gog_sheltered_2.1.0.2.sh",
-            length: 271816803,
-            torrent: torrentLocation,
-            match:[
-              path.dirname( filesToMatch[0][0] )
-            ]
-          },
-          inputArr[2]
-        ];
-        let expected = {
-          'UpdateRussianDialog.lua:11160987': [foundItems[0]],
-          'gog_sheltered_2.1.0.2.sh:271816803': [foundItems[1]],
-          'aze20151005.nm7:26458135': [foundItems[2]]
-        };
+      let expected = {
+        'UpdateRussianDialog.lua:11160987': [foundItems[0]],
+        'gog_sheltered_2.1.0.2.sh:271816803': [foundItems[1]],
+        'aze20151005.nm7:26458135': [foundItems[2]]
+      };
 
 
 
-        // console.log(analyzer._hash);
-        filesToMatch.forEach(file=>{
-          let mapping = analyzer._matchFile(file[0], file[1]);
-
-          // console.log(mapping);
-
-          // assert.deepEqual(analyzer._hash, expected);
-        });
-        assert.deepEqual(analyzer._hash, expected);
-
-
+      // console.log(analyzer._hash);
+      filesToMatch.forEach(file=>{
+        analyzer._matchFile(file[0], file[1]);
       });
+      assert.deepEqual(analyzer._hash, expected);
 
     });
+
+
+
+    it('_regroupHash', function(){
+
+      let expected = {};
+      expected[torrentLocation] = foundItems;
+
+      analyzer._regroupHash();
+      assert.deepEqual(analyzer._mapping, expected);
+    });
+
   });
 
 
