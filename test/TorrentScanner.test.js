@@ -1,13 +1,15 @@
 
 const TorrentScanner = require('../lib/TorrentScanner').TorrentScanner;
+const permitFolder = require('../lib/TorrentScanner').TorrentScanner.permitFolder;
 const assert = require('assert');
 const path = require('path');
 
 
 describe('TorrentScanner', function(){
 
+  let target = __dirname + '/fixtures/t1';
+
   it('simple scan', function(done){
-    let target = __dirname + '/fixtures/t1';
 
     let expectedTagets = [
       target,
@@ -94,6 +96,19 @@ describe('TorrentScanner', function(){
     assert.equal( scanner.shiftRelative('/a/c3.txt'),   '../c3.txt' );
     assert.equal( scanner.shiftRelative('/a/b/c4.txt'), 'b/c4.txt' );
 
+  });
+
+
+  it('permitFolder', function(){
+    let nonexistedfolder = 'tmp/nonexisted';
+    try{
+      fs.rmdirSync(nonexistedfolder);
+    }catch(e){}
+    assert.equal( permitFolder(target+'/subfolder'), true);
+    assert.throws(function(){
+      permitFolder(target+'/subfolder/test1.txt');
+    });
+    assert.equal( permitFolder(nonexistedfolder), true);
   });
 
 });
