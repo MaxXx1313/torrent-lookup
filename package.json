@@ -1,16 +1,20 @@
 {
   "name": "tlookup3",
   "version": "1.0.0",
-  "description": "",
+  "description": "Scan files and match torrent files",
   "main": "index.js",
+  "bin": {
+    "tlookup": "cli.js"
+  },
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "MaxXx1313 <fomy.smap@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "bencode": "^0.11.0",
