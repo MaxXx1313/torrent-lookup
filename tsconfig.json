@@ -1,0 +1,25 @@
+{
+  "files": [
+    "./**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ES2017",
+    "sourceMap": true,
+    "allowJs": true,
+
+    "types": [
+      // add node as an option
+      "node"
+    ],
+    // typeroots option has been previously configured
+    "typeroots": [
+      // add path to @types
+      "../node_modules/@types"
+    ]
+  }
+}

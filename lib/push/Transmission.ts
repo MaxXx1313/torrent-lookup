@@ -3,50 +3,70 @@
 const assert = require('assert');
 const http = require('http');
 const url = require('url');
+import { TorrentClientAdapter } from './TorrentClientAdapter';
 
 
 const CSRF_HEADER = 'x-transmission-session-id';
 const UNWANTED_THRESHOLD = 98;
 
+const ENDPOINT_DEFAULT = 'http://admin:admin@localhost:9091';
+
+
+/**
+ *
+ */
+interface TransmissionAdapterConfig {
+  endpoint?: string;
+}
+
+// interface TransmissionTorrentOptions {
+//   'filename': string;
+//   'download-dir': string;
+//   'files': string;
+//   "files-wanted": string;
+//   "files-unwanted": string;
+// }
+
 
 // https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt
-class Transmission {
+class Transmission extends TorrentClientAdapter {
+
+  private _config: TransmissionAdapterConfig;
+  private _csrf: string = null;
 
   /**
    *
    */
-  constructor(endpoint){
-    endpoint = endpoint || 'http://admin:admin@localhost:9091';
-
-    let parsed = url.parse(endpoint);
-    this._parsed = parsed;
-
-    this._csrf = null;
+  constructor(config: TransmissionAdapterConfig) {
+    super();
+    this._config = config || {};
+    this._config.endpoint = url.parse(this._config.endpoint || ENDPOINT_DEFAULT);
   }
 
   /**
-   * @implements IPushProvider
+   * @implements TorrentClientAdapter
    */
-  push(filename, downloadDir){
-    let self = this;
+  push(filename: string, downloadDir: string): Promise<any> {
     return this.torrentAdd(filename, downloadDir, {paused:false})
       .then(result=>{
-        return self._setWantedByPercentage(result.id, UNWANTED_THRESHOLD)
+        return this._setWantedByPercentage(result.id, UNWANTED_THRESHOLD)
           .then(()=>{
             return result;
           });
       });
   }
 
-  _setWantedByPercentage(torrentId, percentage){
-    let self = this;
+  /**
+   *
+   */
+  _setWantedByPercentage(torrentId: string, percentage: number): Promise<any> {
     percentage = percentage || UNWANTED_THRESHOLD;
 
     // set
-    return self.torrentGet(torrentId, ['files'])
-      .then(result=>result[0])
-      .then(torrentInfo=>{
-        torrentInfo.files.forEach(file=>{
+    return this.torrentGet(torrentId, ['files'])
+      .then(result => result[0])
+      .then(torrentInfo => {
+        torrentInfo.files.forEach(file => {
           file._percentage = 100 * file.bytesCompleted / file.length;
           file._wanted = file._percentage >= UNWANTED_THRESHOLD;
         });
@@ -63,7 +83,7 @@ class Transmission {
         // console.log(prettyFormat(torrentInfo.files));
         // console.log(unwantedFilesData);
 
-        return self.torrentSet(torrentId, {
+        return this.torrentSet(torrentId, {
           "files-wanted": wantedFilesData.wanted,
           "files-unwanted": wantedFilesData.unwanted
         });
@@ -81,8 +101,7 @@ class Transmission {
    *
    * @more: https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt#L356
    */
-  torrentAdd(filename, downloadDir, opts){
-    opts = opts || {};
+  torrentAdd(filename: string, downloadDir: string, opts = {}): Promise<any>{
     opts['filename'] = filename;
     opts['download-dir'] = downloadDir;
 
@@ -90,7 +109,10 @@ class Transmission {
       .then(this._torrentAddResponse.bind(this));
   }
 
-  _torrentAddResponse(res){
+  /**
+   *
+   */
+  _torrentAddResponse(res): any {
     let result = res.body.arguments['torrent-added'] || res.body.arguments['torrent-duplicate'];
     if(result){
       result.isNew = !!res.body.arguments['torrent-added'];
@@ -107,7 +129,7 @@ class Transmission {
    *
    * @more https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt#L127
    */
-  torrentGet(id, fields, opts){
+  torrentGet(id: number, fields: string[], opts?): Promise<any> {
     opts = opts || {};
 
     opts.ids = [id];
@@ -117,6 +139,9 @@ class Transmission {
     return this.rpcRequest('torrent-get', opts)
       .then(this._torrentGetResponse.bind(this));
   }
+  /**
+   *
+   */
   _torrentGetResponse(res){
     // console.log(res.body.arguments.torrents[0].files);
     // console.log(res.body.arguments.torrents[0].fileStats);
@@ -144,7 +169,7 @@ class Transmission {
   rpcRequest(method, data){
     let self = this;
 
-    let opts = clone(this._parsed);
+    let opts = clone(this._parsedUrl);
 
     let payload = {
       method: method,
@@ -217,72 +242,19 @@ class Transmission {
     return res;
   }
 
+  // "content-type":"application/json; charset=UTF-8"
+  static getContentType(contentTypeHeaderValue){
+    return ((""+contentTypeHeaderValue).match(/(.*?)(;|$)/) || [])[1];
+  }
+  //
+  static getCharset(contentTypeHeaderValue){
+    return ((""+contentTypeHeaderValue).match(/charset=(.*?)(;|$)/) || [])[1];
+  }
+
 }// -Transmission class
 
 
-/**
- *
- */
-function clone(obj){
-  return JSON.parse(JSON.stringify(obj));
-}
-
-/**
- * @param {object} opts : see https://nodejs.org/dist/latest-v6.x/docs/api/http.html#http_http_request_options_callback
- * @param {string} [postData]
- */
-function request(opts, postData){
-  return new Promise(function(resolve, reject){
-    let req = http.request(opts, function(res){
-
-      // console.log(`STATUS: ${res.statusCode}`);
-      // console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
-
-      let body = '';
-
-      // let charset = getCharset( res.headers["content-type"] );
-      // res.setEncoding( charset || 'utf8');
-      res.setEncoding( 'utf8');
-      res.on('data', (chunk) => {
-        // console.log(`BODY: ${chunk}`);
-        body += chunk;
-      });
-      res.on('end', () => {
-        res.body = body;
-        // console.log('No more data in response.');
-        if( res.statusCode >= 400){
-          reject(res);
-        } else {
-          resolve(res);
-        }
-      });
-    });
-
-
-    req.on('error', (e) => {
-      reject(e);
-    });
-
-    if(postData){
-      // write data to request body
-      req.write(postData);
-    }
-    req.end();
-
-  });
-}
-
-// "content-type":"application/json; charset=UTF-8"
-function getContentType(contentTypeHeaderValue){
-  return ((""+contentTypeHeaderValue).match(/(.*?)(;|$)/) || [])[1];
-}
-//
-function getCharset(contentTypeHeaderValue){
-  return ((""+contentTypeHeaderValue).match(/charset=(.*?)(;|$)/) || [])[1];
-}
 
 
 
-module.exports.Transmission = Transmission;
-module.exports.Transmission.getContentType = getContentType;
-module.exports.Transmission.getCharset = getCharset;
+

@@ -22,6 +22,10 @@
     "command-line-usage": "^4.0.0",
     "line-by-line": "^0.1.5",
     "minimatch": "^3.0.4",
+    "rxjs": "^5.5.6",
     "single-line-log": "^1.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^9.4.6"
   }
 }
