@@ -156,8 +156,8 @@ export class Analyzer {
         return promiseByLine(dFile, (fileInfo) => {
 
             // parse filepath and size
-            const [pathRelative, size] = fileInfo.match(/(.*):([-\d]+)$/) || [null, null];
-            if (!pathRelative && !size) {
+            const [m, pathRelative, size] = fileInfo.match(/(.*):([-\d]+)$/) || [null, null, null];
+            if (!m) {
                 return null;
             }
 

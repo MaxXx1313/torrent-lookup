@@ -15,6 +15,7 @@
   "scripts": {
     "test": "mocha",
     "tsc": "tsc",
+    "dev": "npm run tsc && npm start",
     "start": "node dist/bin/tlookup.js"
   },
   "keywords": [],
