@@ -7,7 +7,7 @@
     "node": "8"
   },
   "bin": {
-    "tlookup": "dist/bin/cli.js"
+    "tlookup": "dist/bin/tlookup.js"
   },
   "directories": {
     "test": "test"
@@ -15,7 +15,7 @@
   "scripts": {
     "test": "mocha",
     "tsc": "tsc",
-    "start": "node dist/bin/cli.js"
+    "start": "node dist/bin/tlookup.js"
   },
   "keywords": [],
   "author": "MaxXx1313 <fomy.smap@gmail.com>",

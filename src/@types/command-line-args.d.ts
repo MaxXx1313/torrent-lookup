@@ -11,7 +11,9 @@
 //          name: string;
 //          alias?: string; // char
 //          defaultOption?: boolean;
+//          multiple: boolean;
 //          type: any; // String,
+//          defaultValue?: any;
 //          description?: string
 //      }
 // }

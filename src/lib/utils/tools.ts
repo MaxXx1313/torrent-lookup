@@ -8,7 +8,7 @@ declare const Promise: any;
  * Run a function not more often than {@link timeout}
  * TODO: review
  */
-export function debounce(fn: Function, timeout: number){
+export function debounce<T>(fn: (T)=>any, timeout: number): (T)=>any {
   var caller = this;
 
   var pass = true;

@@ -6,13 +6,9 @@ import { readdir } from "./utils/fsPromise";
 import { Stats } from "fs";
 import { Observable } from "rxjs";
 import { QueueWorker } from "./QueueWorker";
-
-
-const SKIPS_DEFAULT = [
-    '.*',
-    'node_modules',
-    '/etc',
-];
+import { SCAN_SKIP_DEFAULT } from "./const";
+import { catchError } from "rxjs/operators";
+import ErrnoException = NodeJS.ErrnoException;
 
 
 /**
@@ -27,31 +23,31 @@ export interface FileScannerOption {
      */
     skip?: Array<string>;
 
-    cbFileFound: (location?: string, stats?: Stats)=>Promise<any>;
+    cbFileFound: (location?: string, stats?: Stats) => Promise<any>;
 
-    cbFolderFound?: (location?: string, stats?: Stats)=>Promise<any>;
-    cbOtherFound?: (location?: string, stats?: Stats)=>Promise<any>;
-    cbError?: (e?: Error, location?: string,)=>Promise<any>;
+    cbFolderFound?: (location?: string, stats?: Stats) => Promise<any>;
+    cbOtherFound?: (location?: string, stats?: Stats) => Promise<any>;
+    cbError?: (e?: Error, location?: string,) => Promise<any>;
 }
 
-
-/**
- *
- */
-export interface ScanResult {
-    path: string;
-    stats: Stats;
-}
 
 /**
  * recursive scan folder content
+ *
+ * @example:
+ *     function logFile(filename){
+ *         console.log('File was found:', filename);
+ *     }
+ *     const scanner = new Scanner({cbFileFound: logFile});
+ *     scanner.addTarget('/home/testuser');
+ *     scanner.run();
  */
-class FileScanner {
+export class FileScanner {
 
     /**
      *
      */
-    protected _skip = SKIPS_DEFAULT;
+    protected _skip = SCAN_SKIP_DEFAULT;
     protected _options: FileScannerOption;
 
     protected jobWorker: QueueWorker<string>;
@@ -63,15 +59,14 @@ class FileScanner {
      */
     constructor(options: FileScannerOption) {
         // super();
+        this.jobWorker = new QueueWorker(this.scanFolder.bind(this));
 
-        this._options = options;
-
-        Object.assign(this._options, {
+        this._options = Object.assign({}, {
             cbError: FileScanner.cbErrorDefault,
             cbFileFound: FileScanner.cbNoOperation,
             cbFolderFound: FileScanner.cbNoOperation,
             cbOtherFound: FileScanner.cbOtherFound,
-        });
+        }, options);
 
 
         if (this._options.skip) {
@@ -79,26 +74,36 @@ class FileScanner {
         }
     }
 
+
     /**
-     * start scanning process
+     * Add one or multiple targets
      * @param {string|Array<string>} target
      */
-    scan(target: string|string[]): Observable<string> {
-        if (!target) {
-            console.log('location must be set');
-            return;
-        }
+    addTarget(target: string | string[]) {
         const targets = Array.isArray(target) ? target : [target];
         const filteredTargets = targets.filter(loc => !this.isExcluded(loc));
 
-        return new Observable(subject => {
-            this.jobWorker = new QueueWorker(this._scanFolder);
-            this.jobWorker.addJobs(filteredTargets);
+        this.jobWorker.addJobs(filteredTargets);
+    }
 
-            this.jobWorker.onJob.subscribe(job => { subject.next(job); });
-            this.jobWorker.onStop.subscribe(() => { subject.complete(); });
-
-            this.jobWorker.run();
+    /**
+     * start scanning process
+     */
+    run(): Observable<string> {
+        return new Observable<string>(subject => {
+            this.jobWorker.onJob.subscribe(job => {
+                subject.next(job);
+            });
+            this.jobWorker.onStop.subscribe(() => {
+                subject.complete();
+            });
+            this.jobWorker.run()
+                .then(() => {
+                    subject.complete();
+                })
+                .catch(e => {
+                    subject.error(e);
+                });
         });
     }
 
@@ -127,8 +132,12 @@ class FileScanner {
     /**
      * @param location
      */
-    protected addTarget(location) {
-        this.jobWorker.addJob(location, !!'prepend');
+    protected async scanFolder(location: string): Promise<any> {
+        return Promise.resolve()
+            .then(()=>{
+            return this._scanFolder(location);
+        })
+        .catch(this._options.cbError.bind(this));
     }
 
     /**
@@ -139,8 +148,7 @@ class FileScanner {
 
         const folderEntries = await readdir(location);
 
-        for (var i = 0; i < folderEntries.length; i++) {
-
+        for (let i = folderEntries.length-1; i >= 0; i--) {
             // get absolute path
             const childLocation = path.join(location, folderEntries[i]);
 
@@ -149,16 +157,7 @@ class FileScanner {
             }
 
             // get stats
-            let stats;
-            try {
-                stats = fs.lstatSync(childLocation);
-            } catch (err) {
-                // skip no file and access warning
-                if (err.code != 'ENOENT') {
-                    await this._options.cbError(err, childLocation);
-                }
-            }
-
+            const stats = fs.lstatSync(childLocation);
             if (!stats) {
                 continue;
             }
@@ -171,7 +170,9 @@ class FileScanner {
             // console.log(self);
 
             if (stats.isDirectory()) {
-                this.addTarget(childLocation);
+                // addTarget() will validate entry with isExcluded() one more time. We don't need it here/already passed
+                // this.addTarget(childLocation);
+                this.jobWorker.addJob(childLocation, true);
                 await this._options.cbFolderFound(childLocation, stats);
             } else if (stats.isFile()) {
                 await this._options.cbFileFound(childLocation, stats);
@@ -185,8 +186,11 @@ class FileScanner {
     /**
      * @param {Error} err
      */
-    static cbErrorDefault(err:Error): Promise<any> {
-        console.warn(err);
+    static cbErrorDefault(err: ErrnoException): Promise<any> {
+        // skip no file and access warning
+        // if (err.code != 'ENOENT') {
+            console.warn('FileScanner:', err.message);
+        // }
         return Promise.resolve();
     }
 
@@ -200,7 +204,7 @@ class FileScanner {
     /**
      */
     static cbOtherFound(file: string, stats: Stats): Promise<any> {
-        console.warn('Skip unknown entry type:', file, stats);
+        console.warn('FileScanner: Skip unknown entry type:', file, stats);
         return Promise.resolve();
     }
 

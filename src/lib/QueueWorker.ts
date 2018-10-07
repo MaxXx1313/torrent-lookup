@@ -20,7 +20,7 @@ export class QueueWorker<T> {
     /**
      * @type {Array<T>}
      */
-    private _queue: T[];
+    private _queue: T[] = [];
 
     /**
      * @type {function}
@@ -62,6 +62,9 @@ export class QueueWorker<T> {
      *
      */
     run(): Promise<any> {
+        if (this._queue.length === 0) {
+            console.warn('QueueWorker: empty queue');
+        }
         return this._digest();
     }
 
