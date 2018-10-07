@@ -1,7 +1,7 @@
 {
   "files": [
     "./node_modules/@types/node/index.d.ts",
-    "./node_modules/@types/mocha/index.d.ts"
+//    "./node_modules/@types/mocha/index.d.ts",
   ],
   "include": [
     "src/**/*.ts"
@@ -12,18 +12,14 @@
 
   "compilerOptions": {
     "module": "commonjs",
-    "target": "ES2017",
+    "target": "es6",
     "sourceMap": true,
     "allowJs": true,
+    "outDir": "dist",
 
     "types": [
       // add node as an option
       "node"
-    ],
-    // typeroots option has been previously configured
-    "typeroots": [
-      // add path to @types
-      "../node_modules/@types"
     ]
   }
 }

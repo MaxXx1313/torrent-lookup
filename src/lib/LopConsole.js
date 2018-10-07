@@ -34,7 +34,7 @@ var LopConsole = (function () {
     /**
      * Start Long Opration
      */
-    LopConsole.prototype.startLOP = function () {
+    LopConsole.prototype.startLOP = function (args) {
         var _this = this;
         // console.log.apply(console, arguments);
         this.startTime = Date.now();

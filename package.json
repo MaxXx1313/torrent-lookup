@@ -7,7 +7,7 @@
     "node": "8"
   },
   "bin": {
-    "tlookup": "cli.js"
+    "tlookup": "dist/bin/cli.js"
   },
   "directories": {
     "test": "test"
@@ -15,7 +15,7 @@
   "scripts": {
     "test": "mocha",
     "tsc": "tsc",
-    "start": "node index.js"
+    "start": "node dist/bin/cli.js"
   },
   "keywords": [],
   "author": "MaxXx1313 <fomy.smap@gmail.com>",
@@ -28,5 +28,9 @@
     "minimatch": "^3.0.4",
     "rxjs": "^5.5.6",
     "single-line-log": "^1.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^10.11.4",
+    "typescript": "^3.1.1"
   }
 }

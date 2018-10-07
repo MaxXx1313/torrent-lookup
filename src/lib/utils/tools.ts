@@ -188,3 +188,16 @@ export function request(opts, postData: any = null){
 
   });
 }
+
+
+//## tick
+let _tic_time = 0;
+
+/**
+ *
+ */
+export function tick(){
+    let t = _tic_time;
+    _tic_time = Date.now();
+    return _tic_time - t;
+}

@@ -1,3 +1,5 @@
+import { FN_DATA_FILE, FN_MAPS_FILE, FN_TORRENTS_FILE } from "./const";
+
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
@@ -57,9 +59,9 @@ class Analyzer extends EventEmitter {
     // assert.ok(options.data, 'data location must be specified');
 
     this._options = {};
-    this._options.dFile = path.join(options.data, options.ddata || 'files.bin');
-    this._options.tFile = path.join(options.data, options.tdata || 'torrents.bin');
-    this._options.rFile = path.join(options.data, options.rdata || 'maps.json');
+    this._options.dFile = path.join(options.data, options.ddata || FN_DATA_FILE );
+    this._options.tFile = path.join(options.data, options.tdata || FN_TORRENTS_FILE );
+    this._options.rFile = path.join(options.data, options.rdata || FN_MAPS_FILE );
 
     /**
      * @type {MyHash}
