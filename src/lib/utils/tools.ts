@@ -19,7 +19,7 @@ export function debounce(fn: Function, timeout: number){
       pass = false;
       fn.apply(caller, arguments);
     }
-  }
+  };
 
   _debounce_fn['_debounce_timer'] = setInterval(function(){
     pass = true;
@@ -190,13 +190,24 @@ export function request(opts, postData: any = null){
 }
 
 
+/**
+ *
+ */
+export function nexTickPromise() {
+  return new Promise(resolve => {
+      process.nextTick(resolve);
+  });
+}
+
+
+
 //## tick
 let _tic_time = 0;
 
 /**
  *
  */
-export function tick(){
+export function tick() {
     let t = _tic_time;
     _tic_time = Date.now();
     return _tic_time - t;
