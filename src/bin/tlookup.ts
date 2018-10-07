@@ -8,6 +8,7 @@ import * as assert from 'assert';
 import * as LopConsole from '../lib/LopConsole';
 import { TorrentScanner, TorrentScannerEntry } from "../TorrentScanner";
 import { DEFAULT_WORKDIR_LOCATION } from "../lib/const";
+import { Analyzer } from "../Analyzer";
 
 const logger = new LopConsole();
 
@@ -99,17 +100,6 @@ switch (options.operation) {
 
 
 // stubs!
-class Analyzer {
-    constructor(...args) {
-    }
-
-    analyze(...args): Promise<any> {
-        return Promise.resolve(null)
-    }
-
-    on(...args) {
-    }
-}
 
 class PushManager {
     constructor(...args) {
@@ -242,28 +232,21 @@ function scanFiles(options: CliOptions) {
 
 }
 
-
 /**
  *
  */
-interface AnalyzeCliOptions {
-    /**
-     * project folder location
-     */
-    target: string;
-}
-
-/**
- *
- */
-function analyzeTorrents(options: AnalyzeCliOptions) {
+function analyzeTorrents(options: CliOptions) {
     // assert.ok(options.data)
     // assert.ok(options.tdata)
     tick();
-    var analyzer = new Analyzer(options);
-    _bindEventListeners(analyzer);
-    analyzer.analyze().then(() => {
+    const analyzer = new Analyzer({
+        workdir: options.tmp
+    });
 
+    analyzer.opStatus.subscribe(status => {
+        logger.log(status);
+    });
+    analyzer.analyze().then(() => {
         logger.log(' Done in %s ms', tick());
     });
 }
