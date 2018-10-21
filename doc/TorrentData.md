@@ -18,7 +18,7 @@
     "length": 271816803,
     "name": "gog_sheltered_2.1.0.2.sh",
     "piece length": 131072,
-    "pieces": "a_lot_of_binary_data",
+    "pieces": "___a_lot_of_binary_data___",
     "private": 0,
 
     "files":[

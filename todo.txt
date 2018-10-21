@@ -1,0 +1,16 @@
+# https://docs.npmjs.com/files/package.json#os
+
+* check torrent push
+  * make nice exceptions
+
+* create "main": "dist/lib.js",
+* export TorrentPusher
+* create bugs repo and fill package.lson : "bugs"
+* create repo (repository field)
+
+* add '#!/usr/bin/env node'
+* 'man' file? (https://docs.npmjs.com/files/package.json#man)
+* restructure the app: "dist/lib"
+
+* check on mac and windows, and linux as well ("os" : [ "darwin", "linux" ],)
+

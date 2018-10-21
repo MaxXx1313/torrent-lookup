@@ -1,26 +1,40 @@
 {
-  "name": "tlookup3",
+  "name": "tlookup",
   "version": "1.0.0",
-  "description": "Scan files and match torrent files",
-  "main": "index.js",
+  "description": "Command-line tool for looking torrent files and downloaded content. Match them together and add it to your favorite torrent client.",
+  "keywords": ["torrents", "match"],
+
+  "author": "MaxXx1313 <fomy.smap@gmail.com>",
+  "license": "ISC",
+  "bugs":{ 
+    "url" : "https://github.com/owner/project/issues", 
+    "email" : "project@hostname.com"
+  },
+
+  "main": "dist/lib.js",
+  "files": [
+    "dist/**"
+  ],
+  "directories": {
+    "test": "test",
+    "bin": "dist/bin",
+    "lib": "dist/lib"
+  },
+  
   "engines": {
     "node": "8"
   },
+
   "bin": {
     "tlookup": "dist/bin/tlookup.js"
   },
-  "directories": {
-    "test": "test"
-  },
   "scripts": {
-    "test": "mocha",
+    "test": "npm run tsc && mocha",
     "tsc": "tsc",
-    "dev": "npm run tsc && npm start",
-    "start": "node dist/bin/tlookup.js"
+    "dev": "npm run tsc && npm start \"$@\"",
+    "build": "npm run tsc",
+    "start": "node dist/bin/tlookup.js \"$@\""
   },
-  "keywords": [],
-  "author": "MaxXx1313 <fomy.smap@gmail.com>",
-  "license": "ISC",
   "dependencies": {
     "bencode": "^0.11.0",
     "command-line-args": "^4.0.2",

@@ -179,7 +179,7 @@ export class Analyzer {
      *
      * Matching is quite challenged task
      *  1. try to match exact file + size
-     //*  2. try to match exact filename
+     *  TODO: 2. try to match exact filename
      */
     _matchFile(location: string, size: number) {
 
