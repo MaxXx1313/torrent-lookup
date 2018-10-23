@@ -5,15 +5,17 @@ import * as commandLineUsage from 'command-line-usage';
 import * as assert from 'assert';
 
 
-import * as LopConsole from '../lib/LopConsole';
 import { TorrentScanner, TorrentScannerEntry } from "../TorrentScanner";
 import { DEFAULT_WORKDIR_LOCATION } from "../lib/const";
 import { Analyzer } from "../Analyzer";
+import { Pusher } from "../lib/Pusher";
 
+const LopConsole = require('../lib/LopConsole');
 const logger = new LopConsole();
 
 
 const OPERATION_SCAN = 'scan';
+
 const OPERATION_ANALYZE = 'analyze';
 const OPERATION_PUSH = 'push';
 
@@ -98,21 +100,6 @@ switch (options.operation) {
         console.error('Unknown operation: %s', options.operation);
 }
 
-
-// stubs!
-
-class PushManager {
-    constructor(...args) {
-    }
-
-    pushAll(...args): Promise<any> {
-        return Promise.resolve(null)
-    }
-
-    on(...args) {
-    }
-}
-
 ////////////////////////////////////////////////////
 
 
@@ -168,22 +155,6 @@ function usage() {
     ];
     const usageTxt = commandLineUsage(sections);
     console.log(usageTxt);
-}
-
-
-/**
- *
- */
-interface ScanCliOptions {
-    /**
-     * scan folder location
-     */
-    target: string;
-
-    /**
-     * Workspace location
-     */
-    tmp: string;
 }
 
 
@@ -255,42 +226,19 @@ function analyzeTorrents(options: CliOptions) {
 /**
  *
  */
-interface PushCliOptions {
-    /**
-     * project folder location
-     */
-    target: string;
-    client: string;
-    o: any;
-}
-
-
-/**
- *
- */
-function pushTorrents(options: PushCliOptions) {
-    assert.ok(options.client, 'Client must be set. use -c|--client to make it');
+function pushTorrents(options: CliOptions) {
+    // assert.ok(options.client, 'Client must be set. use -c|--client to make it');
 
     tick();
-    let client = new PushManager(options.client, options);
-    _bindEventListeners(client);
-    client.pushAll().then(() => {
+    const pusher = new Pusher(options);
+    pusher.opStatus.subscribe(status => {
+        logger.log(status);
+    });
+    pusher.pushAll().then(() => {
         logger.log(' Done in %s ms', tick());
     });
 }
 
-
-/**
- * @param target
- * @private
- */
-function _bindEventListeners(target) {
-
-    target.on('opStatus', function (status) {
-        logger.log('  ' + status);
-    });
-
-}
 
 
 

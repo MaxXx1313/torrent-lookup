@@ -1,9 +1,9 @@
 import { clone, request } from "../utils/tools";
+import { ITorrentClient, PushResult } from './TorrentClientAdapter';
+
 
 const assert = require('assert');
-const http = require('http');
 const url = require('url');
-import { TorrentClientAdapter } from './TorrentClientAdapter';
 
 
 const CSRF_HEADER = 'x-transmission-session-id';
@@ -29,7 +29,7 @@ interface TransmissionAdapterConfig {
 
 
 // https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt
-export class Transmission extends TorrentClientAdapter {
+export class Transmission implements ITorrentClient {
 
     private _config: TransmissionAdapterConfig;
     private _csrf: string = null;
@@ -41,23 +41,34 @@ export class Transmission extends TorrentClientAdapter {
      *
      */
     constructor(config: TransmissionAdapterConfig) {
-        super();
-        this._config = config || {};
-        this._config.endpoint = url.parse(this._config.endpoint || ENDPOINT_DEFAULT);
+
+        this._config = Object.assign({}, {
+            endpoint: ENDPOINT_DEFAULT
+        }, config);
 
         //
         this._endpointParsed = url.parse(this._config.endpoint);
     }
 
+    // "content-type":"application/json; charset=UTF-8"
+    static getContentType(contentTypeHeaderValue) {
+        return (("" + contentTypeHeaderValue).match(/(.*?)(;|$)/) || [])[1];
+    }
+
+    //
+    static getCharset(contentTypeHeaderValue) {
+        return (("" + contentTypeHeaderValue).match(/charset=(.*?)(;|$)/) || [])[1];
+    }
+
     /**
-     * @implements TorrentClientAdapter
+     * @implements ITorrentClient
      */
-    push(filename: string, downloadDir: string): Promise<any> {
+    push(filename: string, downloadDir: string): Promise<PushResult> {
         return this.torrentAdd(filename, downloadDir, {paused: false})
             .then(result => {
                 return this._setWantedByPercentage(result.id, UNWANTED_THRESHOLD)
                     .then(() => {
-                        return result;
+                        return result as PushResult;
                     });
             });
     }
@@ -76,7 +87,7 @@ export class Transmission extends TorrentClientAdapter {
         opts['download-dir'] = downloadDir;
 
         return this.rpcRequest('torrent-add', opts)
-            .then((res) =>  {
+            .then((res) => {
                 let result = res.body.arguments['torrent-added'] || res.body.arguments['torrent-duplicate'];
                 if (result) {
                     result.isNew = !!res.body.arguments['torrent-added'];
@@ -86,7 +97,6 @@ export class Transmission extends TorrentClientAdapter {
                 }
             });
     }
-
 
     /**
      * @param {Array<number>} id
@@ -111,8 +121,6 @@ export class Transmission extends TorrentClientAdapter {
             });
     }
 
-
-
     /**
      * @param {Array<number>} id
      * @param {object} opts
@@ -125,6 +133,39 @@ export class Transmission extends TorrentClientAdapter {
             });
     }
 
+    /**
+     *
+     */
+    _rpcResponse(res) {
+        if (res.body && res.body.result) {
+            if (res.body.result !== "success") {
+                throw new Error(res.body.result || 'Transmission reports an error');
+            }
+        }
+        return res;
+    }
+
+    /**
+     *
+     */
+    _rpcResponseJson(res) {
+        let ct = Transmission.getContentType(res.headers["content-type"]);
+
+        if (ct == "application/json") {
+            res.body = JSON.parse(res.body); // throws error
+        }
+        return res;
+    }
+
+    /**
+     *
+     */
+    _collectCsrf(res) {
+        if (res.headers[CSRF_HEADER]) {
+            this._csrf = res.headers[CSRF_HEADER];
+        }
+        return res;
+    }
 
     /**
      * Mark files inside torrent file to download
@@ -160,10 +201,6 @@ export class Transmission extends TorrentClientAdapter {
 
 
     }
-
-
-
-
 
     /**
      *
@@ -208,53 +245,6 @@ export class Transmission extends TorrentClientAdapter {
                     throw res;
                 }
             });
-    }
-
-    /**
-     *
-     */
-    _rpcResponse(res) {
-        if (res.body && res.body.result) {
-            if (res.body.result !== "success") {
-                throw new Error(res.body.result || 'Transmission reports an error');
-            }
-        }
-        return res;
-    }
-
-    /**
-     *
-     */
-    _rpcResponseJson(res) {
-        let ct = Transmission.getContentType(res.headers["content-type"]);
-
-        if (ct == "application/json") {
-            res.body = JSON.parse(res.body); // throws error
-        }
-        return res;
-    }
-
-    /**
-     *
-     */
-    _collectCsrf(res) {
-        if (res.headers[CSRF_HEADER]) {
-            this._csrf = res.headers[CSRF_HEADER];
-        }
-        return res;
-    }
-
-
-
-
-    // "content-type":"application/json; charset=UTF-8"
-    static getContentType(contentTypeHeaderValue) {
-        return (("" + contentTypeHeaderValue).match(/(.*?)(;|$)/) || [])[1];
-    }
-
-    //
-    static getCharset(contentTypeHeaderValue) {
-        return (("" + contentTypeHeaderValue).match(/charset=(.*?)(;|$)/) || [])[1];
     }
 
 }// -Transmission class

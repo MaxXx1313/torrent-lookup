@@ -1,8 +1,8 @@
 
 const assert = require('assert');
-const PushManager = require('../lib/PushManager').PushManager;
+const PushManager = require('../lib/Pusher').PushManager;
 
-describe('PushManager', function(){
+describe('Pusher', function(){
 
   let torrents = {};
   let i = 0;

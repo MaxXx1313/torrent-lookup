@@ -1,13 +1,16 @@
 "use strict";
-var util = require('util');
-var singleLog = require('single-line-log').stdout;
-var ANIMATION_DELAY = 100;
+const util = require('util');
+const singleLog = require('single-line-log').stdout;
+
+
+
+const ANIMATION_DELAY = 100;
 
 
 /**
  * Console long operation mode
  */
-var LopConsole = (function () {
+const LopConsole = (function () {
     /**
      *
      */

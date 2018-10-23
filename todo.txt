@@ -13,4 +13,5 @@
 * restructure the app: "dist/lib"
 
 * check on mac and windows, and linux as well ("os" : [ "darwin", "linux" ],)
+* set windows path for temp directory (in constants)
 
