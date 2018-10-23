@@ -31,9 +31,9 @@
   "scripts": {
     "test": "npm run tsc && mocha",
     "tsc": "tsc",
-    "dev": "npm run tsc && npm start \"$@\"",
+    "dev": "npm run tsc && npm start",
     "build": "npm run tsc",
-    "start": "node dist/bin/tlookup.js \"$@\""
+    "start": "node dist/bin/tlookup.js"
   },
   "dependencies": {
     "bencode": "^0.11.0",
