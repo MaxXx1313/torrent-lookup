@@ -17,7 +17,7 @@ const Transmission = require('./push/Transmission').Transmission;
 export interface PusherOptions {
     client: string;
     workdir?: string;
-    o?: any[];
+    option?: any[];
 }
 
 /**

@@ -67,7 +67,7 @@ const optionDefinitions = [
     },
 
     {
-        name: 'o', type: String,
+        name: 'option', alias: 'o', type: String,
         multiple: true,
         description: 'client app options (for ex.: "-o endpoint=localhost:8080"). Look into documentation for the client app for details '
     },
@@ -75,8 +75,9 @@ const optionDefinitions = [
 
 
 const options = commandLineArgs(optionDefinitions);
-
+options.option = parseOptions(options.option || []);
 // console.log(options);
+
 if (options.help || !options.operation) {
     usage();
     process.exit(0);
@@ -157,6 +158,26 @@ function usage() {
     console.log(usageTxt);
 }
 
+
+/**
+ * Parse options like "endpoint=localhost:8080" to key-value object
+ */
+function parseOptions(options:string[]): any {
+    return options.map(o => {
+        const m = o.match(/^([\w-]+)(?:=(.*))?$/);
+        if(!m) {
+            console.error('Cannot recognize option:', o);
+        } else {
+            return { name: m[1], value: m[2] || true};
+        }
+    }).reduce((res, item) => {
+        if(res[item.name]) {
+            console.error('Multiple values for option are not supported:', item.name);
+        }
+        res[item.name] = item.value;
+        return res;
+    }, {});
+}
 
 /**
  *

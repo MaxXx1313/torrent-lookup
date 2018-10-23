@@ -1,14 +1,14 @@
 import * as fs from 'fs';
+import { Stats } from 'fs';
 import * as path from 'path';
 
 import * as minimatch from 'minimatch';
 import { readdir } from "./utils/fsPromise";
-import { Stats } from "fs";
 import { Observable } from "rxjs";
 import { QueueWorker } from "./QueueWorker";
 import { SCAN_SKIP_DEFAULT } from "./const";
-import { catchError } from "rxjs/operators";
 import ErrnoException = NodeJS.ErrnoException;
+
 
 
 /**
