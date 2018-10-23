@@ -26,11 +26,12 @@ const OPERATION_PUSH = 'push';
 interface CliOptions {
     operation: string;
     help: boolean;
+    verbose: boolean;
 
     target: string;
     tmp: string;
     client: string;
-    o: any[];
+    option: any[];
 }
 
 
@@ -43,7 +44,7 @@ const optionDefinitions = [
         description: 'Operation. one of \'scan\', \'analyze\' TODO '
     },
 
-    // { name: 'verbose', alias: 'v', type: Boolean },
+    { name: 'verbose', alias: 'v', type: Boolean, defaultValue: false, description: 'verbose otput' },
     {
         name: 'help', alias: 'h', type: Boolean,
         description: 'print help'
@@ -55,6 +56,7 @@ const optionDefinitions = [
         multiple: true,
         description: 'scan folder'
     },
+    // { name: 'all', type: Boolean, defaultValue: false, description: 'scan all available targets' },
 
     {
         name: 'tmp', type: String,
@@ -81,6 +83,10 @@ options.option = parseOptions(options.option || []);
 if (options.help || !options.operation) {
     usage();
     process.exit(0);
+}
+
+if(options.verbose) {
+    console.log('Woring directory:', options.tmp);
 }
 
 switch (options.operation) {

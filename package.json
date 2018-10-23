@@ -2,15 +2,16 @@
   "name": "tlookup",
   "version": "1.0.0",
   "description": "Command-line tool for looking torrent files and downloaded content. Match them together and add it to your favorite torrent client.",
-  "keywords": ["torrents", "match"],
-
+  "keywords": [
+    "torrents",
+    "match"
+  ],
   "author": "MaxXx1313 <fomy.smap@gmail.com>",
   "license": "ISC",
-  "bugs":{ 
-    "url" : "https://github.com/owner/project/issues", 
-    "email" : "project@hostname.com"
+  "bugs": {
+    "url": "https://github.com/owner/project/issues",
+    "email": "project@hostname.com"
   },
-
   "main": "dist/lib.js",
   "files": [
     "dist/**"
@@ -20,11 +21,9 @@
     "bin": "dist/bin",
     "lib": "dist/lib"
   },
-  
   "engines": {
     "node": "8"
   },
-
   "bin": {
     "tlookup": "dist/bin/tlookup.js"
   },

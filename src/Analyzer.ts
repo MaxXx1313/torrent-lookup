@@ -187,15 +187,19 @@ export class Analyzer {
 
         // 1. match exact file + size
         const key = pathInfo.base + ':' + size;
-        // console.log(key);
+        // if(pathInfo.base == 'file3.txt'){
+        //     console.log('_matchFile', key);
+        // }
         if (this._hash[key]) {
 
             const matchTorrentInfo = this._hash[key];
+            // console.log('matchTorrentInfo', matchTorrentInfo);
             matchTorrentInfo.forEach(item => {
 
                 // TODO: 'no-relocate-inside-torrent' option
                 // 2. match path
                 let savedTo = this.__getBasePath(pathInfo.dir, item.dir);
+                // console.log(' matched', pathInfo.dir, item.dir, savedTo);
                 if (savedTo) {
                     // matched!
                     item.match = item.match || [];
@@ -215,7 +219,7 @@ export class Analyzer {
         if (dir == '') {
             return location;
         }
-        if (location.endsWith('/' + dir)) {
+        if (location.endsWith(path.sep + dir)) {
             return location.substr(0, location.length - dir.length - 1);
         }
         return null;
@@ -363,6 +367,7 @@ export class Analyzer {
      */
     _addToHash(torrentInfo: TorrentProcessingInfo) {
         let key = torrentInfo.base + ':' + torrentInfo.length;
+        console.log('_addToHash', key);
         if (!this._hash[key]) {
             this._hash[key] = [];
         }

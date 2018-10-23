@@ -1,7 +1,7 @@
 # https://docs.npmjs.com/files/package.json#os
 
 * check torrent push
-  * make nice exceptions
+  * make nice exceptions for all cases when push fails
 
 * create "main": "dist/lib.js",
 * export TorrentPusher
@@ -14,4 +14,6 @@
 
 * check on mac and windows, and linux as well ("os" : [ "darwin", "linux" ],)
 * set windows path for temp directory (in constants)
+
+* use nice glob
 

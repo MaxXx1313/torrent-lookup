@@ -72,6 +72,11 @@ export class FileScanner {
         if (this._options.skip) {
             this._skip.push.apply(this._skip, this._options.skip);
         }
+
+        // HOTFIX: 1 of 2
+        if (process.platform == 'win32') {
+            this._skip = this._skip.map(s => s.toLowerCase());
+        }
     }
 
 
@@ -113,26 +118,44 @@ export class FileScanner {
      * @private
      */
     isExcluded(location) {
-        // console.log('_isExcluded', location);
-        let locationComponents = location.split(path.sep);
+        // let locationComponents = location.split(path.sep);
 
+        // HOTFIX: 2 of 2
+        if (process.platform == 'win32') {
+            location = location.toLowerCase();
+        }
+
+        let excluded = false;
         for (let i = this._skip.length - 1; i >= 0; i--) {
             let skipRule = this._skip[i];
 
-            let m = minimatch.match(locationComponents, skipRule) || [];
-            // console.log('  minimatch', skipRule, m);
-            if (m.length > 0) {
-                return true;
+            // TODO: find a good glob matcher
+            // let m = minimatch.match(locationComponents, skipRule, { debug: false, nocase: process.platform == 'win32' }) || [];
+            // let m = minimatch(location, skipRule, { debug: false, nocase: process.platform == 'win32' });
+            // console.log(' minimatch', skipRule, m);
+            // if (m.length > 0 ) {
+            // if (m) {
+            if (location.indexOf(skipRule) >=0 ) {
+                excluded = true;
+                break;
             }
         }
-        return false;
+        // console.log('_isExcluded', location, excluded);
+        // process.exit(2);
+        return excluded;
     }
 
 
     /**
+     * @description It a job=)
      * @param location
      */
     protected async scanFolder(location: string): Promise<any> {
+        //fix windows drive root
+        if (location.match(/^\w{1}:\\?$/)) {
+            // location is "C:" o "C:\"
+            location = location.substr(0, 2) + '/';
+        }
         return Promise.resolve()
             .then(()=>{
             return this._scanFolder(location);
@@ -146,7 +169,9 @@ export class FileScanner {
     protected async _scanFolder(location: string): Promise<any> {
         let self = this;
 
+        console.log('_scanFolder: "%s"', location);
         const folderEntries = await readdir(location);
+        // console.log('_scanFolder: "%s"', location, folderEntries);
 
         for (let i = folderEntries.length-1; i >= 0; i--) {
             // get absolute path
