@@ -14,6 +14,14 @@ interface FileWriteOptions {
 /**
  *
  */
+interface FileReadOptions {
+  encoding?: string | null;
+  flag?: string;
+}
+
+/**
+ *
+ */
 export function writeFile(location: string, data: any, opts: FileWriteOptions = {}): Promise<any> {
   return new Promise((resolve, reject) => {
     fs.writeFile(location, data, opts, function(err) {
@@ -25,6 +33,23 @@ export function writeFile(location: string, data: any, opts: FileWriteOptions = 
     });
   });
 }
+
+
+/**
+ *
+ */
+export function readFile(location: string, opts: FileReadOptions = {}): Promise<any> {
+  return new Promise((resolve, reject) => {
+    fs.readFile(location, opts, function(err, data) {
+      if(err){
+        reject(err)
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
+
 
 
 

@@ -9,15 +9,16 @@ import { TorrentScanner, TorrentScannerEntry } from "../TorrentScanner";
 import { DEFAULT_WORKDIR_LOCATION } from "../lib/const";
 import { Analyzer } from "../Analyzer";
 import { Pusher } from "../lib/Pusher";
+import { Info } from "../Info";
 
 const LopConsole = require('../lib/LopConsole');
 const logger = new LopConsole();
 
 
 const OPERATION_SCAN = 'scan';
-
 const OPERATION_ANALYZE = 'analyze';
 const OPERATION_PUSH = 'push';
+const OPERATION_INFO = 'info';
 
 
 /**
@@ -41,7 +42,7 @@ interface CliOptions {
 const optionDefinitions = [
     {
         name: 'operation', type: String, defaultOption: true,
-        description: 'Operation. one of \'scan\', \'analyze\' TODO '
+        description: 'Operation. one of \'scan\', \'analyze\', \'push\', \'info\' '
     },
 
     { name: 'verbose', alias: 'v', type: Boolean, defaultValue: false, description: 'verbose otput' },
@@ -103,6 +104,10 @@ switch (options.operation) {
         pushTorrents(options);
         break;
 
+    case OPERATION_INFO:
+        info(options);
+        break;
+
     default:
         console.error('Unknown operation: %s', options.operation);
 }
@@ -129,6 +134,7 @@ function usage() {
                 '[bold]{scan} - scan files',
                 '[bold]{analyze} - analyze the result files',
                 '[bold]{push} - push torrents to app'
+                '[bold]{info} - print analyze info'
             ]
         },
         {
@@ -239,7 +245,7 @@ function analyzeTorrents(options: CliOptions) {
     tick();
     const analyzer = new Analyzer({
         workdir: options.tmp
-    });
+    });     
 
     analyzer.opStatus.subscribe(status => {
         logger.log(status);
@@ -267,6 +273,11 @@ function pushTorrents(options: CliOptions) {
 }
 
 
-
+function info(options: CliOptions) {
+    const info = new Info(options);
+    info.getInfo().then((stats) => {
+        logger.log(' Matches:', stats.maps);
+    });
+}
 
 
