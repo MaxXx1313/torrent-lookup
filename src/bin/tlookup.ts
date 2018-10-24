@@ -8,7 +8,7 @@ import * as assert from 'assert';
 import { TorrentScanner, TorrentScannerEntry } from "../TorrentScanner";
 import { DEFAULT_WORKDIR_LOCATION } from "../lib/const";
 import { Analyzer } from "../Analyzer";
-import { Pusher } from "../lib/Pusher";
+import { Pusher } from "../Pusher";
 import { Info } from "../Info";
 
 const LopConsole = require('../lib/LopConsole');
@@ -122,7 +122,7 @@ function usage() {
     const sections = [
         {
             header: 'Usage',
-            content: '$ tlookup [bold]{operation} [bold]{--target|-t}=<DIR> [-d|-o|-h]'
+            content: '$ tlookup [bold]{operation} [bold]{--target|-t}=<DIR> [-d|-o|-h|-c]'
         },
         {
             header: 'Description',
@@ -133,7 +133,7 @@ function usage() {
             content: [
                 '[bold]{scan} - scan files',
                 '[bold]{analyze} - analyze the result files',
-                '[bold]{push} - push torrents to app'
+                '[bold]{push} - push torrents to app',
                 '[bold]{info} - print analyze info'
             ]
         },
@@ -248,10 +248,10 @@ function analyzeTorrents(options: CliOptions) {
     });     
 
     analyzer.opStatus.subscribe(status => {
-        logger.log(status);
+        console.log(status);
     });
     analyzer.analyze().then(() => {
-        logger.log(' Done in %s ms', tick());
+        console.log(' Done in %s ms', tick());
     });
 }
 
@@ -265,10 +265,10 @@ function pushTorrents(options: CliOptions) {
     tick();
     const pusher = new Pusher(options);
     pusher.opStatus.subscribe(status => {
-        logger.log(status);
+        console.log(status);
     });
     pusher.pushAll().then(() => {
-        logger.log(' Done in %s ms', tick());
+        console.log(' Done in %s ms', tick());
     });
 }
 
@@ -276,8 +276,12 @@ function pushTorrents(options: CliOptions) {
 function info(options: CliOptions) {
     const info = new Info(options);
     info.getInfo().then((stats) => {
-        logger.log(' Matches:', stats.maps);
+        console.log(' Matches:', stats.maps);
     });
 }
 
-
+process.on('unhandledRejection', (reason, p) => {
+  console.log('Unhandled Rejection:', reason);
+  // application specific logging, throwing an error, or other logic here
+  process.exit(1);
+});

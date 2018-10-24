@@ -1,14 +1,14 @@
-import { DEFAULT_WORKDIR_LOCATION, FN_MAPS_FILE } from "./const";
+import { DEFAULT_WORKDIR_LOCATION, FN_MAPS_FILE } from "./lib/const";
 import { Subject } from "rxjs";
-import { ITorrentClient } from "./push/TorrentClientAdapter";
-import { TorrentMapping } from "../Analyzer";
+import { ITorrentClient } from "./lib/push/TorrentClientAdapter";
+import { TorrentMapping } from "./Analyzer";
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { chainPromise } from "./utils/tools";
+import { chainPromise } from "./lib/utils/tools";
 
 
-const Transmission = require('./push/Transmission').Transmission;
+const Transmission = require('./lib/push/Transmission').Transmission;
 
 
 /**
@@ -50,7 +50,7 @@ export class Pusher {
      */
     static getClient(options: PusherOptions): ITorrentClient {
         // TODO: autodetect client
-        if (options.client) {
+        if (!options.client) {
             throw new Error('Client not set');
         }
         switch (options.client) {
