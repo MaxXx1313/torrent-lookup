@@ -8,8 +8,8 @@
   "author": "MaxXx1313 <fomy.smap@gmail.com>",
   "license": "ISC",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/MaxXx1313/torrent-lookup.git"
+    "type": "git",
+    "url": "https://github.com/MaxXx1313/torrent-lookup.git"
   },
   "bugs": {
     "url": "https://github.com/MaxXx1313/torrent-lookup/issues",
@@ -34,7 +34,7 @@
     "test": "npm run tsc && mocha",
     "tsc": "tsc",
     "dev": "npm run tsc && npm start -- ",
-    "build": "npm run tsc",
+    "build": "npm run tsc; chmod +x ./dist/bin/tlookup.js",
     "start": "node dist/bin/tlookup.js"
   },
   "dependencies": {

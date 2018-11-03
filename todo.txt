@@ -4,18 +4,26 @@
   * make nice exceptions for all cases when push fails
 
 + create "main": "dist/lib.js",
-* export TorrentPusher
+  * export TorrentPusher
 + create bugs repo and fill package.json : "bugs"
 + create repo (repository field)
 
 + add '#!/usr/bin/env node'
 * 'man' file? (https://docs.npmjs.com/files/package.json#man)
-* restructure the app: "dist/lib"
+* restructure the app: "dist/lib" + 'op', utils
+* make tlookup-transmission
+* read tlookup-* for help
+* rename: scan->find, all->scan
+* create autodetect for tlookup-* clients:
+  * which transmission-gtk / where ping (https://superuser.com/questions/207707/what-is-windows-equivalent-of-the-which-command-in-unix-is-there-an-equivale)
 
 * check on mac
 * check on linux
 * check on windows
-* set windows path for temp directory (in constants)
++ set windows path for temp directory (in constants)
 
 * use nice glob
+
+
+* make scan + analyzer
 
