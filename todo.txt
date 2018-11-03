@@ -3,16 +3,18 @@
 * check torrent push
   * make nice exceptions for all cases when push fails
 
-* create "main": "dist/lib.js",
++ create "main": "dist/lib.js",
 * export TorrentPusher
-* create bugs repo and fill package.lson : "bugs"
-* create repo (repository field)
++ create bugs repo and fill package.json : "bugs"
++ create repo (repository field)
 
-* add '#!/usr/bin/env node'
++ add '#!/usr/bin/env node'
 * 'man' file? (https://docs.npmjs.com/files/package.json#man)
 * restructure the app: "dist/lib"
 
-* check on mac and windows, and linux as well ("os" : [ "darwin", "linux" ],)
+* check on mac
+* check on linux
+* check on windows
 * set windows path for temp directory (in constants)
 
 * use nice glob

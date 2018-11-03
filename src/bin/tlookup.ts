@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { debounce, tick } from "../lib/utils/tools";
 
 import * as commandLineArgs from 'command-line-args';
@@ -245,7 +247,7 @@ function analyzeTorrents(options: CliOptions) {
     tick();
     const analyzer = new Analyzer({
         workdir: options.tmp
-    });     
+    });
 
     analyzer.opStatus.subscribe(status => {
         console.log(status);
