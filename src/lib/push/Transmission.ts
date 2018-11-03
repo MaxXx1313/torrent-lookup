@@ -60,6 +60,15 @@ export class Transmission implements ITorrentClient {
         return (("" + contentTypeHeaderValue).match(/charset=(.*?)(;|$)/) || [])[1];
     }
 
+
+    /**
+     * @implements ITorrentClient
+     */
+    isInstalled(): Promise<boolean> {
+        // TODO: implement isInstalled
+        // child_process.execFile(file[, args][, options][, callback])
+    }
+
     /**
      * @implements ITorrentClient
      */
