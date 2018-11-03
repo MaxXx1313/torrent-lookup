@@ -3,7 +3,7 @@
 * check torrent push
   * make nice exceptions for all cases when push fails
 
-+ create "main": "dist/lib.js",
+* create "main": "dist/lib.js",
   * export TorrentPusher
 + create bugs repo and fill package.json : "bugs"
 + create repo (repository field)
