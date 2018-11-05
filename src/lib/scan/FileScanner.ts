@@ -3,10 +3,10 @@ import { Stats } from 'fs';
 import * as path from 'path';
 
 import * as minimatch from 'minimatch';
-import { readdir } from "./utils/fsPromise";
+import { readdir } from "../utils/fsPromise";
 import { Observable } from "rxjs";
 import { QueueWorker } from "./QueueWorker";
-import { SCAN_SKIP_DEFAULT } from "./const";
+import { SCAN_SKIP_DEFAULT } from "../const";
 import ErrnoException = NodeJS.ErrnoException;
 
 
@@ -44,14 +44,13 @@ export interface FileScannerOption {
  */
 export class FileScanner {
 
+    public readonly jobWorker: QueueWorker<string>;
+
     /**
      *
      */
     protected _skip = SCAN_SKIP_DEFAULT;
     protected _options: FileScannerOption;
-
-    protected jobWorker: QueueWorker<string>;
-
 
     /**
      *
@@ -94,22 +93,8 @@ export class FileScanner {
     /**
      * start scanning process
      */
-    run(): Observable<string> {
-        return new Observable<string>(subject => {
-            this.jobWorker.onJob.subscribe(job => {
-                subject.next(job);
-            });
-            this.jobWorker.onStop.subscribe(() => {
-                subject.complete();
-            });
-            this.jobWorker.run()
-                .then(() => {
-                    subject.complete();
-                })
-                .catch(e => {
-                    subject.error(e);
-                });
-        });
+    run(): Promise<any> {
+        return this.jobWorker.run();
     }
 
 

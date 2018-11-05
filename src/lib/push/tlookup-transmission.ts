@@ -29,7 +29,7 @@ interface TransmissionAdapterConfig {
 
 
 // https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt
-export class Transmission implements ITorrentClient {
+export class TlookupTransmission implements ITorrentClient {
 
     private _config: TransmissionAdapterConfig;
     private _csrf: string = null;
@@ -158,7 +158,7 @@ export class Transmission implements ITorrentClient {
      *
      */
     _rpcResponseJson(res) {
-        let ct = Transmission.getContentType(res.headers["content-type"]);
+        let ct = TlookupTransmission.getContentType(res.headers["content-type"]);
 
         if (ct == "application/json") {
             res.body = JSON.parse(res.body); // throws error

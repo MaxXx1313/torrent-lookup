@@ -1,14 +1,14 @@
-import { DEFAULT_WORKDIR_LOCATION, FN_MAPS_FILE } from "./lib/const";
+import { DEFAULT_WORKDIR_LOCATION, FN_MAPS_FILE } from "../const";
 import { Subject } from "rxjs";
 import { ITorrentClient } from "./lib/push/TorrentClientAdapter";
-import { TorrentMapping } from "./Analyzer";
+import { TorrentMapping } from "../analyze/Analyzer";
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { chainPromise } from "./lib/utils/tools";
+import { chainPromise } from "../utils/tools";
 
 
-const Transmission = require('./lib/push/Transmission').Transmission;
+const Transmission = require('./lib/push/Transmission').TlookupTransmission;
 
 
 /**

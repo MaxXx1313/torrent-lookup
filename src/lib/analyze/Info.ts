@@ -1,8 +1,8 @@
-import { DEFAULT_WORKDIR_LOCATION, FN_MAPS_FILE } from "./lib/const";
+import { DEFAULT_WORKDIR_LOCATION, FN_MAPS_FILE } from "../const";
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { readFile } from "./lib/utils/fsPromise";
+import { readFile } from "../utils/fsPromise";
 import { TorrentMapping } from "./Analyzer";
 
 

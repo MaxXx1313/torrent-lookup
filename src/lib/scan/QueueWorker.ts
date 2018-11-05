@@ -1,5 +1,5 @@
 import { Subject } from "rxjs";
-import { nexTickPromise } from "./utils/tools";
+import { nexTickPromise } from "../utils/tools";
 
 /**
  * Created by maksim on 01/12/16.

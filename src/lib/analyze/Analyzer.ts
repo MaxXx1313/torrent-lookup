@@ -1,10 +1,10 @@
-import { DEFAULT_WORKDIR_LOCATION, FN_DATA_FILE, FN_MAPS_FILE, FN_TORRENTS_FILE } from "./lib/const";
+import { DEFAULT_WORKDIR_LOCATION, FN_DATA_FILE, FN_MAPS_FILE, FN_TORRENTS_FILE } from "../const";
 
 import * as fs from 'fs';
 import * as path from 'path';
 import { Subject } from "rxjs";
 import { TorrentData } from "bencode";
-import { writeFile } from "./lib/utils/fsPromise";
+import { writeFile } from "../utils/fsPromise";
 
 const LineByLineReader = require('line-by-line');
 const bencode = require('bencode');

@@ -6,19 +6,14 @@ import * as commandLineArgs from 'command-line-args';
 import * as commandLineUsage from 'command-line-usage';
 import * as assert from 'assert';
 
-
-import { TorrentScanner, TorrentScannerEntry } from "../TorrentScanner";
 import { DEFAULT_WORKDIR_LOCATION } from "../lib/const";
-import { Analyzer } from "../Analyzer";
-import { Pusher } from "../Pusher";
-import { Info } from "../Info";
+import { Analyzer, Info, Pusher, TorrentScanner, TorrentScannerEntry } from "../lib/main";
 
-const LopConsole = require('../lib/LopConsole');
+const LopConsole = require('../lib/utils/LopConsole');
 const logger = new LopConsole();
 
 
-const OPERATION_SCAN = 'scan';
-const OPERATION_ANALYZE = 'analyze';
+const OPERATION_FIND = 'find';
 const OPERATION_PUSH = 'push';
 const OPERATION_INFO = 'info';
 
@@ -44,10 +39,10 @@ interface CliOptions {
 const optionDefinitions = [
     {
         name: 'operation', type: String, defaultOption: true,
-        description: 'Operation. one of \'scan\', \'analyze\', \'push\', \'info\' '
+        description: 'Operation. one of \'find\', \'push\', \'info\' '
     },
 
-    { name: 'verbose', alias: 'v', type: Boolean, defaultValue: false, description: 'verbose otput' },
+    { name: 'verbose', alias: 'v', type: Boolean, defaultValue: false, description: 'verbose output' },
     {
         name: 'help', alias: 'h', type: Boolean,
         description: 'print help'
@@ -57,7 +52,7 @@ const optionDefinitions = [
     {
         name: 'target', alias: 't', type: String,
         multiple: true,
-        description: 'scan folder'
+        description: 'scan folder',
     },
     // { name: 'all', type: Boolean, defaultValue: false, description: 'scan all available targets' },
 
@@ -68,9 +63,8 @@ const optionDefinitions = [
 
     {
         name: 'client', alias: 'c', type: String,
-        description: 'client app to push torrents'
+        description: 'client app to push torrents (operation=push)'
     },
-
     {
         name: 'option', alias: 'o', type: String,
         multiple: true,
@@ -88,28 +82,22 @@ if (options.help || !options.operation) {
     process.exit(0);
 }
 
-if(options.verbose) {
-    console.log('Woring directory:', options.tmp);
+if (options.verbose) {
+    console.log('Working directory:', options.tmp);
 }
 
 switch (options.operation) {
-
-    case OPERATION_SCAN:
-        scanFiles(options);
+    case OPERATION_FIND:
+        scanFiles(options).then(()=>{
+            return analyzeTorrents(options);
+        });
         break;
-
-    case OPERATION_ANALYZE:
-        analyzeTorrents(options);
-        break;
-
     case OPERATION_PUSH:
         pushTorrents(options);
         break;
-
     case OPERATION_INFO:
         info(options);
         break;
-
     default:
         console.error('Unknown operation: %s', options.operation);
 }
@@ -124,7 +112,7 @@ function usage() {
     const sections = [
         {
             header: 'Usage',
-            content: '$ tlookup [bold]{operation} [bold]{--target|-t}=<DIR> [-d|-o|-h|-c]'
+            content: '$ tlookup [bold]{operation} [bold]{--target|-t}=<folder>'
         },
         {
             header: 'Description',
@@ -133,39 +121,33 @@ function usage() {
         {
             header: 'Operation',
             content: [
-                '[bold]{scan} - scan files',
-                '[bold]{analyze} - analyze the result files',
-                '[bold]{push} - push torrents to app',
-                '[bold]{info} - print analyze info'
+                '[bold]{find} - scan files, find torrent files and it\'s downloads',
+                '[bold]{push} - push torrents to client',
+                '[bold]{info} - print scan info'
             ]
         },
         {
             header: 'Options',
             optionList: optionDefinitions,
-            // group:'_none'
         },
-        // {
-        //   header: 'Scanner options',
-        //   optionList: optionDefinitions,
-        //   group:'scanner'
-        // },
-        // {
-        //   header: 'Analyzer options',
-        //   optionList: optionDefinitions,
-        //   group:'analyzer'
-        // }
-
         {
             header: 'Clients',
             content: [
                 'Most clients require remote access to be enabled!',
-                '',
-                '[bold]{t} or [bold]{transmission} - Transmission app',
+            ]
+        },
+        {
+            content: [
+                // TODO: load dynamically
+                { name: 'transmission', alias: 't', summary: ' Transmission app' }
             ]
         },
         {
             header: 'Examples',
-            content: '$ tlookup scan -t /home'
+            content: [
+                { desc: 'Scan home folders', example: '$ tlookup find -t /home' },
+                { desc: 'Push result to transmission', example: '$ tlookup push -c t' },
+            ]
         },
     ];
     const usageTxt = commandLineUsage(sections);
@@ -176,16 +158,16 @@ function usage() {
 /**
  * Parse options like "endpoint=localhost:8080" to key-value object
  */
-function parseOptions(options:string[]): any {
+function parseOptions(options: string[]): any {
     return options.map(o => {
         const m = o.match(/^([\w-]+)(?:=(.*))?$/);
-        if(!m) {
+        if (!m) {
             console.error('Cannot recognize option:', o);
         } else {
-            return { name: m[1], value: m[2] || true};
+            return { name: m[1], value: m[2] || true };
         }
     }).reduce((res, item) => {
-        if(res[item.name]) {
+        if (res[item.name]) {
             console.error('Multiple values for option are not supported:', item.name);
         }
         res[item.name] = item.value;
@@ -196,22 +178,10 @@ function parseOptions(options:string[]): any {
 /**
  *
  */
-function scanFiles(options: CliOptions) {
-
+function scanFiles(options: CliOptions): Promise<any> {
     assert.ok(options.target, 'target must be specified');
 
-
-    let scanner = new TorrentScanner({
-        target: options.target,
-        workdir: options.tmp
-    });
-
-    // SCAN
-    logger.startLOP('scanning');
-    scanner.run()
-        .subscribe(_onProgress, _onError, _onEnd);
-
-    const logDebounced = debounce(function(entry) {
+    const logDebounced = debounce(function (entry) {
         logger.logLOP(entry.location);
     }, 1000);
 
@@ -225,23 +195,30 @@ function scanFiles(options: CliOptions) {
     }
 
 
-    function _onError(e) {
-        logger.stopLOP();
-        console.error(e);
-    }
+    //
+    const scanner = new TorrentScanner({
+        target: options.target,
+        workdir: options.tmp
+    });
 
-    function _onEnd() {
+    // SCAN
+    scanner.onEntry.subscribe(_onProgress);
+
+    logger.startLOP('scanning');
+    return scanner.run().then(() => {
         logger.stopLOP();
         logger.log('Finished in %s sec', logger.elapsedLOP());
         logger.log('  Scanned %s files, found %s torrent files', scanner.stats.files, scanner.stats.torrents);
-    }
-
+    }).catch((e) => {
+        logger.stopLOP();
+        throw e;
+    });
 }
 
 /**
  *
  */
-function analyzeTorrents(options: CliOptions) {
+function analyzeTorrents(options: CliOptions): Promise<any> {
     // assert.ok(options.data)
     // assert.ok(options.tdata)
     tick();
@@ -252,8 +229,8 @@ function analyzeTorrents(options: CliOptions) {
     analyzer.opStatus.subscribe(status => {
         console.log(status);
     });
-    analyzer.analyze().then(() => {
-        console.log(' Done in %s ms', tick());
+    return analyzer.analyze().then(() => {
+        console.log(' Analyzed in %s ms', tick());
     });
 }
 
@@ -261,7 +238,7 @@ function analyzeTorrents(options: CliOptions) {
 /**
  *
  */
-function pushTorrents(options: CliOptions) {
+function pushTorrents(options: CliOptions):Promise<any> {
     // assert.ok(options.client, 'Client must be set. use -c|--client to make it');
 
     tick();
@@ -269,21 +246,28 @@ function pushTorrents(options: CliOptions) {
     pusher.opStatus.subscribe(status => {
         console.log(status);
     });
-    pusher.pushAll().then(() => {
-        console.log(' Done in %s ms', tick());
+    return pusher.pushAll().then(() => {
+        console.log(' Pushed in %s ms', tick());
     });
 }
 
 
-function info(options: CliOptions) {
+/**
+ *
+ */
+function info(options: CliOptions): Promise<any> {
     const info = new Info(options);
-    info.getInfo().then((stats) => {
+    return info.getInfo().then((stats) => {
         console.log(' Matches:', stats.maps);
     });
 }
 
+
+/**
+ *
+ */
 process.on('unhandledRejection', (reason, p) => {
-  console.log('Unhandled Rejection:', reason);
-  // application specific logging, throwing an error, or other logic here
-  process.exit(1);
+    console.log('Unhandled Rejection:', reason);
+    // application specific logging, throwing an error, or other logic here
+    process.exit(1);
 });

@@ -7,12 +7,12 @@
 * use nice glob
 
 file moves:
-* rename: scan->find, all->scan
++ rename: scan->find, all->scan
 * make scan + analyzer
-* add: detect command
+- add: detect command
 
 * restructure the app: "dist/lib" + 'op', utils
-* make tlookup-transmission
++ make tlookup-transmission
 * read tlookup-* for help
 * create "main": "dist/lib.js",
   * export TorrentPusher

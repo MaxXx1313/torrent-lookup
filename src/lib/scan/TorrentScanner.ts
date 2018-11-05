@@ -1,10 +1,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as assert from 'assert';
-import { DEFAULT_WORKDIR_LOCATION, FN_DATA_FILE, FN_MAPS_FILE, FN_TORRENTS_FILE, TORRENT_EXTENSION } from "./lib/const";
-import { pesistFolderSync } from "./lib/utils/fsPromise";
+import { DEFAULT_WORKDIR_LOCATION, FN_DATA_FILE, FN_MAPS_FILE, FN_TORRENTS_FILE, TORRENT_EXTENSION } from "../const";
+import { pesistFolderSync } from "../utils/fsPromise";
 import { Stats, WriteStream } from "fs";
-import { FileScanner } from "./lib/FileScanner";
+import { FileScanner } from "./FileScanner";
 import { Observable, Subject } from "rxjs";
 
 
@@ -101,16 +101,12 @@ export class TorrentScanner {
     /**
      *
      */
-    run(): Observable<TorrentScannerEntry> {
-
+    run(): Promise<any> {
         // SCAN
-        this._beforeScan();
-        this.scanner.run()
-            .subscribe(null, null, () => {
-                this._afterScan();
-                this.onEntry.complete();
-            });
-        return this.onEntry;
+        return Promise.resolve()
+            .then(()=>this._beforeScan())
+            .then(()=>this.scanner.run())
+            .then(()=>this._afterScan());
     }
 
     /**
@@ -121,7 +117,6 @@ export class TorrentScanner {
 
         const dataFileName = path.join(this.options.workdir, FN_DATA_FILE);
         const torrFileName = path.join(this.options.workdir, FN_TORRENTS_FILE);
-        // const mapsFileName = path.join(this.options.workdir, FN_MAPS_FILE);
 
         this.resetStats();
         this._lastFile = null;
@@ -132,9 +127,11 @@ export class TorrentScanner {
     /**
      * Perform operations after scan
      */
-    protected _afterScan(): void {
-        this._dataFileStream.end();
-        this._torrFileStream.end();
+    protected _afterScan(): Promise<any> {
+        return Promise.all([
+            new Promise((resolve) => { this._dataFileStream.end(resolve); }),
+            new Promise((resolve) => { this._torrFileStream.end(resolve); }),
+        ]);
     }
 
 
