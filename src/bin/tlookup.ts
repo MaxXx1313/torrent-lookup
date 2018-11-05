@@ -72,36 +72,40 @@ const optionDefinitions = [
     },
 ];
 
+// run main
+(async function(){
+    tick();
 
-const options = commandLineArgs(optionDefinitions);
-options.option = parseOptions(options.option || []);
-// console.log(options);
+    const options = commandLineArgs(optionDefinitions);
+    options.option = parseOptions(options.option || []);
+    // console.log(options);
 
-if (options.help || !options.operation) {
-    usage();
-    process.exit(0);
-}
+    if (options.help || !options.operation) {
+        usage();
+        process.exit(0);
+    }
 
-if (options.verbose) {
-    console.log('Working directory:', options.tmp);
-}
+    if (options.verbose) {
+        console.log('Working directory:', options.tmp);
+    }
 
-switch (options.operation) {
-    case OPERATION_FIND:
-        scanFiles(options).then(()=>{
-            return analyzeTorrents(options);
-        });
-        break;
-    case OPERATION_PUSH:
-        pushTorrents(options);
-        break;
-    case OPERATION_INFO:
-        info(options);
-        break;
-    default:
-        console.error('Unknown operation: %s', options.operation);
-}
+    switch (options.operation) {
+        case OPERATION_FIND:
+            await scanFiles(options);
+            await analyzeTorrents(options);
+            break;
+        case OPERATION_PUSH:
+            await pushTorrents(options);
+            break;
+        case OPERATION_INFO:
+            await info(options);
+            break;
+        default:
+            console.error('Unknown operation: %s', options.operation);
+    }
 
+    console.log(' Done in %s ms', tick());
+})();
 ////////////////////////////////////////////////////
 
 
@@ -181,8 +185,8 @@ function parseOptions(options: string[]): any {
 function scanFiles(options: CliOptions): Promise<any> {
     assert.ok(options.target, 'target must be specified');
 
-    const logDebounced = debounce(function (entry) {
-        logger.logLOP(entry.location);
+    const logDebounced = debounce(function (str) {
+        logger.logLOP(str);
     }, 1000);
 
     function _onProgress(entry: TorrentScannerEntry) {
@@ -190,7 +194,7 @@ function scanFiles(options: CliOptions): Promise<any> {
             logger.log('Torrent file found:', entry.location);
         } else {
             // logger.logLOP(entry.location);
-            logDebounced(entry);
+            logDebounced(entry.location);
         }
     }
 
@@ -207,7 +211,6 @@ function scanFiles(options: CliOptions): Promise<any> {
     logger.startLOP('scanning');
     return scanner.run().then(() => {
         logger.stopLOP();
-        logger.log('Finished in %s sec', logger.elapsedLOP());
         logger.log('  Scanned %s files, found %s torrent files', scanner.stats.files, scanner.stats.torrents);
     }).catch((e) => {
         logger.stopLOP();
@@ -219,19 +222,13 @@ function scanFiles(options: CliOptions): Promise<any> {
  *
  */
 function analyzeTorrents(options: CliOptions): Promise<any> {
-    // assert.ok(options.data)
-    // assert.ok(options.tdata)
-    tick();
     const analyzer = new Analyzer({
         workdir: options.tmp
     });
-
     analyzer.opStatus.subscribe(status => {
         console.log(status);
     });
-    return analyzer.analyze().then(() => {
-        console.log(' Analyzed in %s ms', tick());
-    });
+    return analyzer.analyze();
 }
 
 
@@ -241,14 +238,11 @@ function analyzeTorrents(options: CliOptions): Promise<any> {
 function pushTorrents(options: CliOptions):Promise<any> {
     // assert.ok(options.client, 'Client must be set. use -c|--client to make it');
 
-    tick();
     const pusher = new Pusher(options);
     pusher.opStatus.subscribe(status => {
         console.log(status);
     });
-    return pusher.pushAll().then(() => {
-        console.log(' Pushed in %s ms', tick());
-    });
+    return pusher.pushAll();
 }
 
 
