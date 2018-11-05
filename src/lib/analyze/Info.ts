@@ -17,10 +17,6 @@ export interface InfoOptions {
     tmp?: string;
 }
 
-export interface Stat {
-    maps: number;
-}
-
 /**
  *
  */
@@ -41,15 +37,9 @@ export class Info {
     /**
      *
      */
-    getInfo(): Promise<Stat> {
+    getMapping(): Promise<TorrentMapping[]> {
         const mapsFileName = path.join(this.options.tmp, FN_MAPS_FILE);
-
-        return this.loadResultFile(mapsFileName)
-            .then(mapData => {
-                return {
-                    maps: mapData.length
-                };
-            });
+        return this.loadResultFile(mapsFileName);
     }
 
     /**

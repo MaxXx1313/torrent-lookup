@@ -104,7 +104,7 @@ const optionDefinitions = [
             console.error('Unknown operation: %s', options.operation);
     }
 
-    console.log(' Done in %s ms', tick());
+    console.log('Done in %s ms', tick());
 })();
 ////////////////////////////////////////////////////
 
@@ -255,8 +255,12 @@ function pushTorrents(options: CliOptions):Promise<any> {
  */
 function info(options: CliOptions): Promise<any> {
     const info = new Info(options);
-    return info.getInfo().then((stats) => {
-        console.log(' Matches:', stats.maps);
+    return info.getMapping().then((mapping) => {
+        for(let i=0; i < mapping.length; i++){
+            console.log('Save:', mapping[i].torrent);
+            console.log('  to:', mapping[i].saveTo);
+        }
+        console.log('Total:', mapping.length);
     });
 }
 
