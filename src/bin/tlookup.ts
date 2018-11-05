@@ -76,9 +76,10 @@ const optionDefinitions = [
 (async function(){
     tick();
 
-    const options = commandLineArgs(optionDefinitions);
+    const options = commandLineArgs(optionDefinitions, { stopAtFirstUnknown: true, partial:true });
     options.option = parseOptions(options.option || []);
-    // console.log(options);
+    const argv = options._unknown || [];
+    // console.log('options', options, argv);
 
     if (options.help || !options.operation) {
         usage();
@@ -91,10 +92,30 @@ const optionDefinitions = [
 
     switch (options.operation) {
         case OPERATION_FIND:
+            const findDefinitions = [
+                { name: 'target', defaultOption: true,  multiple: true }
+            ];
+            const findCommand = commandLineArgs(findDefinitions, { argv });
+            if(findCommand.target){
+                options.target = options.target || [];
+                options.target.push.apply(options.target, findCommand.target);
+            }
+
+            // console.log(options);
+
             await scanFiles(options);
             await analyzeTorrents(options);
             break;
         case OPERATION_PUSH:
+
+            const pushDefinitions = [
+                { name: 'client', defaultOption: true }
+            ];
+            const pushCommand = commandLineArgs(pushDefinitions, { argv });
+            if(pushCommand.client){
+                options.client = pushCommand.client;
+            }
+
             await pushTorrents(options);
             break;
         case OPERATION_INFO:
@@ -116,7 +137,7 @@ function usage() {
     const sections = [
         {
             header: 'Usage',
-            content: '$ tlookup [bold]{operation} [bold]{--target|-t}=<folder>'
+            content: '$ tlookup [bold]{operation} [bold]{target}'
         },
         {
             header: 'Description',
@@ -149,8 +170,8 @@ function usage() {
         {
             header: 'Examples',
             content: [
-                { desc: 'Scan home folders', example: '$ tlookup find -t /home' },
-                { desc: 'Push result to transmission', example: '$ tlookup push -c t' },
+                { desc: 'Scan home folders', example: '$ tlookup find "/home"' },
+                { desc: 'Push result to transmission', example: '$ tlookup push transmission' },
             ]
         },
     ];
@@ -211,7 +232,7 @@ function scanFiles(options: CliOptions): Promise<any> {
     logger.startLOP('scanning');
     return scanner.run().then(() => {
         logger.stopLOP();
-        logger.log('  Scanned %s files, found %s torrent files', scanner.stats.files, scanner.stats.torrents);
+        logger.log('Scanned %s files, found %s torrent files', scanner.stats.files, scanner.stats.torrents);
     }).catch((e) => {
         logger.stopLOP();
         throw e;
