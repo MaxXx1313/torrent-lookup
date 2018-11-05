@@ -154,7 +154,8 @@ export class FileScanner {
     protected async _scanFolder(location: string): Promise<any> {
         let self = this;
 
-        console.log('_scanFolder: "%s"', location);
+        // TODO: verbose log
+        // console.log('_scanFolder: "%s"', location);
         const folderEntries = await readdir(location);
         // console.log('_scanFolder: "%s"', location, folderEntries);
 

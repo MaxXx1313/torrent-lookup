@@ -12,7 +12,7 @@ export interface ITorrentClient {
     /**
      * @return true if the torrent client is available (still might be not configured properly)
      */
-    isInstalled(): Promise<boolean>;
+    // isInstalled(): Promise<boolean>;
 }
 
 export interface PushResult {

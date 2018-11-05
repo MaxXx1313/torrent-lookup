@@ -12,6 +12,7 @@ export const TORRENT_EXTENSION = '.torrent';
 
 export const SCAN_SKIP_DEFAULT = [
     // '.*',
+    '.npm',
     'node_modules',
     'npm-cache',
     '/etc',

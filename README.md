@@ -19,3 +19,20 @@ npm install -g tlookup
 ## Usage
 
 TODO
+
+
+## Build
+```bash
+npm run build
+```
+
+
+## Dev
+
+Compile and run:
+
+```bash
+npm run dev
+```
+
+Write custom adapter: see [ITorrentClient](src/lib/push/README.md)

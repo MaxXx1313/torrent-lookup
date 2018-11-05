@@ -1,14 +1,12 @@
 import { DEFAULT_WORKDIR_LOCATION, FN_MAPS_FILE } from "../const";
 import { Subject } from "rxjs";
-import { ITorrentClient } from "./lib/push/TorrentClientAdapter";
 import { TorrentMapping } from "../analyze/Analyzer";
 
 import * as fs from 'fs';
 import * as path from 'path';
 import { chainPromise } from "../utils/tools";
-
-
-const Transmission = require('./lib/push/Transmission').TlookupTransmission;
+import { ITorrentClient } from "./ITorrentClient";
+import { TlookupTransmission } from "./tlookup-transmission";
 
 
 /**
@@ -17,7 +15,7 @@ const Transmission = require('./lib/push/Transmission').TlookupTransmission;
 export interface PusherOptions {
     client: string;
     workdir?: string;
-    option?: any[];
+    option?: object;
 }
 
 /**
@@ -35,8 +33,6 @@ export class Pusher {
      *
      */
     constructor(options: PusherOptions) {
-        // super();
-
 
         this.options = Object.assign({}, {
             workdir: DEFAULT_WORKDIR_LOCATION
@@ -56,8 +52,7 @@ export class Pusher {
         switch (options.client) {
             case 't':
             case 'transmission':
-                // TODO: options!!!
-                return new Transmission('http://localhost:9091'/*options.url*/);
+                return new TlookupTransmission(options.option);
 
             default:
                 throw new Error('Unknown client: ' + options.client);

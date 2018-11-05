@@ -29,7 +29,7 @@ interface CliOptions {
     target: string;
     tmp: string;
     client: string;
-    option: any[];
+    option: object;
 }
 
 
@@ -162,7 +162,7 @@ function usage() {
 /**
  * Parse options like "endpoint=localhost:8080" to key-value object
  */
-function parseOptions(options: string[]): any {
+function parseOptions(options: string[]): object {
     return options.map(o => {
         const m = o.match(/^([\w-]+)(?:=(.*))?$/);
         if (!m) {
@@ -238,7 +238,11 @@ function analyzeTorrents(options: CliOptions): Promise<any> {
 function pushTorrents(options: CliOptions):Promise<any> {
     // assert.ok(options.client, 'Client must be set. use -c|--client to make it');
 
-    const pusher = new Pusher(options);
+    const pusher = new Pusher({
+        client: options.client,
+        workdir: options.tmp,
+        option: options.option
+    });
     pusher.opStatus.subscribe(status => {
         console.log(status);
     });

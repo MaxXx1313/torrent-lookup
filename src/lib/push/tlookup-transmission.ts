@@ -1,5 +1,5 @@
 import { clone, request } from "../utils/tools";
-import { ITorrentClient, PushResult } from './TorrentClientAdapter';
+import { ITorrentClient, PushResult } from "./ITorrentClient";
 
 
 const assert = require('assert');
@@ -64,10 +64,10 @@ export class TlookupTransmission implements ITorrentClient {
     /**
      * @implements ITorrentClient
      */
-    isInstalled(): Promise<boolean> {
-        // TODO: implement isInstalled
-        // child_process.execFile(file[, args][, options][, callback])
-    }
+    // isInstalled(): Promise<boolean> {
+    //     TODO: implement isInstalled
+    //     child_process.execFile(file[, args][, options][, callback])
+    // }
 
     /**
      * @implements ITorrentClient
@@ -83,6 +83,8 @@ export class TlookupTransmission implements ITorrentClient {
     }
 
     /**
+     * Add or Update torrent
+     *
      * @param {string} filename - filename or URL of the .torrent file
      * @param {string} downloadDir - path to download the torrent to
      * @param {object} [opts] any extra options according to the specificaion
@@ -108,6 +110,7 @@ export class TlookupTransmission implements ITorrentClient {
     }
 
     /**
+     * Get torrent info by id
      * @param {Array<number>} id
      * @param {Array<string>} fields
      * @param {object} [opts]

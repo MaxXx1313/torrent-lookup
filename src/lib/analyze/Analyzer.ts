@@ -367,7 +367,8 @@ export class Analyzer {
      */
     _addToHash(torrentInfo: TorrentProcessingInfo) {
         let key = torrentInfo.base + ':' + torrentInfo.length;
-        console.log('_addToHash', key);
+        // TODO: verbose log
+        // console.log('_addToHash', key);
         if (!this._hash[key]) {
             this._hash[key] = [];
         }
