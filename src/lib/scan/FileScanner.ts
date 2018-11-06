@@ -7,6 +7,7 @@ import { readdir } from "../utils/fsPromise";
 import { Observable } from "rxjs";
 import { QueueWorker } from "./QueueWorker";
 import { SCAN_SKIP_DEFAULT } from "../const";
+import { matchCustom } from "../utils/myglob";
 import ErrnoException = NodeJS.ErrnoException;
 
 
@@ -71,11 +72,6 @@ export class FileScanner {
         if (this._options.skip) {
             this._skip.push.apply(this._skip, this._options.skip);
         }
-
-        // HOTFIX: 1 of 2
-        if (process.platform == 'win32') {
-            this._skip = this._skip.map(s => s.toLowerCase());
-        }
     }
 
 
@@ -105,28 +101,10 @@ export class FileScanner {
     isExcluded(location) {
         // let locationComponents = location.split(path.sep);
 
-        // HOTFIX: 2 of 2
-        if (process.platform == 'win32') {
-            location = location.toLowerCase();
+        const excluded = !this._skip.every(rule => !matchCustom(location, rule));
+        if (excluded) {
+            console.log('Excluded:', location);
         }
-
-        let excluded = false;
-        for (let i = this._skip.length - 1; i >= 0; i--) {
-            let skipRule = this._skip[i];
-
-            // TODO: find a good glob matcher
-            // let m = minimatch.match(locationComponents, skipRule, { debug: false, nocase: process.platform == 'win32' }) || [];
-            // let m = minimatch(location, skipRule, { debug: false, nocase: process.platform == 'win32' });
-            // console.log(' minimatch', skipRule, m);
-            // if (m.length > 0 ) {
-            // if (m) {
-            if (location.indexOf(skipRule) >=0 ) {
-                excluded = true;
-                break;
-            }
-        }
-        // console.log('_isExcluded', location, excluded);
-        // process.exit(2);
         return excluded;
     }
 
