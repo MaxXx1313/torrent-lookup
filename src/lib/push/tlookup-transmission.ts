@@ -75,6 +75,13 @@ export class TlookupTransmission implements ITorrentClient {
     push(filename: string, downloadDir: string): Promise<PushResult> {
         return this.torrentAdd(filename, downloadDir, {paused: false})
             .then(result => {
+                console.log('torrentAdd', result);
+                if(!result.isNew) {
+                    return this.torrentSetLocation(result.id, downloadDir).then(()=>result);
+                } else {
+                    return result;
+                }
+            }).then(result => {
                 return this._setWantedByPercentage(result.id, UNWANTED_THRESHOLD)
                     .then(() => {
                         return result as PushResult;
@@ -108,6 +115,17 @@ export class TlookupTransmission implements ITorrentClient {
                 }
             });
     }
+
+    // HOTFIX: update torrent location (for existed torrents)
+    // https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt#L406
+    torrentSetLocation(id: string, downloadDir: string, opts = {}): Promise<any> {
+        opts['ids'] = [id];
+        opts['location'] = downloadDir;
+        opts['move'] = false;
+        return this.rpcRequest('torrent-set-location', opts);
+    }
+
+
 
     /**
      * Get torrent info by id
@@ -235,6 +253,7 @@ export class TlookupTransmission implements ITorrentClient {
             opts.headers = opts.headers || {};
             opts.headers[CSRF_HEADER] = self._csrf;
 
+            console.log('[DEBUG] (transmission) request:', payload.method/*, opts*/);
             // console.log(opts); console.log(payload);
 
             return request(opts, JSON.stringify(payload))
@@ -243,6 +262,7 @@ export class TlookupTransmission implements ITorrentClient {
                 .then(self._rpcResponse.bind(self))
                 .then(res => {
                     // console.log(res.body);
+                console.log('[DEBUG] (transmission) response:', res.body);
                     return res;
                 });
         }
@@ -256,6 +276,8 @@ export class TlookupTransmission implements ITorrentClient {
                 } else {
                     throw res;
                 }
+            }).then(res=>{
+                return res;
             });
     }
 
