@@ -13,7 +13,7 @@
   },
   "bugs": {
     "url": "https://github.com/MaxXx1313/torrent-lookup/issues",
-    "email": "fomy.smap@gmail.com"
+    "email": "fomy.spam@gmail.com"
   },
   "main": "dist/lib.js",
   "files": [
@@ -35,6 +35,7 @@
     "tsc": "./node_modules/.bin/tsc",
     "dev": "npm run tsc && npm start -- ",
     "build": "npm run tsc; chmod +x ./dist/bin/tlookup.js",
+    "postbuild": "node ./scripts/after_build.js",
     "start": "node dist/bin/tlookup.js"
   },
   "dependencies": {

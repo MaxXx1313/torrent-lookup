@@ -2,7 +2,7 @@
 Adapters
 --------
 
-We'll use node module system in a future
+We'll use node module system in future
 
 
-TODO
+TODO: Incomplete. See `Pusher.ts` and `ITorrentClient.ts` for details
