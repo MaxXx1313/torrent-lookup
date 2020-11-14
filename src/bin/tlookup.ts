@@ -58,7 +58,7 @@ const optionDefinitions = [
 
     {
         name: 'tmp', type: String,
-        defaultValue: DEFAULT_WORKDIR_LOCATION, description: 'folder to save data'
+        defaultValue: DEFAULT_WORKDIR_LOCATION, description: 'folder to save temp data'
     },
 
     {
@@ -146,7 +146,7 @@ function usage() {
         {
             header: 'Operation',
             content: [
-                '[bold]{find} - scan files, find torrent files and it\'s downloads',
+                '[bold]{find} - scan files, find torrent files and match it\'s downloads',
                 '[bold]{push} - push torrents to client',
                 '[bold]{info} - print scan info'
             ]

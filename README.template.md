@@ -5,8 +5,14 @@
 
 Command-line tool for looking torrent files and downloaded content. Match them together and add it to your favorite torrent client.
 
+
+**Supported platforms:**
+- windows
+- linux
+- macos
+
 **Supported clients:**
-* Transmission (Linux)
+* Transmission (all platforms)
   - enable remote access with user/pass: `admin`/`admin`, so it's available at "http://admin:admin@localhost:9091"
 
 
@@ -17,8 +23,13 @@ Command-line tool for looking torrent files and downloaded content. Match them t
 npm install -g tlookup (not pushed yet)
 ```
 
+# Usage example
+
 ```bash
 npm install -g https://github.com/MaxXx1313/torrent-lookup
+npm run build
+npm start -- find
+npm start -- push t
 ```
 
 
@@ -40,11 +51,16 @@ The following command build the project
 npm run build
 ```
 
+The following command run the project
+```bash
+npm start -- find
+```
 
-The following command build and the project
+
+The following command build and run the project
 ```bash
 npm run dev
 ```
 
 
-See instruction for custom adapter here: [ITorrentClient](src/lib/push/README.md)
+See instruction for a custom adapter here: [ITorrentClient](src/lib/push/README.md)
