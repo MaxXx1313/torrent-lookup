@@ -18,4 +18,6 @@ export const SCAN_SKIP_DEFAULT = [
     '/etc',
     'C:\\Windows', 
     'System Volume Information', 
+    '.cocoapods',
+    'Xcode',
 ];
