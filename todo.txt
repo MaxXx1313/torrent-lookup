@@ -1,20 +1,25 @@
-# https://docs.npmjs.com/files/package.json#os
+Ideas to implement:
+---
 
-* use nice glob
+- refactoring of data folder. reuse cache
 
-* create autodetect for tlookup-* clients:
-  * which transmission-gtk / where ping (https://superuser.com/questions/207707/what-is-windows-equivalent-of-the-which-command-in-unix-is-there-an-equivale)
+- https://docs.npmjs.com/files/package.json#os
 
-* check on mac
-* check on linux
-* check on windows
+- use nice glob
+
+- create autodetect for tlookup-* clients:
+- which transmission-gtk / where ping (https://superuser.com/questions/207707/what-is-windows-equivalent-of-the-which-command-in-unix-is-there-an-equivale)
+
+- check on mac
+- check on linux
+- check on windows
 
 
 prerelease:
-* 'man' file? (https://docs.npmjs.com/files/package.json#man)
+- 'man' file? (https://docs.npmjs.com/files/package.json#man)
 
-* check torrent push
-  * make nice exceptions for all cases when push fails
+- check torrent push
+  - make nice exceptions for all cases when push fails
 
 ---
 
