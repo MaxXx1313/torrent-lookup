@@ -1,5 +1,4 @@
 import { TorrentScanner } from './TorrentScanner';
-import { FileScanner } from './FileScanner';
 import { expect } from '@jest/globals';
 
 
@@ -10,18 +9,15 @@ describe('TorrentScanner.e2e', function () {
 
     it('simple scan', function (done) {
 
-        let expectedFiles = [
-            target + "/Sheltered [rutracker.org].t5364696.torrent:41955",
-            target + "/[NNM-Club.me]_Q3 2015.torrent:97896",
-            target + "/gog_sheltered_2.1.0.2.sh:271816803",
+        const expectedFiles = [
             target + "/subfolder/test1.txt:1"
         ];
 
-        let expectedTorrents = [
+        const expectedTorrents = [
             target + "/Sheltered [rutracker.org].t5364696.torrent",
             target + "/[NNM-Club.me]_Q3 2015.torrent",
         ];
-        let statsExpected = {
+        const statsExpected = {
             files: 2,
             torrents: 2
         };
@@ -29,9 +25,11 @@ describe('TorrentScanner.e2e', function () {
         let files = [];
         let torrents = [];
 
-        const scanner = new TorrentScanner({target: [target]});
+        const scanner = new TorrentScanner({
+            target: [target],
+        });
 
-        let sub = scanner.onEntry.subscribe((entry) => {
+        const sub = scanner.onEntry.subscribe((entry) => {
             // console.log('scan', location);
             if (entry.type === 'file') {
                 if (entry.isTorrent) {

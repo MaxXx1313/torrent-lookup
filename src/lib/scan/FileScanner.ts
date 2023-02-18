@@ -108,37 +108,36 @@ export class FileScanner {
 
     /**
      * @description It a job=)
-     * @param location
+     * @param filepath
      */
-    protected async scanFolder(location: string): Promise<any> {
+    protected async scanFolder(filepath: string): Promise<any> {
         // fix windows drive root
-        if (location.match(/^\w{1}:\\?$/)) {
+        if (filepath.match(/^\w{1}:\\?$/)) {
             // location is a pure drive letter: "C:" o "C:\"
-            location = location.substr(0, 2) + '/';
+            filepath = filepath.substr(0, 2) + '/';
         }
         return Promise.resolve()
             .then(() => {
-                return this._scanFolder(location);
+                return this._scanFolder(filepath);
             })
             .catch(this._options.cbError.bind(this));
     }
 
     /**
-     * @param {string} location
+     * @param {string} filepath
      */
-    protected async _scanFolder(location: string): Promise<any> {
-        let self = this;
+    protected async _scanFolder(filepath: string): Promise<any> {
 
         // TODO: verbose log
-        // console.log('_scanFolder: "%s"', location);
-        const folderEntries = await readdir(location);
+        console.log('_scanFolder: "%s"', location);
+        const folderEntries = await readdir(filepath);
         // console.log('_scanFolder: "%s"', location, folderEntries);
 
         for (let i = folderEntries.length - 1; i >= 0; i--) {
             // get absolute path
-            const childLocation = path.join(location, folderEntries[i]);
+            const childLocation = path.join(filepath, folderEntries[i]);
 
-            if (self.isExcluded(childLocation)) {
+            if (this.isExcluded(childLocation)) {
                 continue;
             }
 

@@ -44,7 +44,6 @@ export function readFile(location: string, opts: FileReadOptions = {}): Promise<
  * @more: https://nodejs.org/dist/latest-v6.x/docs/api/fs.html#fs_class_fs_stats
  */
 export function readdir(location: string): Promise<string[]> {
-
     return new Promise(function (resolve, reject) {
         fs.readdir(location, function (err, files) {
             if (err) {
