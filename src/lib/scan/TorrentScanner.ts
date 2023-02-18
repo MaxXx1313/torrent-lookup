@@ -18,6 +18,11 @@ export interface TorrentScannerOptions {
      * Folder for storing temp results
      */
     workdir?: string;
+
+    /**
+     * @see FileScannerOption.exclude
+     */
+    exclude?: string[];
 }
 
 /**
@@ -81,8 +86,8 @@ export class TorrentScanner {
 
 
         this.scanner = new FileScanner({
+            exclude: this.options.exclude,
             cbFileFound: this._onFile.bind(this),
-            cbFolderFound: this._onFolder.bind(this),
         });
 
         if (this.options.target) {
@@ -144,7 +149,7 @@ export class TorrentScanner {
      * @param {string} location
      * @param {fs.Stats} stats
      */
-    protected _onFile(location: string, stats: Stats): Promise<any> {
+    protected async _onFile(location: string, stats: Stats): Promise<any> {
         return new Promise((resolve, reject) => {
             location = path.resolve(location); // make path absolute;
             const isTorrent = this.isTorrentFile(location, stats);
@@ -172,19 +177,6 @@ export class TorrentScanner {
                 });
             }
         });
-    }
-
-    /**
-     * @param {string} location
-     * @param {fs.Stats} stats
-     */
-    protected _onFolder(location: string, stats: Stats): Promise<any> {
-        this.onEntry.next({
-            type: "folder",
-            location
-        });
-
-        return Promise.resolve();
     }
 
 
