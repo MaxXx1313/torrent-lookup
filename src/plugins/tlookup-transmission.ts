@@ -42,7 +42,7 @@ export class TlookupTransmission implements ITorrentClient {
     /**
      *
      */
-    constructor(config: TransmissionAdapterConfig) {
+    constructor(config?: TransmissionAdapterConfig) {
 
         this._config = {
             endpoint: ENDPOINT_DEFAULT,
@@ -55,12 +55,12 @@ export class TlookupTransmission implements ITorrentClient {
 
     // "content-type":"application/json; charset=UTF-8"
     static getContentType(contentTypeHeaderValue: string) {
-        return (("" + contentTypeHeaderValue).match(/(.*?)(;|$)/) || [])[1];
+        return (("" + contentTypeHeaderValue).match(/(.*?)(;|$)/) || [])[1] || null;
     }
 
     //
     static getCharset(contentTypeHeaderValue: string) {
-        return (("" + contentTypeHeaderValue).match(/charset=(.*?)(;|$)/) || [])[1];
+        return (("" + contentTypeHeaderValue).match(/charset=(.*?)(;|$)/) || [])[1] || null;
     }
 
 
