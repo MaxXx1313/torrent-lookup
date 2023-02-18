@@ -3,10 +3,10 @@ import { DEFAULT_WORKDIR_LOCATION, FN_DATA_FILE, FN_MAPS_FILE, FN_TORRENTS_FILE 
 import * as fs from 'fs';
 import * as path from 'path';
 import { Subject } from "rxjs";
-import * as bencode from "bencode";
 import { writeFile } from "../utils/fsPromise";
-import { TorrentData } from '../../@types/bencode';
+import { TorrentData } from './TorrentData';
 import * as readline from 'node:readline';
+import bencode from 'bencode'
 
 
 
@@ -96,6 +96,7 @@ export class Analyzer {
     /**
      *
      */
+
     // private _lastFile: string;
 
 
