@@ -1,6 +1,5 @@
 import { DEFAULT_WORKDIR_LOCATION, FN_MAPS_FILE } from "../const";
 
-import * as fs from 'fs';
 import * as path from 'path';
 import { readFile } from "../utils/fsPromise";
 import { TorrentMapping } from "./Analyzer";
@@ -29,9 +28,10 @@ export class Info {
      */
     constructor(options: InfoOptions) {
 
-        this.options = Object.assign({}, {
-            tmp: DEFAULT_WORKDIR_LOCATION
-        }, options);
+        this.options = {
+            tmp: DEFAULT_WORKDIR_LOCATION,
+            ...(options || {}),
+        };
     }
 
     /**
@@ -46,7 +46,7 @@ export class Info {
      *
      */
     protected loadResultFile(location: string): Promise<TorrentMapping[]> {
-        return readFile(location).then(data=>JSON.parse(data));
+        return readFile(location).then(data => JSON.parse(data));
     }
 
 } // -

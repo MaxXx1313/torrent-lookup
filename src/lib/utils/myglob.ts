@@ -11,11 +11,13 @@ const forcePlatform = null;
  *
  */
 export function matchCustom(loc, glob) /* boolean */ {
-    if(process.platform === 'win32' || forcePlatform === 'win32'){
+  const platform = forcePlatform || process.platform;
+    if(platform === 'win32'){
       loc = loc.replace(/\\/g, path.posix.sep);
       glob = glob.replace(/\\/g, path.posix.sep);
     }
 
+    // put compare function to cache
     if(!globCache[glob]) {
       const globDerived = [glob];
 
@@ -33,7 +35,7 @@ export function matchCustom(loc, glob) /* boolean */ {
         globDerived.push('**/' + glob + '/**');    
       }
 
-      const globRe = globDerived.map(g => minimatch.makeRe(g, { dot: true, nocase: process.platform == 'win32' || forcePlatform === 'win32' }) );
+      const globRe = globDerived.map(g => minimatch.makeRe(g, { dot: true, nocase: platform === 'win32' }) );
 
       globCache[glob] = function(loc){
         const match = !globRe.every(r => !r.test(loc));

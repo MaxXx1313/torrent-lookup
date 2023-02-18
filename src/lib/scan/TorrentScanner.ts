@@ -1,23 +1,28 @@
 import * as fs from 'fs';
+import { Stats, WriteStream } from 'fs';
 import * as path from 'path';
-import * as assert from 'assert';
-import { DEFAULT_WORKDIR_LOCATION, FN_DATA_FILE, FN_MAPS_FILE, FN_TORRENTS_FILE, TORRENT_EXTENSION } from "../const";
+import { DEFAULT_WORKDIR_LOCATION, FN_DATA_FILE, FN_TORRENTS_FILE, TORRENT_EXTENSION } from "../const";
 import { pesistFolderSync } from "../utils/fsPromise";
-import { Stats, WriteStream } from "fs";
 import { FileScanner } from "./FileScanner";
-import { Observable, Subject } from "rxjs";
+import { Subject } from "rxjs";
+
 
 
 export interface TorrentScannerOptions {
     /**
      * Target folder to scan
      */
-    target?: string;
+    target?: string[];
 
     /**
      * Folder for storing temp results
      */
     workdir?: string;
+
+    /**
+     * @see FileScannerOption.exclude
+     */
+    exclude?: string[];
 }
 
 /**
@@ -47,7 +52,7 @@ export interface TorrentScannerEntry {
 
 /**
  * 1. use Scanner to scan files and folders
- *   1.1 chech is that file is a torrent file
+ *   1.1 check is that file is a torrent file
  *     1.1.1 write torrent file into one list
  *     1.1.2 write ordinary file into another list(with file size)
  *
@@ -57,31 +62,32 @@ export class TorrentScanner {
 
     public readonly onEntry: Subject<TorrentScannerEntry> = new Subject();
 
-    options: TorrentScannerOptions;
+    public options: TorrentScannerOptions;
 
-    stats: TorrentScannerStats;
+    public stats: TorrentScannerStats;
 
     private scanner: FileScanner;
 
     private _dataFileStream: WriteStream;
     private _torrFileStream: WriteStream;
 
-    private _lastFile: string;
+    // private _lastFile: string;
+
 
     /**
-     *
      * @param {TorrentScannerOptions} options
      */
     constructor(options: TorrentScannerOptions) {
 
-        this.options = Object.assign({}, {
-            workdir: DEFAULT_WORKDIR_LOCATION
-        }, options);
+        this.options = {
+            workdir: DEFAULT_WORKDIR_LOCATION,
+            ...(options || {}),
+        }
 
 
         this.scanner = new FileScanner({
+            exclude: this.options.exclude,
             cbFileFound: this._onFile.bind(this),
-            cbFolderFound: this._onFolder.bind(this),
         });
 
         if (this.options.target) {
@@ -104,9 +110,9 @@ export class TorrentScanner {
     run(): Promise<any> {
         // SCAN
         return Promise.resolve()
-            .then(()=>this._beforeScan())
-            .then(()=>this.scanner.run())
-            .then(()=>this._afterScan());
+            .then(() => this._beforeScan())
+            .then(() => this.scanner.run())
+            .then(() => this._afterScan());
     }
 
     /**
@@ -119,7 +125,7 @@ export class TorrentScanner {
         const torrFileName = path.join(this.options.workdir, FN_TORRENTS_FILE);
 
         this.resetStats();
-        this._lastFile = null;
+        // this._lastFile = null;
         this._dataFileStream = fs.createWriteStream(dataFileName);
         this._torrFileStream = fs.createWriteStream(torrFileName);
     }
@@ -129,8 +135,12 @@ export class TorrentScanner {
      */
     protected _afterScan(): Promise<any> {
         return Promise.all([
-            new Promise((resolve) => { this._dataFileStream.end(resolve); }),
-            new Promise((resolve) => { this._torrFileStream.end(resolve); }),
+            new Promise((resolve) => {
+                this._dataFileStream.end(resolve);
+            }),
+            new Promise((resolve) => {
+                this._torrFileStream.end(resolve);
+            }),
         ]);
     }
 
@@ -140,7 +150,7 @@ export class TorrentScanner {
      * @param {fs.Stats} stats
      */
     protected _onFile(location: string, stats: Stats): Promise<any> {
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             location = path.resolve(location); // make path absolute;
             const isTorrent = this.isTorrentFile(location, stats);
 
@@ -161,42 +171,29 @@ export class TorrentScanner {
                 this.stats.files++;
 
                 // get relative location
-                const locRelative = this.shiftRelative(location);
-                this._dataFileStream.write(locRelative + ':' + stats.size + '\n', (err) => {
+                // const locRelative = this.shiftRelative(location);
+                this._dataFileStream.write(location + ':' + stats.size + '\n', (err) => {
                     err ? reject(err) : resolve();
                 });
             }
         });
     }
 
-    /**
-     * @param {string} location
-     * @param {fs.Stats} stats
-     */
-    protected _onFolder(location: string, stats: Stats): Promise<any> {
-        this.onEntry.next({
-            type: "folder",
-            location
-        });
-
-        return Promise.resolve();
-    }
-
-
-    /**
-     * Get file location  and return relative path from previous file.
-     * Also set internal relative path to a new one
-     */
-    private shiftRelative(location) {
-        var locRelative;
-        if (this._lastFile) {
-            locRelative = path.relative(this._lastFile + '/..', location);
-        } else {
-            locRelative = location;
-        }
-        this._lastFile = location;
-        return locRelative;
-    }
+    //
+    // /**
+    //  * Get file location  and return relative path from previous file.
+    //  * Also set internal relative path to a new one
+    //  */
+    // private shiftRelative(location) {
+    //     var locRelative;
+    //     if (this._lastFile) {
+    //         locRelative = path.relative(this._lastFile + '/..', location);
+    //     } else {
+    //         locRelative = location;
+    //     }
+    //     this._lastFile = location;
+    //     return locRelative;
+    // }
 
 
     /**

@@ -1,12 +1,9 @@
 import * as fs from 'fs';
 import { Stats } from 'fs';
 import * as path from 'path';
-
-import * as minimatch from 'minimatch';
 import { readdir } from "../utils/fsPromise";
-import { Observable } from "rxjs";
 import { QueueWorker } from "./QueueWorker";
-import { SCAN_SKIP_DEFAULT } from "../const";
+import { SCAN_EXCLUDE_DEFAULT } from "../const";
 import { matchCustom } from "../utils/myglob";
 import ErrnoException = NodeJS.ErrnoException;
 
@@ -22,13 +19,13 @@ export interface FileScannerOption {
      * @type {Array<string>}Array of globs string
      * @see [Glob syntax](https://en.wikipedia.org/wiki/Glob_(programming)) for more details
      */
-    skip?: Array<string>;
+    exclude?: Array<string>;
 
     cbFileFound: (location?: string, stats?: Stats) => Promise<any>;
 
     cbFolderFound?: (location?: string, stats?: Stats) => Promise<any>;
     cbOtherFound?: (location?: string, stats?: Stats) => Promise<any>;
-    cbError?: (e?: Error, location?: string,) => Promise<any>;
+    cbError?: (e?: Error, location?: string) => Promise<any>;
 }
 
 
@@ -50,7 +47,7 @@ export class FileScanner {
     /**
      *
      */
-    protected _skip = SCAN_SKIP_DEFAULT;
+    protected _exclude = SCAN_EXCLUDE_DEFAULT;
     protected _options: FileScannerOption;
 
     /**
@@ -58,19 +55,19 @@ export class FileScanner {
      * @param options
      */
     constructor(options: FileScannerOption) {
-        // super();
         this.jobWorker = new QueueWorker(this.scanFolder.bind(this));
 
-        this._options = Object.assign({}, {
+        this._options = {
             cbError: FileScanner.cbErrorDefault,
             cbFileFound: FileScanner.cbNoOperation,
             cbFolderFound: FileScanner.cbNoOperation,
             cbOtherFound: FileScanner.cbOtherFound,
-        }, options);
+            ...(options || {}),
+        };
 
 
-        if (this._options.skip) {
-            this._skip.push.apply(this._skip, this._options.skip);
+        if (this._options.exclude) {
+            this._exclude.push.apply(this._exclude, this._options.exclude);
         }
     }
 
@@ -98,12 +95,12 @@ export class FileScanner {
      * @param location
      * @private
      */
-    isExcluded(location) {
+    isExcluded(location:string) {
         // let locationComponents = location.split(path.sep);
 
-        const excluded = !this._skip.every(rule => !matchCustom(location, rule));
+        const excluded = !this._exclude.every(rule => !matchCustom(location, rule));
         if (excluded) {
-            console.log('Excluded:', location);
+            console.debug('Excluded:', location);
         }
         return excluded;
     }
@@ -114,16 +111,16 @@ export class FileScanner {
      * @param location
      */
     protected async scanFolder(location: string): Promise<any> {
-        //fix windows drive root
+        // fix windows drive root
         if (location.match(/^\w{1}:\\?$/)) {
-            // location is "C:" o "C:\"
+            // location is a pure drive letter: "C:" o "C:\"
             location = location.substr(0, 2) + '/';
         }
         return Promise.resolve()
-            .then(()=>{
-            return this._scanFolder(location);
-        })
-        .catch(this._options.cbError.bind(this));
+            .then(() => {
+                return this._scanFolder(location);
+            })
+            .catch(this._options.cbError.bind(this));
     }
 
     /**
@@ -137,7 +134,7 @@ export class FileScanner {
         const folderEntries = await readdir(location);
         // console.log('_scanFolder: "%s"', location, folderEntries);
 
-        for (let i = folderEntries.length-1; i >= 0; i--) {
+        for (let i = folderEntries.length - 1; i >= 0; i--) {
             // get absolute path
             const childLocation = path.join(location, folderEntries[i]);
 
@@ -173,19 +170,16 @@ export class FileScanner {
 
 
     /**
-     * @param {Error} err
+     *
      */
     static cbErrorDefault(err: ErrnoException): Promise<any> {
-        // skip no file and access warning
-        // if (err.code != 'ENOENT') {
-            console.warn('FileScanner:', err.message);
-        // }
+        console.warn('FileScanner:', err.message);
         return Promise.resolve();
     }
 
     /**
      */
-    static cbNoOperation(ile: string, stats: Stats): Promise<any> {
+    static cbNoOperation(file: string, stats: Stats): Promise<any> {
         return Promise.resolve();
     }
 
@@ -193,7 +187,8 @@ export class FileScanner {
     /**
      */
     static cbOtherFound(file: string, stats: Stats): Promise<any> {
-        console.warn('FileScanner: Skip unknown entry type:', file, stats);
+        console.log('FileScanner: Skip unknown entry type:', file);
+        console.debug(stats);
         return Promise.resolve();
     }
 

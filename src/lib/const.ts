@@ -10,11 +10,24 @@ export const DEFAULT_WORKDIR_LOCATION = path.join(os.tmpdir(), 'tlookup'); // '~
 export const TORRENT_EXTENSION = '.torrent';
 
 
-export const SCAN_SKIP_DEFAULT = [
+export const SCAN_EXCLUDE_DEFAULT = [
     // '.*',
     '.npm',
     'node_modules',
     'npm-cache',
+    '.cache',
+    '.gradle',
+    '.nuget',
+    '.nvm',
+    '.mozilla',
+    '.vscode',
+    '.zoom',
+    '.pub-cache',
+    '.git',
+    '.dartServer',
+    '.grails',
+    '.local',
+    '.config',
     '/etc',
     'C:\\Windows', 
     'System Volume Information', 

@@ -1,5 +1,7 @@
-import { clone, request } from "../utils/tools";
-import { ITorrentClient, PushResult } from "./ITorrentClient";
+import { clone, request } from "../lib/utils/tools";
+import { ITorrentClient, PushResult } from "../lib/push/ITorrentClient";
+import { UrlWithStringQuery } from 'url';
+
 
 
 const assert = require('assert');
@@ -35,28 +37,29 @@ export class TlookupTransmission implements ITorrentClient {
     private _csrf: string = null;
 
 
-    private _endpointParsed;
+    private _endpointParsed: UrlWithStringQuery;
 
     /**
      *
      */
     constructor(config: TransmissionAdapterConfig) {
 
-        this._config = Object.assign({}, {
-            endpoint: ENDPOINT_DEFAULT
-        }, config);
+        this._config = {
+            endpoint: ENDPOINT_DEFAULT,
+            ...(config || {}),
+        };
 
         //
         this._endpointParsed = url.parse(this._config.endpoint);
     }
 
     // "content-type":"application/json; charset=UTF-8"
-    static getContentType(contentTypeHeaderValue) {
+    static getContentType(contentTypeHeaderValue: string) {
         return (("" + contentTypeHeaderValue).match(/(.*?)(;|$)/) || [])[1];
     }
 
     //
-    static getCharset(contentTypeHeaderValue) {
+    static getCharset(contentTypeHeaderValue: string) {
         return (("" + contentTypeHeaderValue).match(/charset=(.*?)(;|$)/) || [])[1];
     }
 
@@ -72,21 +75,15 @@ export class TlookupTransmission implements ITorrentClient {
     /**
      * @implements ITorrentClient
      */
-    push(filename: string, downloadDir: string): Promise<PushResult> {
-        return this.torrentAdd(filename, downloadDir, {paused: false})
-            .then(result => {
-                console.log('torrentAdd', result);
-                if(!result.isNew) {
-                    return this.torrentSetLocation(result.id, downloadDir).then(()=>result);
-                } else {
-                    return result;
-                }
-            }).then(result => {
-                return this._setWantedByPercentage(result.id, UNWANTED_THRESHOLD)
-                    .then(() => {
-                        return result as PushResult;
-                    });
-            });
+    async push(torrentFile: string, downloadDir: string): Promise<PushResult> {
+        const addResult = await this.torrentAdd(torrentFile, downloadDir, {paused: false});
+        console.log('torrentAdd', addResult);
+        if (!addResult.isNew) {
+            await this.torrentSetLocation(addResult.id, downloadDir);
+        }
+
+        await this._setWantedByPercentage(addResult.id, UNWANTED_THRESHOLD);
+        return addResult as PushResult;
     }
 
     /**
@@ -100,7 +97,7 @@ export class TlookupTransmission implements ITorrentClient {
      *
      * @more: https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt#L356
      */
-    torrentAdd(filename: string, downloadDir: string, opts = {}): Promise<any> {
+    torrentAdd(filename: string, downloadDir: string, opts = {}): Promise<{ id: number, name: string, hashString: string, isNew: boolean }> {
         opts['filename'] = filename;
         opts['download-dir'] = downloadDir;
 
@@ -118,13 +115,12 @@ export class TlookupTransmission implements ITorrentClient {
 
     // HOTFIX: update torrent location (for existed torrents)
     // https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt#L406
-    torrentSetLocation(id: string, downloadDir: string, opts = {}): Promise<any> {
+    torrentSetLocation(id: number, downloadDir: string, opts = {}): Promise<any> {
         opts['ids'] = [id];
         opts['location'] = downloadDir;
         opts['move'] = false;
         return this.rpcRequest('torrent-set-location', opts);
     }
-
 
 
     /**
@@ -135,7 +131,7 @@ export class TlookupTransmission implements ITorrentClient {
      *
      * @more https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt#L127
      */
-    torrentGet(id: string, fields: string[], opts?): Promise<any> {
+    torrentGet(id: number, fields: string[], opts?): Promise<any> {
         opts = opts || {};
 
         opts.ids = [id];
@@ -155,7 +151,7 @@ export class TlookupTransmission implements ITorrentClient {
      * @param {Array<number>} id
      * @param {object} opts
      */
-    torrentSet(id: string, opts) {
+    torrentSet(id: number, opts) {
         opts.ids = [id];
         return this.rpcRequest('torrent-set', opts)
             .then((res) => {
@@ -200,18 +196,18 @@ export class TlookupTransmission implements ITorrentClient {
     /**
      * Mark files inside torrent file to download
      */
-    protected _setWantedByPercentage(torrentId: string, percentage: number = UNWANTED_THRESHOLD): Promise<any> {
+    protected _setWantedByPercentage(torrentId: number, percentage: number = UNWANTED_THRESHOLD): Promise<any> {
 
         // set
         return this.torrentGet(torrentId, ['files'])
             .then(result => result[0])
             .then(torrentInfo => {
-                torrentInfo.files.forEach(file => {
+                for (const file of torrentInfo.files) {
                     file._percentage = 100 * file.bytesCompleted / file.length;
                     file._wanted = file._percentage >= percentage;
-                });
+                }
 
-                let wantedFilesData = torrentInfo.files.reduce(function (result, item, index) {
+                const wantedFilesData = torrentInfo.files.reduce(function (result, item, index) {
                     if (item._wanted === false) {
                         result.unwanted.push(index);
                     } else {
@@ -220,8 +216,6 @@ export class TlookupTransmission implements ITorrentClient {
                     return result;
                 }, {wanted: [], unwanted: []});
 
-                // console.log(prettyFormat(torrentInfo.files));
-                // console.log(unwantedFilesData);
 
                 return this.torrentSet(torrentId, {
                     "files-wanted": wantedFilesData.wanted,
@@ -235,7 +229,7 @@ export class TlookupTransmission implements ITorrentClient {
     /**
      *
      */
-    protected rpcRequest(method, data) {
+    protected rpcRequest(method, data): Promise<any> {
         let self = this;
 
         let opts = clone(this._endpointParsed);
@@ -260,9 +254,9 @@ export class TlookupTransmission implements ITorrentClient {
                 .then(self._collectCsrf.bind(self))
                 .then(self._rpcResponseJson.bind(self))
                 .then(self._rpcResponse.bind(self))
-                .then(res => {
+                .then((res: any) => {
                     // console.log(res.body);
-                console.log('[DEBUG] (transmission) response:', res.body);
+                    console.log('[DEBUG] (transmission) response:', res.body);
                     return res;
                 });
         }
@@ -276,7 +270,7 @@ export class TlookupTransmission implements ITorrentClient {
                 } else {
                     throw res;
                 }
-            }).then(res=>{
+            }).then(res => {
                 return res;
             });
     }
