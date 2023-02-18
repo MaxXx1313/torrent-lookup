@@ -97,7 +97,7 @@ export class TlookupTransmission implements ITorrentClient {
      *
      * @more: https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt#L356
      */
-    torrentAdd(filename: string, downloadDir: string, opts = {}): Promise<{ id: string, name: string, hashString: string, isNew: boolean }> {
+    torrentAdd(filename: string, downloadDir: string, opts = {}): Promise<{ id: number, name: string, hashString: string, isNew: boolean }> {
         opts['filename'] = filename;
         opts['download-dir'] = downloadDir;
 
@@ -115,7 +115,7 @@ export class TlookupTransmission implements ITorrentClient {
 
     // HOTFIX: update torrent location (for existed torrents)
     // https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt#L406
-    torrentSetLocation(id: string, downloadDir: string, opts = {}): Promise<any> {
+    torrentSetLocation(id: number, downloadDir: string, opts = {}): Promise<any> {
         opts['ids'] = [id];
         opts['location'] = downloadDir;
         opts['move'] = false;
@@ -131,7 +131,7 @@ export class TlookupTransmission implements ITorrentClient {
      *
      * @more https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt#L127
      */
-    torrentGet(id: string, fields: string[], opts?): Promise<any> {
+    torrentGet(id: number, fields: string[], opts?): Promise<any> {
         opts = opts || {};
 
         opts.ids = [id];
@@ -151,7 +151,7 @@ export class TlookupTransmission implements ITorrentClient {
      * @param {Array<number>} id
      * @param {object} opts
      */
-    torrentSet(id: string, opts) {
+    torrentSet(id: number, opts) {
         opts.ids = [id];
         return this.rpcRequest('torrent-set', opts)
             .then((res) => {
@@ -196,7 +196,7 @@ export class TlookupTransmission implements ITorrentClient {
     /**
      * Mark files inside torrent file to download
      */
-    protected _setWantedByPercentage(torrentId: string, percentage: number = UNWANTED_THRESHOLD): Promise<any> {
+    protected _setWantedByPercentage(torrentId: number, percentage: number = UNWANTED_THRESHOLD): Promise<any> {
 
         // set
         return this.torrentGet(torrentId, ['files'])

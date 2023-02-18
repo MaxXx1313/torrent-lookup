@@ -16,6 +16,6 @@ export interface ITorrentClient {
 }
 
 export interface PushResult {
-    id: string;
+    id: string | number;
     isNew: boolean;
 }

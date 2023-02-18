@@ -100,7 +100,7 @@ export class FileScanner {
 
         const excluded = !this._exclude.every(rule => !matchCustom(location, rule));
         if (excluded) {
-            console.log('Excluded:', location);
+            console.debug('Excluded:', location);
         }
         return excluded;
     }
@@ -187,7 +187,8 @@ export class FileScanner {
     /**
      */
     static cbOtherFound(file: string, stats: Stats): Promise<any> {
-        console.log('FileScanner: Skip unknown entry type:', file, stats);
+        console.log('FileScanner: Skip unknown entry type:', file);
+        console.debug(stats);
         return Promise.resolve();
     }
 
