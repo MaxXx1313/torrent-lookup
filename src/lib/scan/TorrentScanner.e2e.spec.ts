@@ -1,25 +1,30 @@
 import { TorrentScanner } from './TorrentScanner';
 import { expect } from '@jest/globals';
+import * as path from 'path';
 
 
 
 describe('TorrentScanner.e2e', function () {
 
-    let target = __dirname + '/../../../test/fixtures/t1';
+    // normalize path
+    const target = path.resolve(__dirname + '/../../../test/fixtures');
 
     it('simple scan', function (done) {
 
         const expectedFiles = [
-            target + "/subfolder/test1.txt:1"
+            target + "/t1/sourcefile/test1.txt",
+            target + "/t2/sourcefolder/file1.txt",
+            target + "/t2/sourcefolder/file2.txt",
+            target + "/t2/sourcefolder/file3.txt",
         ];
 
         const expectedTorrents = [
-            target + "/Sheltered [rutracker.org].t5364696.torrent",
-            target + "/[NNM-Club.me]_Q3 2015.torrent",
+            target + "/t1/fixture1 - test1.txt.torrent",
+            target + "/t2/fixture2 - sourcefolder.torrent",
         ];
         const statsExpected = {
-            files: 2,
-            torrents: 2
+            files: 4,
+            torrents: 2,
         };
 
         let files = [];
@@ -35,7 +40,7 @@ describe('TorrentScanner.e2e', function () {
                 if (entry.isTorrent) {
                     torrents.push(entry.location);
                 } else {
-                    files.push(location);
+                    files.push(entry.location);
                 }
             }
         });
@@ -56,8 +61,12 @@ describe('TorrentScanner.e2e', function () {
 });
 
 function assertArray(expectedArray: any[], actualArray: any[]) {
-    expect(expectedArray.length).toEqual(actualArray.length);
     for (const elem of actualArray) {
         expect(expectedArray).toContain(elem);
     }
+    // make it easy to recognize error
+    for (const elem of expectedArray) {
+        expect(actualArray).toContain(elem);
+    }
+    expect(expectedArray.length).toEqual(actualArray.length);
 }

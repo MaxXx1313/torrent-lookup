@@ -84,7 +84,6 @@ export class TorrentScanner {
             ...(options || {}),
         }
 
-
         this.scanner = new FileScanner({
             exclude: this.options.exclude,
             cbFileFound: this._onFile.bind(this),
@@ -146,25 +145,25 @@ export class TorrentScanner {
 
 
     /**
-     * @param {string} location
+     * @param {string} filepath
      * @param {fs.Stats} stats
      */
-    protected _onFile(location: string, stats: Stats): Promise<any> {
+    protected _onFile(filepath: string, stats: Stats): Promise<any> {
         return new Promise<void>((resolve, reject) => {
-            location = path.resolve(location); // make path absolute;
-            const isTorrent = this.isTorrentFile(location, stats);
+            filepath = path.resolve(filepath); // make path absolute;
+            const isTorrent = this.isTorrentFile(filepath, stats);
 
             this.onEntry.next({
                 type: "file",
                 isTorrent,
-                location
+                location: filepath,
             });
 
             if (isTorrent) {
                 this.stats.torrents++;
 
                 // write to torrent list
-                this._torrFileStream.write(location + '\n', (err) => {
+                this._torrFileStream.write(filepath + '\n', (err) => {
                     err ? reject(err) : resolve();
                 });
             } else {
@@ -172,7 +171,7 @@ export class TorrentScanner {
 
                 // get relative location
                 // const locRelative = this.shiftRelative(location);
-                this._dataFileStream.write(location + ':' + stats.size + '\n', (err) => {
+                this._dataFileStream.write(filepath + ':' + stats.size + '\n', (err) => {
                     err ? reject(err) : resolve();
                 });
             }

@@ -21,11 +21,11 @@ export interface FileScannerOption {
      */
     exclude?: Array<string>;
 
-    cbFileFound: (location?: string, stats?: Stats) => Promise<any>;
+    cbFileFound: (filepath?: string, stats?: Stats) => Promise<any>;
 
-    cbFolderFound?: (location?: string, stats?: Stats) => Promise<any>;
-    cbOtherFound?: (location?: string, stats?: Stats) => Promise<any>;
-    cbError?: (e?: Error, location?: string) => Promise<any>;
+    cbFolderFound?: (filepath?: string, stats?: Stats) => Promise<any>;
+    cbOtherFound?: (filepath?: string, stats?: Stats) => Promise<any>;
+    cbError?: (e?: Error, filepath?: string) => Promise<any>;
 }
 
 
@@ -92,15 +92,15 @@ export class FileScanner {
 
 
     /**
-     * @param location
+     * @param filepath
      * @private
      */
-    isExcluded(location:string) {
-        // let locationComponents = location.split(path.sep);
+    isExcluded(filepath: string) {
+        // let locationComponents = filepath.split(path.sep);
 
-        const excluded = !this._exclude.every(rule => !matchCustom(location, rule));
+        const excluded = !this._exclude.every(rule => !matchCustom(filepath, rule));
         if (excluded) {
-            console.debug('Excluded:', location);
+            console.debug('Excluded:', filepath);
         }
         return excluded;
     }
@@ -127,19 +127,17 @@ export class FileScanner {
      * @param {string} filepath
      */
     protected async _scanFolder(filepath: string): Promise<any> {
-
         // TODO: verbose log
-        console.log('_scanFolder: "%s"', location);
         const folderEntries = await readdir(filepath);
-        // console.log('_scanFolder: "%s"', location, folderEntries);
+        // console.log('_scanFolder: "%s"', filepath, folderEntries);
 
-        for (let i = folderEntries.length - 1; i >= 0; i--) {
+        for (const fileOrFolder of folderEntries) {
             // get absolute path
-            const childLocation = path.join(filepath, folderEntries[i]);
-
+            const childLocation = path.join(filepath, fileOrFolder);
             if (this.isExcluded(childLocation)) {
                 continue;
             }
+
 
             // get stats
             const stats = fs.lstatSync(childLocation);
@@ -152,8 +150,6 @@ export class FileScanner {
                 continue;
             }
 
-            // console.log(self);
-
             if (stats.isDirectory()) {
                 // addTarget() will validate entry with isExcluded() one more time. We don't need it here/already passed
                 // this.addTarget(childLocation);
@@ -164,6 +160,7 @@ export class FileScanner {
             } else {
                 await this._options.cbOtherFound(childLocation, stats);
             }
+
         }
     }
 
