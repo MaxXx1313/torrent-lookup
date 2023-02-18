@@ -93,7 +93,6 @@ export class TorrentScanner {
         if (this.options.target) {
             this.addTarget(this.options.target);
         }
-        this.resetStats();
     }
 
     /**
@@ -109,6 +108,7 @@ export class TorrentScanner {
      */
     run(): Promise<any> {
         // SCAN
+        this.resetStats();
         return Promise.resolve()
             .then(() => this._beforeScan())
             .then(() => this.scanner.run())
