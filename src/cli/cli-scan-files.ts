@@ -2,8 +2,8 @@ import { CliOptions } from './CliOptions';
 import * as assert from 'assert';
 import { debounce } from '../lib/utils/tools';
 import { TorrentScanner, TorrentScannerEntry } from '../lib';
+import { LopConsole } from './LopConsole';
 
-const LopConsole = require('./LopConsole');
 const logger = new LopConsole();
 
 
@@ -36,7 +36,7 @@ export function cliScanFiles(options: CliOptions): Promise<any> {
     // SCAN
     scanner.onEntry.subscribe(_onProgress);
 
-    logger.startLOP('scanning');
+    logger.startLOP();
     return scanner.run().then(() => {
         logger.stopLOP();
         logger.log('Scanned %s files, found %s torrent files', scanner.stats.files, scanner.stats.torrents);

@@ -51,6 +51,7 @@
     "@types/command-line-args": "^5.2.0",
     "@types/command-line-usage": "^5.0.2",
     "@types/node": "^16.18.12",
+    "@types/single-line-log": "^1.1.0",
     "mocha": "^10.2.0",
     "typescript": "^4.9.5"
   }

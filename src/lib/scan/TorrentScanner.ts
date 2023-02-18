@@ -149,8 +149,8 @@ export class TorrentScanner {
      * @param {string} location
      * @param {fs.Stats} stats
      */
-    protected async _onFile(location: string, stats: Stats): Promise<any> {
-        return new Promise((resolve, reject) => {
+    protected _onFile(location: string, stats: Stats): Promise<any> {
+        return new Promise<void>((resolve, reject) => {
             location = path.resolve(location); // make path absolute;
             const isTorrent = this.isTorrentFile(location, stats);
 

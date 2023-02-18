@@ -55,15 +55,15 @@ export class FileScanner {
      * @param options
      */
     constructor(options: FileScannerOption) {
-        // super();
         this.jobWorker = new QueueWorker(this.scanFolder.bind(this));
 
-        this._options = Object.assign({}, {
+        this._options = {
             cbError: FileScanner.cbErrorDefault,
             cbFileFound: FileScanner.cbNoOperation,
             cbFolderFound: FileScanner.cbNoOperation,
             cbOtherFound: FileScanner.cbOtherFound,
-        }, options);
+            ...(options || {}),
+        };
 
 
         if (this._options.exclude) {
@@ -95,7 +95,7 @@ export class FileScanner {
      * @param location
      * @private
      */
-    isExcluded(location) {
+    isExcluded(location:string) {
         // let locationComponents = location.split(path.sep);
 
         const excluded = !this._exclude.every(rule => !matchCustom(location, rule));
@@ -111,9 +111,9 @@ export class FileScanner {
      * @param location
      */
     protected async scanFolder(location: string): Promise<any> {
-        //fix windows drive root
+        // fix windows drive root
         if (location.match(/^\w{1}:\\?$/)) {
-            // location is "C:" o "C:\"
+            // location is a pure drive letter: "C:" o "C:\"
             location = location.substr(0, 2) + '/';
         }
         return Promise.resolve()
@@ -170,19 +170,16 @@ export class FileScanner {
 
 
     /**
-     * @param {Error} err
+     *
      */
     static cbErrorDefault(err: ErrnoException): Promise<any> {
-        // skip no file and access warning
-        // if (err.code != 'ENOENT') {
         console.warn('FileScanner:', err.message);
-        // }
         return Promise.resolve();
     }
 
     /**
      */
-    static cbNoOperation(ile: string, stats: Stats): Promise<any> {
+    static cbNoOperation(file: string, stats: Stats): Promise<any> {
         return Promise.resolve();
     }
 
@@ -190,7 +187,7 @@ export class FileScanner {
     /**
      */
     static cbOtherFound(file: string, stats: Stats): Promise<any> {
-        console.warn('FileScanner: Skip unknown entry type:', file, stats);
+        console.log('FileScanner: Skip unknown entry type:', file, stats);
         return Promise.resolve();
     }
 

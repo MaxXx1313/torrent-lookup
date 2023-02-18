@@ -1,87 +1,80 @@
-"use strict";
-const util = require('util');
-const singleLog = require('single-line-log').stdout;
+import { stdout } from 'single-line-log';
+import * as util from 'util';
 
 
 
 const ANIMATION_DELAY = 100;
 
+const STATE_ANIMATION = ['-', '\\', '/'];
 
 /**
  * Console long operation mode
  */
-const LopConsole = (function () {
+export class LopConsole {
+
+    private _status = 'Please wait...';
+
+    private _stateIds = 0;
+    private _stateLength = STATE_ANIMATION.length;
+
+    private startTime: number | null;
+    private endTime: number | null;
+    private _animationTimer;
+
+
     /**
      *
      */
-    function LopConsole() {
-        this._status = 'Please wait...';
-        this.states = ['-', '\\', '/'];
-        this.stateLength = this.states.length;
-        this.idx = 0; // state index
-
-        //
-        // let console_log_original = console.log;
-        // console.log = lop_console_log;
+    log(...args) {
+        this.clear();   //remove active line
+        console.log.apply(console, args); // push data
+        // this._print(); // resume progress
     }
 
     /**
-     *
+     * Start Long Operation
      */
-    LopConsole.prototype.log = function () {
-        this.clear();   //remove active line
-        console.log.apply(console, arguments); // push data
-        // this._print(); // resume progress
-    };
-
-    /**
-     * Start Long Opration
-     */
-    LopConsole.prototype.startLOP = function (args) {
-        var _this = this;
-        // console.log.apply(console, arguments);
+    startLOP() {
         this.startTime = Date.now();
         this.endTime = null;
         this._animationTimer = setInterval(function () {
-            this.idx = (this.idx + 1) % this.stateLength;
+            this._stateIds = (this._stateIds + 1) % this._stateLength;
             this._print();
             // this._animationTimer.unref();
         }.bind(this), ANIMATION_DELAY);
-    };
+    }
+
     /**
-     * Stop Long OPeration
+     * Stop Long Operation
      */
-    LopConsole.prototype.stopLOP = function () {
+    stopLOP() {
         clearInterval(this._animationTimer);
         this.endTime = Date.now();
 
         this.clear();
-    };
+    }
+
     /**
      * Get elapsed milliseconds
      * @return {number}
      */
-    LopConsole.prototype.elapsedLOP = function () {
+    elapsedLOP() {
         return (this.endTime || Date.now()) - this.startTime;
-    };
+    }
+
     /**
      * Update long operation progress
      */
-    LopConsole.prototype.logLOP = function () {
-        this._status = util.format.apply(util, arguments);
-    };
+    logLOP(...args) {
+        this._status = util.format.apply(util, args);
+    }
 
-    LopConsole.prototype._print = function () {
-        singleLog(util.format('[%s] %s', this.states[this.idx], this._status)); // write text
-    };
+    _print() {
+        stdout(util.format('[%s] %s', STATE_ANIMATION[this._stateLength], this._status)); // write text
+    }
 
+    clear = function () {
+        stdout('');
+    }
 
-    LopConsole.prototype.clear = function () {
-        singleLog('');
-        // singleLog.clear(); // not work
-    };
-
-
-    return LopConsole;
-}());
-module.exports = LopConsole;
+}
