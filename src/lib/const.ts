@@ -2,8 +2,8 @@
 const path = require('path');
 const os = require('os');
 
-export const FN_DATA_FILE = 'files.bin';
-export const FN_TORRENTS_FILE = 'torrents.bin';
+export const FN_DATA_FILE = 'files.txt';
+export const FN_TORRENTS_FILE = 'torrents.txt';
 export const FN_MAPS_FILE = 'maps.json';
 
 export const DEFAULT_WORKDIR_LOCATION = path.join(os.tmpdir(), 'tlookup'); // '~/tmp'

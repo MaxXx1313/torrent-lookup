@@ -1,0 +1,2 @@
+/home/chertkov/Projects/tlookup3/test/fixtures/t2/fixture2 - sourcefolder.torrent
+/home/chertkov/Projects/tlookup3/test/fixtures/t1/fixture1 - test1.txt.torrent
