@@ -6,7 +6,7 @@ import { Subject } from "rxjs";
 import { writeFile } from "../utils/fsPromise";
 import { TorrentData } from './TorrentData';
 import * as readline from 'node:readline';
-import bencode from 'bencode'
+import * as bencode from 'bencode';
 
 
 
