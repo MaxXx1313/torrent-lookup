@@ -77,16 +77,16 @@ export class Pusher {
     }
 
     /**
-     *
+     * @private
      */
-    protected async _pushAll(matchArr: TorrentMapping[]): Promise<any> {
+    public async _pushAll(matchArr: TorrentMapping[]): Promise<any> {
         for (const torrentMapping of matchArr) {
             await this.push(torrentMapping.torrent, torrentMapping.saveTo);
         }
     }
 
     /**
-     *
+     * @private
      */
     protected loadMapping(): TorrentMapping[] {
         const mapsFileName = path.join(this.options.workdir, FN_MAPS_FILE);
