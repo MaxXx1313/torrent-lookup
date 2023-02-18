@@ -1,18 +1,18 @@
 import * as fs from 'fs';
+import { Stats, WriteStream } from 'fs';
 import * as path from 'path';
-import * as assert from 'assert';
-import { DEFAULT_WORKDIR_LOCATION, FN_DATA_FILE, FN_MAPS_FILE, FN_TORRENTS_FILE, TORRENT_EXTENSION } from "../const";
+import { DEFAULT_WORKDIR_LOCATION, FN_DATA_FILE, FN_TORRENTS_FILE, TORRENT_EXTENSION } from "../const";
 import { pesistFolderSync } from "../utils/fsPromise";
-import { Stats, WriteStream } from "fs";
 import { FileScanner } from "./FileScanner";
-import { Observable, Subject } from "rxjs";
+import { Subject } from "rxjs";
+
 
 
 export interface TorrentScannerOptions {
     /**
      * Target folder to scan
      */
-    target?: string;
+    target?: string[];
 
     /**
      * Folder for storing temp results
@@ -47,7 +47,7 @@ export interface TorrentScannerEntry {
 
 /**
  * 1. use Scanner to scan files and folders
- *   1.1 chech is that file is a torrent file
+ *   1.1 check is that file is a torrent file
  *     1.1.1 write torrent file into one list
  *     1.1.2 write ordinary file into another list(with file size)
  *
@@ -57,9 +57,9 @@ export class TorrentScanner {
 
     public readonly onEntry: Subject<TorrentScannerEntry> = new Subject();
 
-    options: TorrentScannerOptions;
+    public options: TorrentScannerOptions;
 
-    stats: TorrentScannerStats;
+    public stats: TorrentScannerStats;
 
     private scanner: FileScanner;
 
@@ -68,15 +68,16 @@ export class TorrentScanner {
 
     private _lastFile: string;
 
+
     /**
-     *
      * @param {TorrentScannerOptions} options
      */
     constructor(options: TorrentScannerOptions) {
 
-        this.options = Object.assign({}, {
-            workdir: DEFAULT_WORKDIR_LOCATION
-        }, options);
+        this.options = {
+            workdir: DEFAULT_WORKDIR_LOCATION,
+            ...(options || {}),
+        }
 
 
         this.scanner = new FileScanner({
@@ -104,9 +105,9 @@ export class TorrentScanner {
     run(): Promise<any> {
         // SCAN
         return Promise.resolve()
-            .then(()=>this._beforeScan())
-            .then(()=>this.scanner.run())
-            .then(()=>this._afterScan());
+            .then(() => this._beforeScan())
+            .then(() => this.scanner.run())
+            .then(() => this._afterScan());
     }
 
     /**
@@ -129,8 +130,12 @@ export class TorrentScanner {
      */
     protected _afterScan(): Promise<any> {
         return Promise.all([
-            new Promise((resolve) => { this._dataFileStream.end(resolve); }),
-            new Promise((resolve) => { this._torrFileStream.end(resolve); }),
+            new Promise((resolve) => {
+                this._dataFileStream.end(resolve);
+            }),
+            new Promise((resolve) => {
+                this._torrFileStream.end(resolve);
+            }),
         ]);
     }
 

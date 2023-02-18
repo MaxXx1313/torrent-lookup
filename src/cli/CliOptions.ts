@@ -1,3 +1,7 @@
+import { OptionsParsed } from './cli-parse-option';
+
+
+
 export interface CliOptions {
     operation: 'find' | 'push' | 'info';
     verbose: boolean;
@@ -6,7 +10,7 @@ export interface CliOptions {
     /**
      * For 'scan' only
      */
-    target: string; // TODO: []
+    target: string[];
     tmp: string;
 
     /**
@@ -14,7 +18,8 @@ export interface CliOptions {
      */
     client: string;
     /**
+     * client options
      * for 'push' only
      */
-    clientOptions: object;
+    option: OptionsParsed;
 }
