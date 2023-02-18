@@ -109,7 +109,7 @@ describe('Analyzer', function () {
 
             // console.log(analyzer._hash);
             filesToMatch.forEach(file => {
-                analyzer._matchFile(file[0], file[1]);
+                analyzer.matchFile(file[0], file[1]);
             });
             expect(analyzer._hash['file1.txt:13']).toStrictEqual(expected['file1.txt:13']);
 
@@ -122,7 +122,7 @@ describe('Analyzer', function () {
                 analyzer._addToHash(input);
             });
             filesToMatch.forEach(file => {
-                analyzer._matchFile(file[0], file[1]);
+                analyzer.matchFile(file[0], file[1]);
             });
 
             //
@@ -141,7 +141,7 @@ describe('Analyzer', function () {
                 analyzer._addToHash(input);
             });
             filesToMatch.forEach(file => {
-                analyzer._matchFile(file[0], file[1]);
+                analyzer.matchFile(file[0], file[1]);
             });
             analyzer._regroupHash();
 

@@ -51,7 +51,7 @@ describe('Analyzer.e2e', function () {
 
         const analyzer = new Analyzer();
 
-        const data = analyzer._loadTorrentFileSync(assetsPath + '/t1/fixture1 - test1.txt.torrent');
+        analyzer.loadTorrentFileSync(assetsPath + '/t1/fixture1 - test1.txt.torrent');
 
         const expected = [{
             dir: '',
@@ -70,7 +70,7 @@ describe('Analyzer.e2e', function () {
 
         const analyzer = new Analyzer();
 
-        const data = analyzer._loadTorrentFileSync(assetsPath + '/t2/fixture2 - sourcefolder.torrent');
+        analyzer.loadTorrentFileSync(assetsPath + '/t2/fixture2 - sourcefolder.torrent');
 
         // console.log(data);
         const expectedFiles = [
@@ -107,7 +107,7 @@ describe('Analyzer.e2e', function () {
 
         expect(() => {
 
-            analyzer._loadTorrentFileSync(assetsPath + '/t1/nonexistedFile.torrent');
+            analyzer.loadTorrentFileSync(assetsPath + '/t1/nonexistedFile.torrent');
 
         }).toThrow();
 

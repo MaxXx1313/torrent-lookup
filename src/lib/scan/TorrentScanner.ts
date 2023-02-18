@@ -5,6 +5,7 @@ import { DEFAULT_WORKDIR_LOCATION, FN_DATA_FILE, FN_TORRENTS_FILE, TORRENT_EXTEN
 import { pesistFolderSync } from "../utils/fsPromise";
 import { FileScanner } from "./FileScanner";
 import { Subject } from "rxjs";
+import { FileMatcher } from '../utils/FileMatcher';
 
 
 
@@ -171,7 +172,8 @@ export class TorrentScanner {
 
                 // get relative location
                 // const locRelative = this.shiftRelative(location);
-                this._dataFileStream.write(filepath + ':' + stats.size + '\n', (err) => {
+                const fileInfoStr = FileMatcher.combineFileInfo({location: filepath, size: stats.size});
+                this._dataFileStream.write(fileInfoStr + '\n', (err) => {
                     err ? reject(err) : resolve();
                 });
             }
