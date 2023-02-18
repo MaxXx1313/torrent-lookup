@@ -1,6 +1,6 @@
 {
   "name": "tlookup",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Command-line tool for looking torrent files and downloaded content. Match them together and add it to your favorite torrent client.",
   "keywords": [
     "torrents"
