@@ -3,7 +3,7 @@ import { OptionsParsed } from './cli-parse-option';
 
 
 export interface CliOptions {
-    operation: 'find' | 'push' | 'info';
+    operation: 'scan' | 'push' | 'info';
     verbose: boolean;
     help: boolean;
 

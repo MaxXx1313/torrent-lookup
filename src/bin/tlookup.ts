@@ -25,7 +25,7 @@ const optionDefinitions: OptionDefinition[] = [
         name: 'operation',
         type: String,
         defaultOption: true,
-        description: "Operation. one of 'find', 'push', 'info'",
+        description: "Operation. one of 'scan', 'push', 'info'",
     },
 
     {
@@ -96,7 +96,7 @@ const optionDefinitions: OptionDefinition[] = [
 
     switch (options.operation) {
 
-        case 'find':
+        case 'scan':
             const findDefinitions = [
                 {name: 'target', defaultOption: true, multiple: true}
             ];
@@ -153,7 +153,7 @@ function usage() {
         {
             header: 'Operation',
             content: [
-                '{bold find} - scan files, find torrent files and it\'s downloads',
+                '{bold scan} - scan files, find torrent files and it\'s downloads',
                 '{bold push} - push torrents to client',
                 '{bold info} - print scan info'
             ]
