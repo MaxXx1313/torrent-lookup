@@ -31,4 +31,6 @@ export const SCAN_EXCLUDE_DEFAULT = [
     '/etc',
     'C:\\Windows', 
     'System Volume Information', 
+    '.cocoapods',
+    'Xcode',
 ];
