@@ -20,7 +20,7 @@ describe('Analyzer', function () {
             analyzer = new Analyzer();
         });
 
-        const torrentLocation = '/test/sometorrent.torrent';
+        const torrentLocation = assetsPath + '/t2/fixture2 - sourcefolder.torrent';
         const inputArr = [
             {
                 base: 'file1.txt',
@@ -45,171 +45,62 @@ describe('Analyzer', function () {
             },
         ];
 
-        const filesToMatch: Array<[string, number]> = [
-            ['/some/folder/file1', 13],
-        ];
 
-        const foundItems = [
-            {
-                base: 'file1.txt',
-                dir: 'sourcefolder',
-                length: 13,
-                torrent: torrentLocation,
-
-                // next is added:
-                match: [],
-            },
-            {
-                base: 'file2.txt',
-                dir: 'sourcefolder',
-                length: 14,
-                torrent: torrentLocation,
-
-                // next is added:
-                match: [],
-            },
-            // {
-            //     base: 'file3.txt',
-            //     dir: 'sourcefolder',
-            //     length: 14,
-            //     torrent: torrentLocation,
-            //
-            //     // next is added:
-            //     match: [],
-            // },
-        ];
-
-
-        it('_addToHash', function () {
-
+        it('loadTorrentFileSync', function () {
             const expected = {
                 'file1.txt:13': [inputArr[0]],
                 'file2.txt:14': [inputArr[1]],
                 'file3.txt:14': [inputArr[2]],
             };
-
-            inputArr.forEach(input => {
-                analyzer._addToHash(input);
-            });
+            analyzer.loadTorrentFileSync(torrentLocation);
             expect(analyzer._hash).toStrictEqual(expected);
-
         });
 
 
-        it('_matchFile', function () {
+        it('matchFile', function () {
+            analyzer.loadTorrentFileSync(torrentLocation);
 
-            inputArr.forEach(input => {
-                analyzer._addToHash(input);
-            });
-
+            const filesToMatch = [
+                {name: '/somepath/sourcefolder/file1.txt', size: 13},
+                {name: '/secondpath/sourcefolder/file1.txt', size: 13},
+                {name: '/otherpath/wrongfolder/file1.txt', size: 13},
+            ];
             const expected = {
-                'file1.txt:13': [foundItems[0]],
+                ...inputArr[0],
+                match: ['/somepath', '/secondpath'],
             };
 
-
-            // console.log(analyzer._hash);
-            filesToMatch.forEach(file => {
-                analyzer.matchFile(file[0], file[1]);
-            });
-            expect(analyzer._hash['file1.txt:13']).toStrictEqual(expected['file1.txt:13']);
+            for (const fileInfo of filesToMatch) {
+                analyzer.matchFile(fileInfo.name, fileInfo.size);
+            }
+            expect(analyzer._hash['file1.txt:13']).toStrictEqual([expected]);
 
         });
 
 
-        it('_regroupHash', function () {
+        it('analyzeCacheData', function () {
 
-            inputArr.forEach(input => {
-                analyzer._addToHash(input);
-            });
-            filesToMatch.forEach(file => {
-                analyzer.matchFile(file[0], file[1]);
-            });
-
-            //
-            const expected = {
-                [torrentLocation]: inputArr,
-            };
-
-            analyzer._regroupHash();
-            expect(analyzer._mapping).toStrictEqual(expected);
-        });
-
-
-        it.skip('_makeDecision #1', function () {
-
-            inputArr.forEach(input => {
-                analyzer._addToHash(input);
-            });
-            filesToMatch.forEach(file => {
-                analyzer.matchFile(file[0], file[1]);
-            });
-            analyzer._regroupHash();
+            analyzer.loadTorrentFileSync(torrentLocation);
+            const filesToMatch = [
+                {name: '/somepath/sourcefolder/file1.txt', size: 13},
+                {name: '/somepath/sourcefolder/file2.txt', size: 14},
+                {name: '/otherpath/sourcefolder/file1.txt', size: 13},
+            ];
+            for (const fileInfo of filesToMatch) {
+                analyzer.matchFile(fileInfo.name, fileInfo.size);
+            }
 
             ///
             const expected = [
                 {
                     torrent: torrentLocation,
-                    saveTo: '/home/maksim/Projects/tlookup3/test/fixtures/t1'
+                    saveTo: '/somepath'
                 },
             ];
 
-            analyzer._makeDecision();
+            analyzer.analyzeCacheData();
             expect(analyzer._decision).toStrictEqual(expected);
-
         });
-        //
-        //
-        // it('_makeDecision #2', function () {
-        //     let mapping = {
-        //         '/downloads/torrent1.torrent': [
-        //             {
-        //                 dir: 'dir1',
-        //                 base: "file1.txt",
-        //                 length: 1,
-        //                 torrent: '/downloads/torrent1.torrent',
-        //
-        //                 match: [
-        //                     '/downloads/data1',
-        //                     '/downloads/data2'
-        //                 ]
-        //             }, {
-        //                 dir: 'dir2',
-        //                 base: "file2.txt",
-        //                 length: 1,
-        //                 torrent: '/downloads/torrent1.torrent',
-        //
-        //                 match: [
-        //                     '/downloads/data2'
-        //                 ]
-        //             }
-        //         ],
-        //         '/downloads/torrent2.torrent': [
-        //             // no matter
-        //         ]
-        //     };
-        //
-        //     let expected = [{
-        //         torrent: '/downloads/torrent1.torrent',
-        //         saveTo: '/downloads/data2'
-        //     }, {
-        //         torrent: '/downloads/torrent2.torrent',
-        //         saveTo: undefined
-        //     }];
-        //
-        //     let a = new Analyzer();
-        //     a._mapping = mapping;
-        //     let maps = a._makeDecision();
-        //     assert.deepEqual(maps, expected);
-        //
-        // });
-
     });
-
-
-    // it('_saveJson', function () {
-    //     let a = new Analyzer();
-    //     a._decision = [1, 2, 3];
-    //     return a.saveTo(target + '/decision.json');
-    // });
 
 });

@@ -6,7 +6,7 @@ import { writeFile } from "../utils/fsPromise";
 import { promiseByLine } from '../utils/line-by-line';
 import { bencodeReadSync } from '../utils/bencode/bencode';
 import { FileMatcher } from '../utils/FileMatcher';
-import { cutBasePath } from '../utils/tools';
+import { extractBasePath } from '../utils/tools';
 
 
 
@@ -16,7 +16,7 @@ import { cutBasePath } from '../utils/tools';
  */
 interface TorrentProcessingInfo {
     base: string; // file name + extension
-    dir: string; // folder
+    dir: string; // folder, relative to torrent download location
     length: number; // file size
     torrent: string; // torrent location
     match: string[]; // path, which match this file by name(?)
@@ -64,20 +64,12 @@ export class Analyzer {
     /**
      *  key is a "filename:size"
      *  value is Array<TorrentProcessingInfo>
-     *  Note: one file can present in different torrents.
-     *  Moreover, file can be in one torrent file several times
+     *  Note:
+     *  - one 'key' can present in different torrents.
+     *  - one 'key' can be in one torrent file several times.
      *  @private
      */
     public _hash: { [location: string]: TorrentProcessingInfo[] } = {};
-
-
-    /**
-     *  key is torrent file location
-     *  value is TorrentInfo
-     *  @private
-     */
-    public _mapping: { [location: string]: TorrentProcessingInfo[] } = {};
-
 
     /**
      * Analyze result
@@ -85,6 +77,12 @@ export class Analyzer {
      */
     public _decision: TorrentMapping[];
 
+    /**
+     *  'key' is torrent file location
+     *  value is TorrentInfo[]
+     *  @private
+     */
+    private _mapping: { [location: string]: TorrentProcessingInfo[] } = {};
 
     /**
      *
@@ -107,7 +105,7 @@ export class Analyzer {
     }
 
     /**
-     *
+     * Main flow
      */
     analyze(): Promise<any> {
         const torrentsFileName = path.join(this.options.workdir, FN_TORRENTS_FILE);
@@ -115,10 +113,9 @@ export class Analyzer {
         const mapsFileName = path.join(this.options.workdir, FN_MAPS_FILE);
 
         return this.loadTorrentFilesFromFile(torrentsFileName)
-            .then(this.matchFiles.bind(this, dataFileName))
-            .then(this._regroupHash.bind(this))
-            .then(this._makeDecision.bind(this))
-            .then(this.saveTo.bind(this, mapsFileName));
+            .then(this.matchFilesFromFile.bind(this, dataFileName))
+            .then(this.analyzeCacheData.bind(this))
+            .then(this.saveDecisionTo.bind(this, mapsFileName));
     }
 
     /**
@@ -137,11 +134,54 @@ export class Analyzer {
 
     }
 
+    /**s
+     * @return {TorrentProcessingInfo}
+     * https://nodejs.org/dist/latest-v7.x/docs/api/path.html#path_path_parse_path
+     */
+    public loadTorrentFileSync(location): void {
+        const data = bencodeReadSync(location);
+
+        const encoding = data.encoding || 'UTF-8';
+
+        // console.log(data.info.files);
+        let files: TorrentProcessingInfo[];
+        if (!data.info.files) {
+            // single file
+            files = [{
+                base: (data.info.name as any).toString(encoding),
+                dir: '',
+                length: data.info.length,
+                torrent: location,
+                match: [],
+            }];
+        } else {
+            // multiple files
+            const name = (data.info.name as any).toString(encoding);
+
+            files = data.info.files.map(function (fileData) {
+                fileData.path.unshift(name);
+                return {
+                    base: (fileData.path.pop() as any).toString(encoding),
+                    dir: fileData.path.join('/'),
+
+                    length: fileData.length,
+                    torrent: location,
+                    match: [],
+                }
+            });
+        }
+
+        //
+        for (const file of files) {
+            this._addToHash(file);
+        }
+    }
+
 
     /**
      *
      */
-    public matchFiles(dataFile: string): Promise<void> {
+    public matchFilesFromFile(dataFile: string): Promise<void> {
         this.opStatus.next('Matching files');
 
         return promiseByLine(dataFile, (fileInfoString) => {
@@ -182,7 +222,7 @@ export class Analyzer {
             for (const item of matchTorrentInfo) {
                 // TODO: 'no-relocate-inside-torrent' option
                 // 2. match path
-                let savedTo = cutBasePath(pathInfo.dir, item.dir);
+                const savedTo = extractBasePath(pathInfo.dir, item.dir);
                 // console.log(' matched', pathInfo.dir, item.dir, savedTo);
                 if (savedTo) {
                     // location found
@@ -193,12 +233,37 @@ export class Analyzer {
         }
     }
 
+    /**
+     * analyze everything that is loaded and matched.
+     * This calculates the decision where to keep torrent file data
+     */
+    public analyzeCacheData(): void {
+        this._regroupHash();
+        this._hash = null; // free some memory
+        this._makeDecision();
+    }
+
+    /**
+     *
+     */
+    public getDecision() {
+        return this._decision;
+    }
+
+    /**
+     */
+    saveDecisionTo(mappingFileLocation: string): Promise<any> {
+        this.opStatus.next('Saving');
+
+        const data = this._decision;
+        return writeFile(mappingFileLocation, JSON.stringify(data));
+    }
 
     /**
      * group by torrent location
      * @private
      */
-    public _regroupHash() {
+    private _regroupHash(): void {
         this.opStatus.next('Hashing results');
 
         this._mapping = {};
@@ -209,114 +274,68 @@ export class Analyzer {
                 this._mapping[torrent].push(torrentInfo);
             });
         });
-        this._hash = null; // free some memory
     }
 
     /**
      * @return {Array<TorrentMapping>}
      * @private
      */
-    public _makeDecision(): void {
+    private _makeDecision(): void {
         this.opStatus.next('Analyzing');
-        this._decision = Object.keys(this._mapping).map(torrent => {
 
-            // key is path, value is a score
-            const pathArr: { [path: string]: number } = {};
+        let mapping: TorrentMapping[] = [];
+        for (const torrent in this._mapping) {
 
-            this._mapping[torrent].forEach(torrentInfo => {
+            /*
+              Here we calculate score based on how many files from the torrent are kept in the same location
+              This step si needed because torrent can be downloaded in many places
+                or we can find a piece of data in the other location
+             */
+            // key is absolute path, value is a score
+            const scoreHash: { [path: string]: number } = {};
+
+            for (const torrentInfo of this._mapping[torrent]) {
                 if (!torrentInfo.match) {
+                    // nothing found for this torrent file
                     return;
                 }
-
                 // collect scores
-                torrentInfo.match.forEach(path => {
-                    pathArr[path] = (pathArr[path] || 0) + 1;
-                });
-
-            });
+                for (const matchPath of torrentInfo.match) {
+                    scoreHash[matchPath] = (scoreHash[matchPath] || 0) + 1;
+                }
+            }
 
             // choose max
             let maxScore = -1;
-            let saveTo;
-            Object.keys(pathArr).forEach(function (location) {
-                if (maxScore < pathArr[location]) {
-                    maxScore = pathArr[location];
-                    saveTo = location;
+            let saveTo: string | undefined;
+            for (const h in scoreHash) {
+                if (maxScore < scoreHash[h]) {
+                    maxScore = scoreHash[h];
+                    saveTo = h;
                 }
-            });
+            }
 
-            /**
-             * @type {TorrentMapping}
-             */
-            return {
-                torrent: torrent,
-                saveTo: saveTo
-            };
+            //
+            if (saveTo) {
+                mapping.push({
+                    torrent: torrent,
+                    saveTo: saveTo,
+                });
+            }
+        }
 
-        }).filter(mapping => mapping.saveTo);
+        this._decision = mapping;
 
         this.stats.maps = this._decision.length;
         this.opStatus.next('Found ' + this.stats.maps + ' matches');
     }
 
 
-    /**
-     */
-    saveTo(mappingFileLocation: string): Promise<any> {
-        this.opStatus.next('Saving');
-
-        const data = this._decision;
-        return writeFile(mappingFileLocation, JSON.stringify(data));
-    }
-
-    /**s
-     * @return {TorrentProcessingInfo}
-     * https://nodejs.org/dist/latest-v7.x/docs/api/path.html#path_path_parse_path
-     */
-    public loadTorrentFileSync(location): void {
-        const data = bencodeReadSync(location);
-
-        const encoding = data.encoding || 'UTF-8';
-
-        // console.log(data.info.files);
-        let files: TorrentProcessingInfo[];
-        if (!data.info.files) {
-            // single file
-            files = [{
-                base: (data.info.name as any).toString(encoding),
-                dir: '',
-                length: data.info.length,
-                torrent: location,
-                match: [],
-            }];
-        } else {
-            // multiple files
-            const name = (data.info.name as any).toString(encoding);
-
-            files = data.info.files.map(function (fileData) {
-                fileData.path.unshift(name);
-                return {
-                    base: (fileData.path.pop() as any).toString(encoding),
-                    dir: fileData.path.join('/'),
-
-                    length: fileData.length,
-                    torrent: location,
-                    match: [],
-                }
-            });
-        }
-
-        for (const file of files) {
-            this._addToHash(file);
-        }
-    }
 
     /**
      */
     private _addToHash(torrentInfo: TorrentProcessingInfo) {
-        let key = torrentInfo.base + ':' + torrentInfo.length;
-        // TODO: verbose log
-        // console.log('_addToHash', key);
+        const key = torrentInfo.base + ':' + torrentInfo.length;
         if (!this._hash[key]) {
             this._hash[key] = [];
         }

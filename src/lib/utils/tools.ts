@@ -1,4 +1,7 @@
 import * as path from 'path';
+
+
+
 const http = require('http');
 
 
@@ -75,11 +78,11 @@ export function request(opts, postData: any = null) {
 }
 
 /**
- * Cut basepath from {@param filepath} if {@param dir} is a child path
+ * Get basepath from {@param filepath} to {@param dir}, if it's a child
  * Otherwise return false
  * @private
  */
-export function cutBasePath(filepath: string, dir: string): string {
+export function extractBasePath(filepath: string, dir: string): string {
     if (dir == '') {
         return filepath;
     }

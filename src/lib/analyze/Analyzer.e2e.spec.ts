@@ -53,14 +53,16 @@ describe('Analyzer.e2e', function () {
 
         analyzer.loadTorrentFileSync(assetsPath + '/t1/fixture1 - test1.txt.torrent');
 
-        const expected = [{
-            dir: '',
-            base: 'test1.txt',
-            length: 13,
-            torrent: assetsPath + '/t1/fixture1 - test1.txt.torrent',
-            match: [],
-        }];
-        expect(data).toStrictEqual(expected);
+        const expected = {
+            'test1.txt:13': [{
+                dir: '',
+                base: 'test1.txt',
+                length: 13,
+                torrent: assetsPath + '/t1/fixture1 - test1.txt.torrent',
+                match: [],
+            }],
+        };
+        expect(analyzer._hash).toStrictEqual(expected);
 
 
     });
@@ -73,31 +75,31 @@ describe('Analyzer.e2e', function () {
         analyzer.loadTorrentFileSync(assetsPath + '/t2/fixture2 - sourcefolder.torrent');
 
         // console.log(data);
-        const expectedFiles = [
-            {
+        const expectedFiles = {
+            'file1.txt:13': [{
                 base: 'file1.txt',
                 dir: 'sourcefolder',
                 length: 13,
                 torrent: assetsPath + '/t2/fixture2 - sourcefolder.torrent',
                 match: [],
-            },
-            {
+            }],
+            'file2.txt:14': [{
                 base: 'file2.txt',
                 dir: 'sourcefolder',
                 length: 14,
                 torrent: assetsPath + '/t2/fixture2 - sourcefolder.torrent',
                 match: [],
-            },
-            {
+            }],
+            'file3.txt:14': [{
                 base: 'file3.txt',
                 dir: 'sourcefolder',
                 length: 14,
                 torrent: assetsPath + '/t2/fixture2 - sourcefolder.torrent',
                 match: [],
-            }
-        ];
+            }]
+        };
 
-        expect(data).toStrictEqual(expectedFiles);
+        expect(analyzer._hash).toStrictEqual(expectedFiles);
     });
 
 
