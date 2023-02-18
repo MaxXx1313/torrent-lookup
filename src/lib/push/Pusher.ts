@@ -6,7 +6,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { chainPromise } from "../utils/tools";
 import { ITorrentClient } from "./ITorrentClient";
-import { TlookupTransmission } from "./tlookup-transmission";
+import { TlookupTransmission } from "../../plugins/tlookup-transmission";
 
 
 /**

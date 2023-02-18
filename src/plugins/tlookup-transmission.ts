@@ -1,5 +1,5 @@
-import { clone, request } from "../utils/tools";
-import { ITorrentClient, PushResult } from "./ITorrentClient";
+import { clone, request } from "../lib/utils/tools";
+import { ITorrentClient, PushResult } from "../lib/push/ITorrentClient";
 
 
 const assert = require('assert');
