@@ -14,7 +14,7 @@ export class LopConsole {
 
     private _status = 'Please wait...';
 
-    private _stateIds = 0;
+    private _stateIdx = 0;
     private _stateLength = STATE_ANIMATION.length;
 
     private startTime: number | null;
@@ -38,7 +38,7 @@ export class LopConsole {
         this.startTime = Date.now();
         this.endTime = null;
         this._animationTimer = setInterval(function () {
-            this._stateIds = (this._stateIds + 1) % this._stateLength;
+            this._stateIdx = (this._stateIdx + 1) % this._stateLength;
             this._print();
             // this._animationTimer.unref();
         }.bind(this), ANIMATION_DELAY);
@@ -70,7 +70,7 @@ export class LopConsole {
     }
 
     _print() {
-        stdout(util.format('[%s] %s', STATE_ANIMATION[this._stateLength], this._status)); // write text
+        stdout(util.format('[%s] %s', STATE_ANIMATION[this._stateIdx], this._status)); // write text
     }
 
     clear = function () {

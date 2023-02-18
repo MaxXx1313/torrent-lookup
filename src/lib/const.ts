@@ -15,6 +15,7 @@ export const SCAN_EXCLUDE_DEFAULT = [
     '.npm',
     'node_modules',
     'npm-cache',
+    '.cache',
     '/etc',
     'C:\\Windows', 
     'System Volume Information', 
