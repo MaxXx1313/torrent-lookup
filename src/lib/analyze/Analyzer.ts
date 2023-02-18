@@ -3,11 +3,11 @@ import { DEFAULT_WORKDIR_LOCATION, FN_DATA_FILE, FN_MAPS_FILE, FN_TORRENTS_FILE 
 import * as fs from 'fs';
 import * as path from 'path';
 import { Subject } from "rxjs";
-import { TorrentData } from "bencode";
+import * as bencode from "bencode";
 import { writeFile } from "../utils/fsPromise";
+import { TorrentData } from '../../@types/bencode';
+import * as readline from 'node:readline';
 
-const LineByLineReader = require('line-by-line');
-const bencode = require('bencode');
 
 
 /**
@@ -19,7 +19,6 @@ interface TorrentProcessingInfo {
     dir: string; // folder
     length: number; // file size
     torrent: string; // torrent location
-
     match: string[]; // path, which match this file by name(?)
 }
 
@@ -60,7 +59,7 @@ export class Analyzer {
 
     public readonly opStatus: Subject<string> = new Subject();
 
-    options: AnalyzerOptions;
+    public options: AnalyzerOptions;
 
     /**
      *  key is a "filename+':'+size" =)
@@ -68,26 +67,26 @@ export class Analyzer {
      *  Note: one file can present in different torrens.
      *  Moreover it can be in one torrent file several times!
      */
-    _hash: { [location: string]: TorrentProcessingInfo[] } = {};
+    private _hash: { [location: string]: TorrentProcessingInfo[] } = {};
 
 
     /**
      *  key is torrent file location
      *  value is TorrentInfo
      */
-    _mapping: { [location: string]: TorrentProcessingInfo[] } = {};
+    private _mapping: { [location: string]: TorrentProcessingInfo[] } = {};
 
 
     /**
      * Analyze result
      */
-    _decision: TorrentMapping[];
+    private _decision: TorrentMapping[];
 
 
     /**
      *
      */
-    stats = {
+    public stats = {
         files: 0, // not a torrent file
         torrents: 0,
         maps: 0,
@@ -97,14 +96,13 @@ export class Analyzer {
     /**
      *
      */
-    private _lastFile: string;
+    // private _lastFile: string;
 
 
     /**
      * @param options
      */
     constructor(options: AnalyzerOptions) {
-
         this.options = Object.assign({}, {
             workdir: DEFAULT_WORKDIR_LOCATION
         }, options);
@@ -151,18 +149,18 @@ export class Analyzer {
     protected matchFiles(dFile): Promise<void> {
         this.opStatus.next('Matching files');
 
-        this._lastFile = null;
+        // this._lastFile = null;
 
         return promiseByLine(dFile, (fileInfo) => {
 
             // parse filepath and size
-            const [m, pathRelative, size] = fileInfo.match(/(.*):([-\d]+)$/) || [null, null, null];
+            const [m, pathAbsolute, size] = fileInfo.match(/(.*):([-\d]+)$/) || [null, null, null];
             if (!m) {
                 return null;
             }
 
             // get absolute location
-            const pathAbsolute = this.pushRelative(pathRelative);
+            // const pathAbsolute = this.pushRelative(pathRelative);
 
             //
             this._matchFile(pathAbsolute, parseInt(size));
@@ -181,7 +179,7 @@ export class Analyzer {
      *  1. try to match exact file + size
      *  TODO: 2. try to match exact filename
      */
-    _matchFile(location: string, size: number) {
+    private _matchFile(location: string, size: number) {
 
         const pathInfo = path.parse(location);
 
@@ -214,7 +212,7 @@ export class Analyzer {
      * Otherwise return false
      * @private
      */
-    __getBasePath(location: string, dir: string): string {
+    private __getBasePath(location: string, dir: string): string {
         // console.log('__matchPath', pathInfo, dir);
         if (dir == '') {
             return location;
@@ -230,7 +228,7 @@ export class Analyzer {
      * group by torrent location
      * @private
      */
-    _regroupHash() {
+    private _regroupHash() {
         this.opStatus.next('Hashing results');
 
         this._mapping = {};
@@ -248,7 +246,7 @@ export class Analyzer {
     /**
      * @return {Array<TorrentMapping>}
      */
-    _makeDecision(): void {
+    private _makeDecision(): void {
         this.opStatus.next('Analyzing');
         this._decision = Object.keys(this._mapping).map(torrent => {
 
@@ -292,19 +290,19 @@ export class Analyzer {
     }
 
 
-    /**
-     *
-     */
-    pushRelative(location) {
-        let locAbsolute;
-        if (this._lastFile) {
-            locAbsolute = path.join(this._lastFile + '/..', location);
-        } else {
-            locAbsolute = location;
-        }
-        this._lastFile = locAbsolute;
-        return locAbsolute;
-    }
+    // /**
+    //  *
+    //  */
+    // pushRelative(location) {
+    //     let locAbsolute;
+    //     if (this._lastFile) {
+    //         locAbsolute = path.join(this._lastFile + '/..', location);
+    //     } else {
+    //         locAbsolute = location;
+    //     }
+    //     this._lastFile = locAbsolute;
+    //     return locAbsolute;
+    // }
 
 
     /**
@@ -320,7 +318,7 @@ export class Analyzer {
     /**s
      * @return {TorrentProcessingInfo}
      */
-    _loadTorrentFileSync(location): TorrentProcessingInfo[] {
+    private _loadTorrentFileSync(location): TorrentProcessingInfo[] {
         const content = fs.readFileSync(location);
 
         const data: TorrentData = bencode.decode(content/*, 'UTF-8'*/);
@@ -330,7 +328,7 @@ export class Analyzer {
     /**
      * https://nodejs.org/dist/latest-v7.x/docs/api/path.html#path_path_parse_path
      */
-    protected _grabTorrentData(data: TorrentData, location: string): TorrentProcessingInfo[] {
+    private _grabTorrentData(data: TorrentData, location: string): TorrentProcessingInfo[] {
         delete data.info.pieces; // some binary data
         const encoding = data.encoding || 'UTF-8';
 
@@ -338,7 +336,7 @@ export class Analyzer {
         if (!data.info.files) {
             // single file
             return [{
-                base: (data.info.name as any).toString(encoding), // we need 'as any' to ignore error for toString() arguments
+                base: (data.info.name as any).toString(encoding),
                 dir: '',
                 length: data.info.length,
                 torrent: location,
@@ -365,7 +363,7 @@ export class Analyzer {
     /**
      * @param {TorrentProcessingInfo} torrentInfo
      */
-    _addToHash(torrentInfo: TorrentProcessingInfo) {
+    private _addToHash(torrentInfo: TorrentProcessingInfo) {
         let key = torrentInfo.base + ':' + torrentInfo.length;
         // TODO: verbose log
         // console.log('_addToHash', key);
@@ -380,23 +378,21 @@ export class Analyzer {
 
 
 /**
- * @param {string} file
- * @param {function(file:string)=>Promise} processFn
- * @param {function(e:Error)=>any} errorFn
  */
-function promiseByLine(file, processFn: (line: string) => Promise<void>, errorFn?: (e?: Error) => any) {
+function promiseByLine(file: string, processFn: (line: string) => Promise<void>, errorFn?: (e?: Error) => any) {
 
-    return new Promise(function (resolve) {
+    return new Promise<void>(function (resolve) {
 
-        const lr = new LineByLineReader(file);
+        const input = fs.createReadStream(file);
+        const lreader = readline.createInterface({input});
 
-        lr.on('error', function (err) {
+        lreader.on('error', function (err) {
             console.error(err);
         });
 
-        lr.on('line', function (line) {
+        lreader.on('line', function (line) {
             // pause emitting of lines...
-            lr.pause();
+            lreader.pause();
 
             // ...do your asynchronous line processing..
             Promise.resolve()
@@ -412,11 +408,11 @@ function promiseByLine(file, processFn: (line: string) => Promise<void>, errorFn
                 .then(function () {
 
                     // ...and continue emitting lines.
-                    lr.resume();
+                    lreader.resume();
                 });
         });
 
-        lr.on('end', function () {
+        lreader.on('close', function () {
             // All lines are read, file is closed now.
             resolve();
         });

@@ -71,7 +71,7 @@ export class TorrentScanner {
     private _dataFileStream: WriteStream;
     private _torrFileStream: WriteStream;
 
-    private _lastFile: string;
+    // private _lastFile: string;
 
 
     /**
@@ -125,7 +125,7 @@ export class TorrentScanner {
         const torrFileName = path.join(this.options.workdir, FN_TORRENTS_FILE);
 
         this.resetStats();
-        this._lastFile = null;
+        // this._lastFile = null;
         this._dataFileStream = fs.createWriteStream(dataFileName);
         this._torrFileStream = fs.createWriteStream(torrFileName);
     }
@@ -171,29 +171,29 @@ export class TorrentScanner {
                 this.stats.files++;
 
                 // get relative location
-                const locRelative = this.shiftRelative(location);
-                this._dataFileStream.write(locRelative + ':' + stats.size + '\n', (err) => {
+                // const locRelative = this.shiftRelative(location);
+                this._dataFileStream.write(location + ':' + stats.size + '\n', (err) => {
                     err ? reject(err) : resolve();
                 });
             }
         });
     }
 
-
-    /**
-     * Get file location  and return relative path from previous file.
-     * Also set internal relative path to a new one
-     */
-    private shiftRelative(location) {
-        var locRelative;
-        if (this._lastFile) {
-            locRelative = path.relative(this._lastFile + '/..', location);
-        } else {
-            locRelative = location;
-        }
-        this._lastFile = location;
-        return locRelative;
-    }
+    //
+    // /**
+    //  * Get file location  and return relative path from previous file.
+    //  * Also set internal relative path to a new one
+    //  */
+    // private shiftRelative(location) {
+    //     var locRelative;
+    //     if (this._lastFile) {
+    //         locRelative = path.relative(this._lastFile + '/..', location);
+    //     } else {
+    //         locRelative = location;
+    //     }
+    //     this._lastFile = location;
+    //     return locRelative;
+    // }
 
 
     /**
