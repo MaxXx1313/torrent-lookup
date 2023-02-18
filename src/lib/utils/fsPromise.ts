@@ -1,31 +1,18 @@
-import fs = require('fs');
+import * as fs from 'fs';
+import { WriteFileOptions } from 'fs';
 
 
 
-declare const Promise: any;
-
-/**
- *
- */
-interface FileWriteOptions {
-    encoding?: string | null;
-    mode?: number | string;
-    flag?: string;
-}
-
-/**
- *
- */
 interface FileReadOptions {
-    encoding?: string | null;
-    flag?: string;
+    encoding?: null | undefined;
+    flag?: string | undefined;
 }
 
 /**
  *
  */
-export function writeFile(location: string, data: any, opts: FileWriteOptions = {}): Promise<any> {
-    return new Promise((resolve, reject) => {
+export function writeFile(location: string, data: any, opts: WriteFileOptions = {}): Promise<any> {
+    return new Promise<void>((resolve, reject) => {
         fs.writeFile(location, data, opts, function (err) {
             if (err) {
                 reject(err)
@@ -40,13 +27,13 @@ export function writeFile(location: string, data: any, opts: FileWriteOptions = 
 /**
  *
  */
-export function readFile(location: string, opts: FileReadOptions = {}): Promise<any> {
-    return new Promise((resolve, reject) => {
+export function readFile(location: string, opts: FileReadOptions = {}): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
         fs.readFile(location, opts, function (err, data) {
             if (err) {
                 reject(err)
             } else {
-                resolve(data);
+                resolve(data.toString());
             }
         });
     });
