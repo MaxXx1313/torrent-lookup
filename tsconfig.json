@@ -18,7 +18,8 @@
 
     "types": [
       // add node as an option
-      "node"
+      "node",
+      "jest",
     ]
   }
 }

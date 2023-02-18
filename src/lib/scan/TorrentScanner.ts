@@ -209,7 +209,7 @@ export class TorrentScanner {
     /**
      * @return {boolean}
      */
-    protected isTorrentFile(location, stats) {
+    isTorrentFile(location: string, stats?) {
         return (location.match(/(\.\w+)$/) || [])[1] == TORRENT_EXTENSION;
     }
 

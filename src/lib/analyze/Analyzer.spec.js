@@ -1,5 +1,5 @@
 
-const Analyzer = require('../lib/Analyzer').Analyzer;
+const Analyzer = require('../../../dist/lib/analyze/Analyzer').Analyzer;
 const assert = require('assert');
 const path = require('path');
 const fs = require('fs');
