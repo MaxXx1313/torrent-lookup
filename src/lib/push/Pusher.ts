@@ -9,6 +9,7 @@ import { ITorrentClient } from "./ITorrentClient";
 import { TlookupTransmission } from "../../plugins/tlookup-transmission";
 
 
+
 /**
  *
  */
@@ -23,20 +24,20 @@ export interface PusherOptions {
  */
 export class Pusher {
 
-
     public readonly opStatus: Subject<string> = new Subject();
 
-    options: PusherOptions;
-    client: ITorrentClient;
+    public options: PusherOptions;
+    public client: ITorrentClient;
 
     /**
      *
      */
     constructor(options: PusherOptions) {
 
-        this.options = Object.assign({}, {
-            workdir: DEFAULT_WORKDIR_LOCATION
-        }, options);
+        this.options = {
+            workdir: DEFAULT_WORKDIR_LOCATION,
+            ...options,
+        };
 
         this.client = Pusher.getClient(options);
     }
@@ -63,7 +64,7 @@ export class Pusher {
      *
      */
     pushAll(): Promise<any> {
-        return this._pushAll( this.loadMapping() );
+        return this._pushAll(this.loadMapping());
     }
 
     /**
@@ -79,10 +80,10 @@ export class Pusher {
     /**
      *
      */
-    protected _pushAll(matchArr: TorrentMapping[]): Promise<any> {
-        return chainPromise(matchArr, {drop: true}, (match) => {
-            return this.push(match.torrent, match.saveTo);
-        });
+    protected async _pushAll(matchArr: TorrentMapping[]): Promise<any> {
+        for (const torrentMapping of matchArr) {
+            await this.push(torrentMapping.torrent, torrentMapping.saveTo);
+        }
     }
 
     /**
@@ -90,7 +91,7 @@ export class Pusher {
      */
     protected loadMapping(): TorrentMapping[] {
         const mapsFileName = path.join(this.options.workdir, FN_MAPS_FILE);
-        return JSON.parse(fs.readFileSync(mapsFileName) as any as string);
+        return JSON.parse(fs.readFileSync(mapsFileName).toString());
     }
 
 } // -
