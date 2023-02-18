@@ -6,7 +6,9 @@
     "src/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "src/test.ts",
+    "src/**/*.spec.ts"
   ],
 
   "compilerOptions": {
@@ -18,7 +20,8 @@
 
     "types": [
       // add node as an option
-      "node"
+      "node",
+      "jest",
     ]
   }
 }

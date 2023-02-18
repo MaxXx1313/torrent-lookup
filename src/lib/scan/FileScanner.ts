@@ -21,11 +21,11 @@ export interface FileScannerOption {
      */
     exclude?: Array<string>;
 
-    cbFileFound: (location?: string, stats?: Stats) => Promise<any>;
+    cbFileFound: (filepath?: string, stats?: Stats) => Promise<any>;
 
-    cbFolderFound?: (location?: string, stats?: Stats) => Promise<any>;
-    cbOtherFound?: (location?: string, stats?: Stats) => Promise<any>;
-    cbError?: (e?: Error, location?: string) => Promise<any>;
+    cbFolderFound?: (filepath?: string, stats?: Stats) => Promise<any>;
+    cbOtherFound?: (filepath?: string, stats?: Stats) => Promise<any>;
+    cbError?: (e?: Error, filepath?: string) => Promise<any>;
 }
 
 
@@ -92,15 +92,15 @@ export class FileScanner {
 
 
     /**
-     * @param location
+     * @param filepath
      * @private
      */
-    isExcluded(location:string) {
-        // let locationComponents = location.split(path.sep);
+    isExcluded(filepath: string) {
+        // let locationComponents = filepath.split(path.sep);
 
-        const excluded = !this._exclude.every(rule => !matchCustom(location, rule));
+        const excluded = !this._exclude.every(rule => !matchCustom(filepath, rule));
         if (excluded) {
-            console.debug('Excluded:', location);
+            console.debug('Excluded:', filepath);
         }
         return excluded;
     }
@@ -108,39 +108,36 @@ export class FileScanner {
 
     /**
      * @description It a job=)
-     * @param location
+     * @param filepath
      */
-    protected async scanFolder(location: string): Promise<any> {
+    protected async scanFolder(filepath: string): Promise<any> {
         // fix windows drive root
-        if (location.match(/^\w{1}:\\?$/)) {
+        if (filepath.match(/^\w{1}:\\?$/)) {
             // location is a pure drive letter: "C:" o "C:\"
-            location = location.substr(0, 2) + '/';
+            filepath = filepath.substr(0, 2) + '/';
         }
         return Promise.resolve()
             .then(() => {
-                return this._scanFolder(location);
+                return this._scanFolder(filepath);
             })
             .catch(this._options.cbError.bind(this));
     }
 
     /**
-     * @param {string} location
+     * @param {string} filepath
      */
-    protected async _scanFolder(location: string): Promise<any> {
-        let self = this;
-
+    protected async _scanFolder(filepath: string): Promise<any> {
         // TODO: verbose log
-        // console.log('_scanFolder: "%s"', location);
-        const folderEntries = await readdir(location);
-        // console.log('_scanFolder: "%s"', location, folderEntries);
+        const folderEntries = await readdir(filepath);
+        // console.log('_scanFolder: "%s"', filepath, folderEntries);
 
-        for (let i = folderEntries.length - 1; i >= 0; i--) {
+        for (const fileOrFolder of folderEntries) {
             // get absolute path
-            const childLocation = path.join(location, folderEntries[i]);
-
-            if (self.isExcluded(childLocation)) {
+            const childLocation = path.join(filepath, fileOrFolder);
+            if (this.isExcluded(childLocation)) {
                 continue;
             }
+
 
             // get stats
             const stats = fs.lstatSync(childLocation);
@@ -153,8 +150,6 @@ export class FileScanner {
                 continue;
             }
 
-            // console.log(self);
-
             if (stats.isDirectory()) {
                 // addTarget() will validate entry with isExcluded() one more time. We don't need it here/already passed
                 // this.addTarget(childLocation);
@@ -165,6 +160,7 @@ export class FileScanner {
             } else {
                 await this._options.cbOtherFound(childLocation, stats);
             }
+
         }
     }
 

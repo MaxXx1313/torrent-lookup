@@ -1,0 +1,4 @@
+/home/chertkov/Projects/tlookup3/test/fixtures/t2/sourcefolder/file1.txt:13
+/home/chertkov/Projects/tlookup3/test/fixtures/t2/sourcefolder/file2.txt:14
+/home/chertkov/Projects/tlookup3/test/fixtures/t2/sourcefolder/file3.txt:14
+/home/chertkov/Projects/tlookup3/test/fixtures/t1/sourcefile/test1.txt:13

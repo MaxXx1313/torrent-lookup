@@ -65,22 +65,25 @@ export class Analyzer {
      *  key is a "filename+':'+size" =)
      *  value is Array<TorrentProcessingInfo>
      *  Note: one file can present in different torrens.
-     *  Moreover it can be in one torrent file several times!
+     *  Moreover, it can be in one torrent file several times!
+     *  @private
      */
-    private _hash: { [location: string]: TorrentProcessingInfo[] } = {};
+    public _hash: { [location: string]: TorrentProcessingInfo[] } = {};
 
 
     /**
      *  key is torrent file location
      *  value is TorrentInfo
+     *  @private
      */
-    private _mapping: { [location: string]: TorrentProcessingInfo[] } = {};
+    public _mapping: { [location: string]: TorrentProcessingInfo[] } = {};
 
 
     /**
      * Analyze result
+     * @private
      */
-    private _decision: TorrentMapping[];
+    public _decision: TorrentMapping[];
 
 
     /**
@@ -103,10 +106,11 @@ export class Analyzer {
     /**
      * @param options
      */
-    constructor(options: AnalyzerOptions) {
-        this.options = Object.assign({}, {
-            workdir: DEFAULT_WORKDIR_LOCATION
-        }, options);
+    constructor(options?: AnalyzerOptions) {
+        this.options = {
+            workdir: DEFAULT_WORKDIR_LOCATION,
+            ...(options || {}),
+        };
     }
 
     /**
@@ -175,12 +179,13 @@ export class Analyzer {
     /**
      * @param {string} location
      * @param {number} size
+     * @private
      *
      * Matching is quite challenged task
      *  1. try to match exact file + size
      *  TODO: 2. try to match exact filename
      */
-    private _matchFile(location: string, size: number) {
+    _matchFile(location: string, size: number) {
 
         const pathInfo = path.parse(location);
 
@@ -229,7 +234,7 @@ export class Analyzer {
      * group by torrent location
      * @private
      */
-    private _regroupHash() {
+    public _regroupHash() {
         this.opStatus.next('Hashing results');
 
         this._mapping = {};
@@ -246,8 +251,9 @@ export class Analyzer {
 
     /**
      * @return {Array<TorrentMapping>}
+     * @private
      */
-    private _makeDecision(): void {
+    public _makeDecision(): void {
         this.opStatus.next('Analyzing');
         this._decision = Object.keys(this._mapping).map(torrent => {
 
@@ -319,7 +325,7 @@ export class Analyzer {
     /**s
      * @return {TorrentProcessingInfo}
      */
-    private _loadTorrentFileSync(location): TorrentProcessingInfo[] {
+    _loadTorrentFileSync(location): TorrentProcessingInfo[] {
         const content = fs.readFileSync(location);
 
         const data: TorrentData = bencode.decode(content/*, 'UTF-8'*/);
@@ -364,7 +370,7 @@ export class Analyzer {
     /**
      * @param {TorrentProcessingInfo} torrentInfo
      */
-    private _addToHash(torrentInfo: TorrentProcessingInfo) {
+    _addToHash(torrentInfo: TorrentProcessingInfo) {
         let key = torrentInfo.base + ':' + torrentInfo.length;
         // TODO: verbose log
         // console.log('_addToHash', key);
