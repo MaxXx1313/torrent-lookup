@@ -53,13 +53,13 @@ describe('Analyzer', function () {
                 'file2.txt:14': [inputArr[1]],
                 'file3.txt:14': [inputArr[2]],
             };
-            analyzer.loadTorrentFileSync(torrentLocation);
+            analyzer.loadTorrentFile(torrentLocation);
             assert.deepEqual(analyzer._hash, expected);
         });
 
 
         it('matchFile', function () {
-            analyzer.loadTorrentFileSync(torrentLocation);
+            analyzer.loadTorrentFile(torrentLocation);
 
             const filesToMatch = [
                 {name: '/somepath/sourcefolder/file1.txt', size: 13},
@@ -81,7 +81,7 @@ describe('Analyzer', function () {
 
         it('analyzeCacheData', function () {
 
-            analyzer.loadTorrentFileSync(torrentLocation);
+            analyzer.loadTorrentFile(torrentLocation);
             const filesToMatch = [
                 {name: '/somepath/sourcefolder/file1.txt', size: 13},
                 {name: '/somepath/sourcefolder/file2.txt', size: 14},

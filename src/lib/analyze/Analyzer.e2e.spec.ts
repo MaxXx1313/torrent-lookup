@@ -1,7 +1,8 @@
 import { Analyzer } from './Analyzer';
-import * as path from 'path';
-import * as fs from 'fs';
-
+import path from 'node:path';
+import fs from 'node:fs';
+import { describe, it } from 'node:test';
+import assert from 'node:assert';
 
 
 describe('Analyzer.e2e', function () {
@@ -42,16 +43,16 @@ describe('Analyzer.e2e', function () {
                     expectChildPath(assetsPath, mapExpected[i].saveTo, mapActual[i].saveTo);
                     expectChildPath(assetsPath, mapExpected[i].torrent, mapActual[i].torrent);
                 }
-                expect(mapExpected.length).toBe(mapActual.length);
+                assert.equal(mapExpected.length, mapActual.length);
             });
     });
 
 
-    it('_loadTorrentFileSync - single file', function () {
+    it('_loadTorrentFileSync - single file', async function () {
 
         const analyzer = new Analyzer();
 
-        analyzer.loadTorrentFileSync(assetsPath + '/t1/fixture1 - test1.txt.torrent');
+        await analyzer.loadTorrentFile(assetsPath + '/t1/fixture1 - test1.txt.torrent');
 
         const expected = {
             'test1.txt:13': [{
@@ -62,17 +63,17 @@ describe('Analyzer.e2e', function () {
                 match: [],
             }],
         };
-        expect(analyzer._hash).toStrictEqual(expected);
+        assert.deepEqual(analyzer._hash, expected);
 
 
     });
 
 
-    it('_loadTorrentFileSync - many files', function () {
+    it('_loadTorrentFileSync - many files', async function () {
 
         const analyzer = new Analyzer();
 
-        analyzer.loadTorrentFileSync(assetsPath + '/t2/fixture2 - sourcefolder.torrent');
+        await analyzer.loadTorrentFile(assetsPath + '/t2/fixture2 - sourcefolder.torrent');
 
         // console.log(data);
         const expectedFiles = {
@@ -99,7 +100,7 @@ describe('Analyzer.e2e', function () {
             }]
         };
 
-        expect(analyzer._hash).toStrictEqual(expectedFiles);
+        assert.deepEqual(analyzer._hash, expectedFiles);
     });
 
 
@@ -107,11 +108,11 @@ describe('Analyzer.e2e', function () {
 
         const analyzer = new Analyzer();
 
-        expect(() => {
+        analyzer.loadTorrentFile(assetsPath + '/t1/nonexistedFile.torrent')
+            .then(() => {
+                assert.fail('Should not succeed');
+            })
 
-            analyzer.loadTorrentFileSync(assetsPath + '/t1/nonexistedFile.torrent');
-
-        }).toThrow();
 
     });
 

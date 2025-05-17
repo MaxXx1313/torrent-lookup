@@ -145,7 +145,7 @@ export class Analyzer {
         this.opStatus.next('Loading files');
 
         return promiseByLine(dataFileLocation, (line: string) => {
-            return this.loadTorrentFileSync(line)
+            return this.loadTorrentFile(line)
                 .catch(e => {
                     console.error('Unabe to load torrent file:', line);
                     console.error(e);
@@ -161,17 +161,15 @@ export class Analyzer {
      * @return {TorrentFileInfo}
      * https://nodejs.org/dist/latest-v7.x/docs/api/path.html#path_path_parse_path
      */
-    public async loadTorrentFileSync(filepath: string): Promise<void> {
+    public async loadTorrentFile(filepath: string): Promise<void> {
         const data = bencodeReadSync(filepath);
-
-        const encoding = data.encoding || 'UTF-8';
 
         // console.log(data.info.files);
         let files: TorrentFileInfo[];
         if (!data.info.files) {
             // single file
             files = [{
-                base: (data.info.name as any).toString(encoding),
+                base: data.info.name,
                 dir: '',
                 length: data.info.length,
 
@@ -180,7 +178,7 @@ export class Analyzer {
             }];
         } else {
             // multiple files
-            const name = (data.info.name as any).toString(encoding);
+            const name = data.info.name;
 
             // TODO: need to validate this
             files = data.info.files.map((fileData) => {
