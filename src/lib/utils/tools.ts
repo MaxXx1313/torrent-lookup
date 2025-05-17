@@ -1,5 +1,5 @@
-import path from 'node:path';
-import http from 'node:http';
+import * as path from 'node:path';
+import * as http from 'node:http';
 
 
 /**

@@ -1,5 +1,5 @@
-import path from 'node:path';
-import os from 'node:os';
+import * as path from 'node:path';
+import * as os from 'node:os';
 
 export const FN_DATA_FILE = 'files.txt';
 export const FN_TORRENTS_FILE = 'torrents.txt';

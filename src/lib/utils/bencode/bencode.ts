@@ -2,6 +2,10 @@ import fs from 'node:fs';
 import bencode from 'bencode';
 import { TorrentData } from './TorrentData.interface';
 
+// TODO: nodejs is not working here
+// const bencode ={
+//     decode:()=>null,
+// }as any;
 
 /**
  */

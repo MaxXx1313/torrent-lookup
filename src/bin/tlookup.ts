@@ -5,6 +5,10 @@ import { tick } from "../lib/utils/tools";
 import commandLineArgs from 'command-line-args';
 import commandLineUsage from 'command-line-usage';
 
+// TODO: nodejs is not working here
+// import * as commandLineArgs from 'command-line-args';
+// import * as commandLineUsage from 'command-line-usage';
+
 import { DEFAULT_WORKDIR_LOCATION } from "../lib/const";
 import { CliOptions } from '../cli/CliOptions';
 import { parseOptions } from '../cli/cli-parse-option';

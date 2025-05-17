@@ -1,5 +1,6 @@
-import fs, { Stats, WriteStream } from 'node:fs';
-import path from 'node:path';
+import * as fs from 'node:fs';
+import { Stats, WriteStream } from 'node:fs';
+import * as path from 'node:path';
 import {
     DEFAULT_WORKDIR_LOCATION,
     FN_DATA_FILE,

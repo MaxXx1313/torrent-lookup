@@ -1,7 +1,7 @@
 import { DEFAULT_WORKDIR_LOCATION, FN_DATA_FILE, FN_MAPS_FILE, FN_TORRENTS_FILE } from "../const";
 
-import path from 'node:path';
-import fs from 'node:fs/promises';
+import * as path from 'node:path';
+import * as fs from 'node:fs/promises';
 import { Subject } from "rxjs";
 import { promiseByLine } from '../utils/line-by-line';
 import { bencodeReadSync } from '../utils/bencode/bencode';

@@ -3,8 +3,8 @@ import { ITorrentClient, PushResult } from "../lib/push/ITorrentClient";
 import { UrlWithStringQuery } from 'url';
 
 
-import assert from 'node:assert';
-import url from 'node:url';
+import * as assert from 'node:assert';
+import * as url from 'node:url';
 
 
 const CSRF_HEADER = 'x-transmission-session-id';

@@ -1,9 +1,8 @@
 import { DEFAULT_WORKDIR_LOCATION, FN_MAPS_FILE } from "../const";
 
-import * as path from 'path';
-import { readFile } from "../utils/fsPromise";
+import * as path from 'node:path';
+import * as fs from 'node:fs/promises';
 import { TorrentMapping } from "./Analyzer";
-
 
 
 /**
@@ -46,7 +45,7 @@ export class Info {
      *
      */
     protected loadResultFile(location: string): Promise<TorrentMapping[]> {
-        return readFile(location).then(data => JSON.parse(data));
+        return fs.readFile(location, {encoding: 'utf-8'}).then(data => JSON.parse(data));
     }
 
 } // -
