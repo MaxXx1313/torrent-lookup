@@ -20,7 +20,6 @@
     "dist/**"
   ],
   "directories": {
-    "test": "test",
     "bin": "dist/bin",
     "lib": "dist/lib"
   },
@@ -31,7 +30,7 @@
     "tlookup": "dist/bin/tlookup.js"
   },
   "scripts": {
-    "test": "jest",
+    "test": "npx bun test",
     "tsc": "tsc",
     "dev": "npm run tsc && npm start -- ",
     "build": "npm run tsc; chmod +x ./dist/bin/tlookup.js",

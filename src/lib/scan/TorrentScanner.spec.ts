@@ -1,6 +1,7 @@
 import { TorrentScanner } from './TorrentScanner';
 import { FileScanner } from './FileScanner';
-import { expect } from '@jest/globals';
+import { describe, it } from 'node:test';
+import * as assert from 'node:assert';
 
 
 
@@ -10,9 +11,9 @@ describe('TorrentScanner', function () {
 
         let scanner = new TorrentScanner({target: []});
 
-        expect(scanner.isTorrentFile('/fixtures/[NNM-Club.me]_Q3 2015.torrent')).toBe(true);
-        expect(scanner.isTorrentFile('/fixtures/[NNM-Club.me]_Q3 2015.txt')).toBe(false);
-        expect(scanner.isTorrentFile('/fixtures/[NNM-Club.me]_Q3 2015.torrent.txt')).toBe(false);
+        assert.equal(scanner.isTorrentFile('/fixtures/[NNM-Club.me]_Q3 2015.torrent'), true);
+        assert.equal(scanner.isTorrentFile('/fixtures/[NNM-Club.me]_Q3 2015.txt'), false);
+        assert.equal(scanner.isTorrentFile('/fixtures/[NNM-Club.me]_Q3 2015.torrent.txt'), false);
     });
 
 
@@ -34,7 +35,7 @@ describe('TorrentScanner', function () {
         ];
 
         tests.forEach(test => {
-            expect(scanner.isExcluded(test[0])).toBe(test[1]);
+            assert.equal(scanner.isExcluded(test[0]), test[1]);
         });
 
     });

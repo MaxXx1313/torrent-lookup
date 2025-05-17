@@ -1,56 +1,58 @@
-const minimatch = require("minimatch");
-const path = require('path');
+import * as minimatch from "minimatch";
+import { MMRegExp } from "minimatch";
+import path from 'node:path';
 
 
-const globCache = {};
-
-const forcePlatform = null;
+const _pattenCache = {};
 
 
 /**
  *
  */
-export function matchCustom(loc: string, glob: string) /* boolean */ {
-    const platform = forcePlatform || process.platform;
+export function matchCustom(filepath: string, pattern: string) /* boolean */ {
+    const platform = process.platform;
     if (platform === 'win32') {
-        loc = loc.replace(/\\/g, path.posix.sep);
-        glob = glob.replace(/\\/g, path.posix.sep);
+        filepath = filepath.replace(/\\/g, path.posix.sep);
+        pattern = pattern.replace(/\\/g, path.posix.sep);
     }
 
     // put compare function to cache
-    if (!globCache[glob]) {
-        const globDerived = [glob];
+    if (!_pattenCache[pattern]) {
+        const globDerived = [pattern];
 
-        const fixChild = !(glob.endsWith('/**') || glob.endsWith('/*'));
+        const fixChild = !(pattern.endsWith('/**') || pattern.endsWith('/*'));
         if (fixChild) {
-            globDerived.push(glob + '/**');
+            globDerived.push(pattern + '/**');
         }
 
-        const fixParent = !isAbsolute(glob) && !(glob.startsWith('**/') || glob.startsWith('*/'));
+        const fixParent = !isAbsolute(pattern) && !(pattern.startsWith('**/') || pattern.startsWith('*/'));
         if (fixParent) {
-            globDerived.push('**/' + glob);
+            globDerived.push('**/' + pattern);
         }
 
         if (fixChild && fixParent) {
-            globDerived.push('**/' + glob + '/**');
+            globDerived.push('**/' + pattern + '/**');
         }
 
-        const globRe = globDerived.map(g => minimatch.makeRe(g, {dot: true, nocase: platform === 'win32'}));
+        const globReArr: MMRegExp[] = globDerived
+            .map(g => minimatch.makeRe(g, {dot: true, nocase: platform === 'win32'}) as MMRegExp)
+            .filter(v => !!v);
 
-        globCache[glob] = function (loc) {
-            const match = !globRe.every(r => !r.test(loc));
+        _pattenCache[pattern] = function (_filepath: string) {
+            const match = !globReArr.every(r => !r.test(_filepath));
             // console.log(' matchCustom', loc, globDerived, match/*, globRe*/);
             return match;
         }
     }
-    return globCache[glob](loc);
+    return _pattenCache[pattern](filepath);
 }
 
 
-function isAbsolute(loc) {
-    if (!loc) {
+function isAbsolute(filepath: string) {
+    if (!filepath) {
         throw new Error('Invalid path');
     }
-    return loc.startsWith('/') || loc.match(/^\w\:/);
+    return path.isAbsolute(filepath);
+    // return filepath.startsWith('/') || filepath.match(/^\w\:/);
     // return path.win32.isAbsolute(loc) || path.posix.isAbsolute(loc);
 }

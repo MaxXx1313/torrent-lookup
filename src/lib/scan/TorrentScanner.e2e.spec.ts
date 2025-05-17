@@ -1,7 +1,7 @@
 import { TorrentScanner } from './TorrentScanner';
-import { expect } from '@jest/globals';
-import * as path from 'path';
-
+import path from 'node:path';
+import { describe, it } from 'node:test';
+import assert = require('node:assert');
 
 
 describe('TorrentScanner.e2e', function () {
@@ -51,9 +51,9 @@ describe('TorrentScanner.e2e', function () {
             assertArray(files, expectedFiles);
             assertArray(torrents, expectedTorrents);
 
-            expect(scanner.stats).toEqual(statsExpected);
+            assert.equal(scanner.stats, statsExpected);
 
-            done();
+            // done();
         });
     });
 
@@ -62,11 +62,11 @@ describe('TorrentScanner.e2e', function () {
 
 function assertArray(expectedArray: any[], actualArray: any[]) {
     for (const elem of actualArray) {
-        expect(expectedArray).toContain(elem);
+        assert(expectedArray.includes(elem));
     }
     // make it easy to recognize error
     for (const elem of expectedArray) {
-        expect(actualArray).toContain(elem);
+        assert(actualArray.includes(elem));
     }
-    expect(expectedArray.length).toEqual(actualArray.length);
+    assert.equal(expectedArray.length, actualArray.length);
 }

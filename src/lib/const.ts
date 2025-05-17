@@ -1,6 +1,5 @@
-
-const path = require('path');
-const os = require('os');
+import path from 'node:path';
+import os from 'node:os';
 
 export const FN_DATA_FILE = 'files.txt';
 export const FN_TORRENTS_FILE = 'torrents.txt';
@@ -12,6 +11,7 @@ export const TORRENT_EXTENSION = '.torrent';
 
 export const SCAN_EXCLUDE_DEFAULT = [
     // '.*',
+    // all platforms
     '.npm',
     'node_modules',
     'npm-cache',
@@ -28,9 +28,15 @@ export const SCAN_EXCLUDE_DEFAULT = [
     '.grails',
     '.local',
     '.config',
+
+    // linux specific
     '/etc',
+
+    // windows specific
     'C:\\Windows', 
-    'System Volume Information', 
+    'System Volume Information',
+
+    // mac specific
     '.cocoapods',
     'Xcode',
 ];
