@@ -35,7 +35,7 @@
     "tsc": "tsc",
     "dev": "npm run tsc && npm start -- ",
     "build": "npm run tsc; chmod +x ./dist/bin/tlookup.js",
-    "serve": "npx ts-node src/bin/tlookup.ts",
+    "serve": "npx bun src/bin/tlookup.ts",
     "start": "node dist/bin/tlookup.js"
   },
   "dependencies": {
@@ -52,6 +52,7 @@
     "@types/command-line-usage": "^5.0.4",
     "@types/node": "^20.17.47",
     "@types/single-line-log": "^1.1.2",
+    "bun": "^1.2.13",
     "typescript": "^5.8.3"
   }
 }
