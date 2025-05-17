@@ -84,7 +84,7 @@ export function extractBasePath(filepath: string, dir: string): string {
         return filepath;
     }
     if (filepath.endsWith(path.sep + dir)) {
-        return filepath.substr(0, filepath.length - dir.length - 1);
+        return filepath.substring(0, filepath.length - dir.length - 1);
     }
     return null;
 }

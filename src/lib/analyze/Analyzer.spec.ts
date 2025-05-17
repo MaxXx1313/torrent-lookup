@@ -99,7 +99,7 @@ describe('Analyzer', function () {
                 },
             ];
 
-            analyzer.analyzeCacheData();
+            analyzer._analyzeCacheData();
             assert.deepEqual(analyzer._decision, expected);
         });
     });
