@@ -1,41 +1,36 @@
 import { TorrentScanner } from './TorrentScanner';
 import { FileScanner } from './FileScanner';
-import { expect } from '@jest/globals';
+import { describe, it } from 'node:test';
+import assert from 'node:assert';
 
 
-
-describe('TorrentScanner', function () {
+describe('TorrentScanner.spec', function () {
 
     it('isTorrentFile', function () {
 
-        let scanner = new TorrentScanner({target: []});
+        const scanner = new TorrentScanner({target: []});
 
-        expect(scanner.isTorrentFile('/fixtures/[NNM-Club.me]_Q3 2015.torrent')).toBe(true);
-        expect(scanner.isTorrentFile('/fixtures/[NNM-Club.me]_Q3 2015.txt')).toBe(false);
-        expect(scanner.isTorrentFile('/fixtures/[NNM-Club.me]_Q3 2015.torrent.txt')).toBe(false);
+        assert.equal(scanner.isTorrentFile('/some/path/test1.torrent'), true);
+        assert.equal(scanner.isTorrentFile('/some/path/test1.torrent.txt'), false);
     });
 
 
     it('isExcluded', function () {
 
-        let scanner = new FileScanner({
-            exclude: ['.skippedfolder'],
+        const scanner = new FileScanner({
+            exclude: ['.skippedfolder', 'node_modules'],
             cbFileFound: () => null,
         });
 
-        let tests: Array<[string, boolean]> = [
-            ['/home/user/Projects/tlookup3/test/fixtures/t1/.skippedfolder', true],
-            ['/subfolder/.config/asd', true],
-            ['/subfolder/asd.config/asd', false],
-
+        const tests: Array<[string, boolean]> = [
+            ['/subfolder/.skippedfolder', true],
             ['/subfolder/node_modules/asd', true],
             ['/subfolder/nodemodules', false],
-
         ];
 
-        tests.forEach(test => {
-            expect(scanner.isExcluded(test[0])).toBe(test[1]);
-        });
+        for (const test of tests) {
+            assert.equal(scanner.isExcluded(test[0]), test[1], 'path failed: ' + test[0]);
+        }
 
     });
 

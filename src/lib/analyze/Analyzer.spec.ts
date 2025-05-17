@@ -1,12 +1,13 @@
 import { Analyzer } from './Analyzer';
-import * as path from 'path';
-
+import path from 'path';
+import { beforeEach, describe, it } from 'node:test';
+import assert from 'node:assert';
 
 
 /**
  * Maybe someday I'll review this, the approach is not correct
  */
-describe('Analyzer', function () {
+describe('Analyzer.spec', function () {
 
     // normalize path
     const workdir = path.resolve(__dirname + '/../../../test/analyzer');
@@ -19,6 +20,13 @@ describe('Analyzer', function () {
         beforeEach(() => {
             analyzer = new Analyzer();
         });
+
+
+        const filesToMatch = [
+            {name: '/firstpath/sourcefolder/file1.txt', size: 13},
+            {name: '/secondpath/sourcefolder/file1.txt', size: 13},
+            {name: '/otherpath/wrongfolder/file1.txt', size: 13},
+        ];
 
         const torrentLocation = assetsPath + '/t2/fixture2 - sourcefolder.torrent';
         const inputArr = [
@@ -52,40 +60,29 @@ describe('Analyzer', function () {
                 'file2.txt:14': [inputArr[1]],
                 'file3.txt:14': [inputArr[2]],
             };
-            analyzer.loadTorrentFileSync(torrentLocation);
-            expect(analyzer._hash).toStrictEqual(expected);
+            analyzer.loadTorrentFile(torrentLocation);
+            assert.deepEqual(analyzer._hash, expected);
         });
 
 
         it('matchFile', function () {
-            analyzer.loadTorrentFileSync(torrentLocation);
-
-            const filesToMatch = [
-                {name: '/somepath/sourcefolder/file1.txt', size: 13},
-                {name: '/secondpath/sourcefolder/file1.txt', size: 13},
-                {name: '/otherpath/wrongfolder/file1.txt', size: 13},
-            ];
+            analyzer.loadTorrentFile(torrentLocation);
             const expected = {
                 ...inputArr[0],
-                match: ['/somepath', '/secondpath'],
+                match: ['/firstpath', '/secondpath'],
             };
 
             for (const fileInfo of filesToMatch) {
                 analyzer.matchFile(fileInfo.name, fileInfo.size);
             }
-            expect(analyzer._hash['file1.txt:13']).toStrictEqual([expected]);
+            assert.deepEqual(analyzer._hash['file1.txt:13'], [expected]);
 
         });
 
 
         it('analyzeCacheData', function () {
 
-            analyzer.loadTorrentFileSync(torrentLocation);
-            const filesToMatch = [
-                {name: '/somepath/sourcefolder/file1.txt', size: 13},
-                {name: '/somepath/sourcefolder/file2.txt', size: 14},
-                {name: '/otherpath/sourcefolder/file1.txt', size: 13},
-            ];
+            analyzer.loadTorrentFile(torrentLocation);
             for (const fileInfo of filesToMatch) {
                 analyzer.matchFile(fileInfo.name, fileInfo.size);
             }
@@ -94,12 +91,12 @@ describe('Analyzer', function () {
             const expected = [
                 {
                     torrent: torrentLocation,
-                    saveTo: '/somepath'
+                    saveTo: '/firstpath'
                 },
             ];
 
-            analyzer.analyzeCacheData();
-            expect(analyzer._decision).toStrictEqual(expected);
+            analyzer.makeDecision();
+            assert.deepEqual(analyzer._decision, expected);
         });
     });
 

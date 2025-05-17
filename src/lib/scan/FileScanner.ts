@@ -1,12 +1,10 @@
-import * as fs from 'fs';
-import { Stats } from 'fs';
-import * as path from 'path';
-import { readdir } from "../utils/fsPromise";
+import fs from 'node:fs/promises';
+import { Stats } from 'node:fs';
+import path from 'node:path';
 import { QueueWorker } from "./QueueWorker";
 import { SCAN_EXCLUDE_DEFAULT } from "../const";
 import { matchCustom } from "../utils/myglob";
 import ErrnoException = NodeJS.ErrnoException;
-
 
 
 /**
@@ -20,6 +18,7 @@ export interface FileScannerOption {
      * @see [Glob syntax](https://en.wikipedia.org/wiki/Glob_(programming)) for more details
      */
     exclude?: Array<string>;
+    followLinks?: boolean;
 
     cbFileFound: (filepath?: string, stats?: Stats) => Promise<any>;
 
@@ -47,7 +46,7 @@ export class FileScanner {
     /**
      *
      */
-    protected _exclude = SCAN_EXCLUDE_DEFAULT;
+    protected _exclude = [];
     protected _options: FileScannerOption;
 
     /**
@@ -55,7 +54,7 @@ export class FileScanner {
      * @param options
      */
     constructor(options: FileScannerOption) {
-        this.jobWorker = new QueueWorker(this.scanFolder.bind(this));
+        this.jobWorker = new QueueWorker(this.scanFolder.bind(this), {stopOnError: true});
 
         this._options = {
             cbError: FileScanner.cbErrorDefault,
@@ -74,19 +73,18 @@ export class FileScanner {
 
     /**
      * Add one or multiple targets
-     * @param {string|Array<string>} target
      */
-    addTarget(target: string | string[]) {
+    addTarget(target: string | string[], opts?: { prepend?: boolean }) {
         const targets = Array.isArray(target) ? target : [target];
         const filteredTargets = targets.filter(loc => !this.isExcluded(loc));
 
-        this.jobWorker.addJobs(filteredTargets);
+        this.jobWorker.addJobs(filteredTargets, opts?.prepend || false);
     }
 
     /**
      * start scanning process
      */
-    run(): Promise<any> {
+    run(): Promise<void> {
         return this.jobWorker.run();
     }
 
@@ -114,12 +112,9 @@ export class FileScanner {
         // fix windows drive root
         if (filepath.match(/^\w{1}:\\?$/)) {
             // location is a pure drive letter: "C:" o "C:\"
-            filepath = filepath.substr(0, 2) + '/';
+            filepath = filepath.substring(0, 2) + '/';
         }
-        return Promise.resolve()
-            .then(() => {
-                return this._scanFolder(filepath);
-            })
+        return this._scanFolder(filepath)
             .catch(this._options.cbError.bind(this));
     }
 
@@ -128,7 +123,7 @@ export class FileScanner {
      */
     protected async _scanFolder(filepath: string): Promise<any> {
         // TODO: verbose log
-        const folderEntries = await readdir(filepath);
+        const folderEntries = await fs.readdir(filepath);
         // console.log('_scanFolder: "%s"', filepath, folderEntries);
 
         for (const fileOrFolder of folderEntries) {
@@ -140,21 +135,22 @@ export class FileScanner {
 
 
             // get stats
-            const stats = fs.lstatSync(childLocation);
+            const stats = await fs.lstat(childLocation);
             if (!stats) {
                 continue;
             }
 
             if (stats.isSymbolicLink()) {
-                // skip symbolic link
-                continue;
+                if (!this._options.followLinks) {
+                    // skip symbolic link
+                    continue;
+                }
             }
 
             if (stats.isDirectory()) {
-                // addTarget() will validate entry with isExcluded() one more time. We don't need it here/already passed
-                // this.addTarget(childLocation);
-                this.jobWorker.addJob(childLocation, true);
+                // addTarget() will validate entry with isExcluded() one more time. We don't need it here
                 await this._options.cbFolderFound(childLocation, stats);
+                this.addTarget(childLocation);
             } else if (stats.isFile()) {
                 await this._options.cbFileFound(childLocation, stats);
             } else {

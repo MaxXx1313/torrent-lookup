@@ -1,12 +1,15 @@
-import * as fs from 'fs';
-import { Stats, WriteStream } from 'fs';
-import * as path from 'path';
-import { DEFAULT_WORKDIR_LOCATION, FN_DATA_FILE, FN_TORRENTS_FILE, TORRENT_EXTENSION } from "../const";
-import { pesistFolderSync } from "../utils/fsPromise";
+import fs, { Stats, WriteStream } from 'node:fs';
+import path from 'node:path';
+import {
+    DEFAULT_WORKDIR_LOCATION,
+    FN_DATA_FILE,
+    FN_TORRENTS_FILE,
+    SCAN_EXCLUDE_DEFAULT,
+    TORRENT_EXTENSION
+} from "../const";
 import { FileScanner } from "./FileScanner";
 import { Subject } from "rxjs";
 import { FileMatcher } from '../utils/FileMatcher';
-
 
 
 export interface TorrentScannerOptions {
@@ -86,7 +89,10 @@ export class TorrentScanner {
         }
 
         this.scanner = new FileScanner({
-            exclude: this.options.exclude,
+            exclude: [
+                ...SCAN_EXCLUDE_DEFAULT,
+                ...(this.options.exclude || []),
+            ],
             cbFileFound: this._onFile.bind(this),
         });
 
@@ -112,14 +118,14 @@ export class TorrentScanner {
         return Promise.resolve()
             .then(() => this._beforeScan())
             .then(() => this.scanner.run())
-            .then(() => this._afterScan());
+            .finally(() => this._afterScan());
     }
 
     /**
      * Perform operations before scan
      */
     protected _beforeScan(): void {
-        pesistFolderSync(this.options.workdir);
+        fs.mkdirSync(this.options.workdir, {recursive: true});
 
         const dataFileName = path.join(this.options.workdir, FN_DATA_FILE);
         const torrFileName = path.join(this.options.workdir, FN_TORRENTS_FILE);
@@ -180,23 +186,6 @@ export class TorrentScanner {
         });
     }
 
-    //
-    // /**
-    //  * Get file location  and return relative path from previous file.
-    //  * Also set internal relative path to a new one
-    //  */
-    // private shiftRelative(location) {
-    //     var locRelative;
-    //     if (this._lastFile) {
-    //         locRelative = path.relative(this._lastFile + '/..', location);
-    //     } else {
-    //         locRelative = location;
-    //     }
-    //     this._lastFile = location;
-    //     return locRelative;
-    // }
-
-
     /**
      *
      */
@@ -210,8 +199,9 @@ export class TorrentScanner {
     /**
      * @return {boolean}
      */
-    isTorrentFile(location: string, stats?) {
-        return (location.match(/(\.\w+)$/) || [])[1] == TORRENT_EXTENSION;
+    isTorrentFile(location: string, stats?: Stats) {
+        return path.extname(location) === TORRENT_EXTENSION;
+        // return (location.match(/(\.\w+)$/) || [])[1] == TORRENT_EXTENSION;
     }
 
 } // TorrentScanner

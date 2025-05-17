@@ -2,11 +2,10 @@ import { DEFAULT_WORKDIR_LOCATION, FN_MAPS_FILE } from "../const";
 import { Subject } from "rxjs";
 import { TorrentMapping } from "../analyze/Analyzer";
 
-import * as fs from 'fs';
-import * as path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import { ITorrentClient } from "./ITorrentClient";
 import { TlookupTransmission } from "../../plugins/tlookup-transmission";
-
 
 
 /**
@@ -21,7 +20,7 @@ export interface PusherOptions {
 /**
  *
  */
-export class Pusher {
+export class PushManager {
 
     public readonly opStatus: Subject<string> = new Subject();
 
@@ -38,7 +37,7 @@ export class Pusher {
             ...options,
         };
 
-        this.client = Pusher.getClient(options);
+        this.client = PushManager.getClient(options);
     }
 
     /**
@@ -69,7 +68,7 @@ export class Pusher {
     /**
      *
      */
-    push(location: string, saveTo: string): Promise<any> {
+    push(location: string, saveTo: string): Promise<void> {
         return this.client.push(location, saveTo)
             .then(result => {
                 this.opStatus.next('Torrent ' + (result.isNew ? 'added' : 'exists') + ': ' + result.id + ':\t' + location);
@@ -90,7 +89,7 @@ export class Pusher {
      */
     protected loadMapping(): TorrentMapping[] {
         const mapsFileName = path.join(this.options.workdir, FN_MAPS_FILE);
-        return JSON.parse(fs.readFileSync(mapsFileName).toString());
+        return JSON.parse(fs.readFileSync(mapsFileName, {encoding: 'utf-8'}).toString());
     }
 
 } // -

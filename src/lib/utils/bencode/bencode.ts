@@ -1,19 +1,14 @@
-/**s
- * @return {TorrentProcessingInfo}
- */
-import * as fs from 'fs';
-import * as bencode from 'bencode';
-import { TorrentData } from './TorrentData';
-
+import fs from 'node:fs';
+import bencode from 'bencode';
+import { TorrentData } from './TorrentData.interface';
 
 
 /**
- * @param location
  */
-export function bencodeReadSync(location): TorrentData {
-    const content = fs.readFileSync(location);
+export function bencodeReadSync(filepath: string): TorrentData {
+    const content = fs.readFileSync(filepath);
 
-    const data: TorrentData = bencode.decode(content/*, 'UTF-8'*/);
+    const data: TorrentData = bencode.decode(content, undefined, undefined, 'UTF-8');
     delete data.info.pieces; // some binary data
     return data;
 }

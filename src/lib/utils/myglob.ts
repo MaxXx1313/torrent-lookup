@@ -1,56 +1,51 @@
-const minimatch = require("minimatch");
-const path = require('path');
+import path from 'node:path';
 
 
-const globCache = {};
-
-const forcePlatform = null;
+const _pattenCache = {};
 
 
 /**
  *
  */
-export function matchCustom(loc: string, glob: string) /* boolean */ {
-    const platform = forcePlatform || process.platform;
+export function matchCustom(filepath: string, pattern: string, opts?: { platform?: string }): boolean {
+    const platform = opts?.platform || process.platform;
     if (platform === 'win32') {
-        loc = loc.replace(/\\/g, path.posix.sep);
-        glob = glob.replace(/\\/g, path.posix.sep);
+        filepath = filepath.replace(/\\/g, path.posix.sep).toLowerCase();
+        pattern = pattern.replace(/\\/g, path.posix.sep).toLowerCase();
     }
 
     // put compare function to cache
-    if (!globCache[glob]) {
-        const globDerived = [glob];
-
-        const fixChild = !(glob.endsWith('/**') || glob.endsWith('/*'));
-        if (fixChild) {
-            globDerived.push(glob + '/**');
-        }
-
-        const fixParent = !isAbsolute(glob) && !(glob.startsWith('**/') || glob.startsWith('*/'));
-        if (fixParent) {
-            globDerived.push('**/' + glob);
-        }
-
-        if (fixChild && fixParent) {
-            globDerived.push('**/' + glob + '/**');
-        }
-
-        const globRe = globDerived.map(g => minimatch.makeRe(g, {dot: true, nocase: platform === 'win32'}));
-
-        globCache[glob] = function (loc) {
-            const match = !globRe.every(r => !r.test(loc));
-            // console.log(' matchCustom', loc, globDerived, match/*, globRe*/);
-            return match;
-        }
+    if (!_pattenCache[pattern]) {
+        _pattenCache[pattern] = createTestFunction(pattern, {platform});
     }
-    return globCache[glob](loc);
+    return _pattenCache[pattern](filepath);
 }
 
 
-function isAbsolute(loc) {
-    if (!loc) {
+function isAbsolute(filepath: string, opts: { platform: string }) {
+    if (!filepath) {
         throw new Error('Invalid path');
     }
-    return loc.startsWith('/') || loc.match(/^\w\:/);
-    // return path.win32.isAbsolute(loc) || path.posix.isAbsolute(loc);
+    switch (opts.platform) {
+        case 'win32':
+            return path.win32.isAbsolute(filepath);
+        default:
+            return path.posix.isAbsolute(filepath);
+    }
+    // return path.isAbsolute(filepath);
+    // return filepath.startsWith('/') || filepath.match(/^\w\:/);
+    // return path.win32.isAbsolute(filepath) || path.posix.isAbsolute(filepath);
+}
+
+
+function createTestFunction(pattern: string, opts: { platform: string }) {
+    const patternPrepared = path.normalize(pattern + path.sep)
+        .replace(/\//g, '\/')
+        .replace(/\*/g, '.+');
+    const patternRegEx = new RegExp(patternPrepared);
+
+    return function (filepath: string) {
+        const filepathWithSlash = path.normalize(filepath + path.sep);
+        return patternRegEx.test(filepathWithSlash);
+    };
 }

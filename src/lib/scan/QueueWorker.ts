@@ -1,19 +1,15 @@
-import { Subject } from "rxjs";
+import { Subject, take } from "rxjs";
 import { nexTickPromise } from "../utils/tools";
 
-/**
- * Created by maksim on 01/12/16.
- */
-
-declare const Promise: any;
+export type JobWorkerFn<T, R> = (job: T) => R | Promise<R>;
 
 /**
  * @template T
  */
-export class QueueWorker<T> {
+export class QueueWorker<T, R = any> {
 
     public readonly onStart: Subject<void> = new Subject();
-    public readonly onStop: Subject<void> = new Subject();
+    public readonly onStop: Subject<Error | null> = new Subject();
 
     public readonly onJob: Subject<T> = new Subject();
 
@@ -22,16 +18,17 @@ export class QueueWorker<T> {
      */
     private _queue: T[] = [];
 
-    /**
-     * @type {function}
-     */
-    private _worker: Function;
-
+    private _isRunning = false;
+    private _terminateFlag = false;
 
     /**
      */
-    constructor(worker: Function = null) {
-        this._worker = worker;
+    constructor(
+        private worker: JobWorkerFn<T, R> = null,
+        private opts?: {
+            autostart?: boolean,
+            stopOnError?: boolean,
+        }) {
     }
 
     /**
@@ -43,6 +40,9 @@ export class QueueWorker<T> {
             this._queue.push(jobItem);
         } else {
             this._queue.unshift(jobItem);
+        }
+        if (this.opts.autostart) {
+            this._digest();
         }
     }
 
@@ -56,47 +56,93 @@ export class QueueWorker<T> {
         } else {
             this._queue.unshift.apply(this._queue, jobItems);
         }
+        if (this.opts.autostart) {
+            this._digest();
+        }
     }
 
     /**
      *
      */
-    run(): Promise<any> {
+    run(): Promise<void> {
         if (this._queue.length === 0) {
             console.warn('QueueWorker: empty queue');
         }
-        return this._digest();
+        this._digest();
+        return this.onStop.pipe(take(1)).toPromise().then(e => {
+            if (e) {
+                return Promise.reject(e);
+            } else {
+                return Promise.resolve();
+            }
+        });
+    }
+
+    /**
+     *
+     */
+    terminate() {
+        this._terminateFlag = true;
     }
 
     /**
      * @private
      */
-    protected async _digest() {
-        this.onStart.next();
-
-        while (true) {
-            await nexTickPromise();
-
-            const job = this._queue.shift();
-            if (job) {
-                await this.runJob(job);
-            } else {
-                this.onStop.next();
-                break;
-            }
+    protected _digest(): void {
+        if (this._isRunning === true) {
+            return;
         }
+        this._isRunning = true;
+
+        nexTickPromise().then(async () => {
+            this.onStart.next();
+            while (true) {
+                await nexTickPromise();
+
+                if (this._terminateFlag) {
+                    this._terminate();
+                    return;
+                }
+
+                const job = this._queue.shift();
+                if (job) {
+                    this.onJob.next(job);
+
+                    await this._runJob(job).catch(e => {
+                        console.error(e);
+                        if (this.opts.stopOnError) {
+                            this._terminate(e);
+                            throw e;
+                        } else {
+                            return null;
+                        }
+                    });
+                } else {
+                    this._terminate();
+                    break;
+                }
+            }
+        });
+    }
+
+    /**
+     * @protected
+     */
+    protected _terminate(e?: Error) {
+        this._isRunning = false;
+        this._terminateFlag = false;
+        this._queue.length = 0;
+        this.onStop.next(e || null);
     }
 
 
     /**
      * @param {T} job
      */
-    protected runJob(job: T): Promise<any> {
-        this.onJob.next(job);
-
+    protected _runJob(job: T): Promise<R | null> {
         return Promise.resolve()
             .then(() => {
-                return this._worker(job);
+                return this.worker(job);
             });
     }
 

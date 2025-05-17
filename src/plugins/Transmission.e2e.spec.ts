@@ -1,4 +1,6 @@
 import { TlookupTransmission } from './tlookup-transmission';
+import { describe, it } from 'node:test';
+import assert from 'node:assert';
 
 
 // describe('Transmission', function(){
@@ -85,8 +87,8 @@ describe('Transmission', function () {
         ];
 
         for (const test of tests) {
-            expect(TlookupTransmission.getContentType(test[0])).toBe(test[1]);
-            expect(TlookupTransmission.getCharset(test[0])).toBe(test[2]);
+            assert.equal(TlookupTransmission.getContentType(test[0]), test[1]);
+            assert.equal(TlookupTransmission.getCharset(test[0]), test[2]);
         }
 
     });
