@@ -141,13 +141,13 @@ export class Analyzer {
     /**
      *
      */
-    public _loadTorrentFilesFromFile(dataFileLocation: string): Promise<void> {
+    protected _loadTorrentFilesFromFile(dataFileLocation: string): Promise<void> {
         this.opStatus.next('Loading files');
 
         return promiseByLine(dataFileLocation, (line: string) => {
             return this.loadTorrentFile(line)
                 .catch(e => {
-                    console.error('Unabe to load torrent file:', line);
+                    console.error('Unable to load torrent file:', line);
                     console.error(e);
                 });
         }).then(() => {
@@ -207,7 +207,7 @@ export class Analyzer {
     /**
      *
      */
-    public _matchFilesFromFile(dataFile: string): Promise<void> {
+    protected _matchFilesFromFile(dataFile: string): Promise<void> {
         this.opStatus.next('Matching files');
 
         return promiseByLine(dataFile, (fileInfoString) => {
@@ -264,8 +264,8 @@ export class Analyzer {
      * analyze everything that is loaded and matched.
      * This calculates the decision where to keep torrent file data
      */
-    public _analyzeCacheData(): void {
-        this._makeDecision();
+    protected _analyzeCacheData(): void {
+        this.makeDecision();
     }
 
     /**
@@ -277,7 +277,7 @@ export class Analyzer {
 
     /**
      */
-    _saveDecisionTo(mappingFileLocation: string): Promise<any> {
+    protected _saveDecisionTo(mappingFileLocation: string): Promise<any> {
         this.opStatus.next('Saving');
 
         const data = this._decision;
@@ -286,9 +286,8 @@ export class Analyzer {
 
     /**
      * group by torrent location
-     * @private
      */
-    private _makeDecision(): void {
+    public makeDecision(): void {
         this.opStatus.next('Analyzing');
 
         this._mapping = {};
