@@ -2,8 +2,8 @@
 
 import { tick } from "../lib/utils/tools";
 
-import * as commandLineArgs from 'command-line-args';
-import * as commandLineUsage from 'command-line-usage';
+import commandLineArgs from 'command-line-args';
+import commandLineUsage from 'command-line-usage';
 
 import { DEFAULT_WORKDIR_LOCATION } from "../lib/const";
 import { CliOptions } from '../cli/CliOptions';
@@ -12,7 +12,6 @@ import { cliScanFiles } from '../cli/cli-scan-files';
 import { cliAnalyzeFiles } from '../cli/cli-analyze-files';
 import { cliPushFiles } from '../cli/cli-push-files';
 import { cliInfoFiles } from '../cli/cli-info-files';
-
 
 
 type OptionDefinition = commandLineArgs.OptionDefinition & { description?: string };
