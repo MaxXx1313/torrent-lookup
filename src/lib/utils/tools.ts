@@ -1,8 +1,5 @@
-import * as path from 'path';
-
-
-
-const http = require('http');
+import path from 'node:path';
+import http from 'node:http';
 
 
 /**
@@ -53,7 +50,7 @@ export function request(opts, postData: any = null) {
                 body += chunk;
             });
             res.on('end', () => {
-                res.body = body;
+                (res as any).body = body;
                 // console.log('No more data in response.');
                 if (res.statusCode >= 400) {
                     reject(res);

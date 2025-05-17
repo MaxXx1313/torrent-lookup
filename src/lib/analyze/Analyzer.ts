@@ -2,7 +2,6 @@ import { DEFAULT_WORKDIR_LOCATION, FN_DATA_FILE, FN_MAPS_FILE, FN_TORRENTS_FILE 
 
 import * as path from 'path';
 import { Subject } from "rxjs";
-import { writeFile } from "../utils/fsPromise";
 import { promiseByLine } from '../utils/line-by-line';
 import { bencodeReadSync } from '../utils/bencode/bencode';
 import { FileMatcher } from '../utils/FileMatcher';
@@ -256,7 +255,8 @@ export class Analyzer {
         this.opStatus.next('Saving');
 
         const data = this._decision;
-        return writeFile(mappingFileLocation, JSON.stringify(data));
+        // TODO
+        // return writeFile(mappingFileLocation, JSON.stringify(data));
     }
 
     /**

@@ -1,4 +1,4 @@
-import { Subject } from "rxjs";
+import { Subject, take } from "rxjs";
 import { nexTickPromise } from "../utils/tools";
 
 export type JobWorkerFn<T, R> = (job: T) => R | Promise<R>;
@@ -9,7 +9,7 @@ export type JobWorkerFn<T, R> = (job: T) => R | Promise<R>;
 export class QueueWorker<T, R = any> {
 
     public readonly onStart: Subject<void> = new Subject();
-    public readonly onStop: Subject<void> = new Subject();
+    public readonly onStop: Subject<Error | null> = new Subject();
 
     public readonly onJob: Subject<T> = new Subject();
 
@@ -64,11 +64,18 @@ export class QueueWorker<T, R = any> {
     /**
      *
      */
-    run(): Promise<any> {
+    run(): Promise<void> {
         if (this._queue.length === 0) {
             console.warn('QueueWorker: empty queue');
         }
-        return this._digest();
+        this._digest();
+        return this.onStop.pipe(take(1)).toPromise().then(e => {
+            if (e) {
+                return Promise.reject(e);
+            } else {
+                return Promise.resolve();
+            }
+        });
     }
 
     /**
@@ -81,41 +88,51 @@ export class QueueWorker<T, R = any> {
     /**
      * @private
      */
-    protected async _digest() {
+    protected _digest(): void {
         if (this._isRunning === true) {
             return;
         }
         this._isRunning = true;
 
-        this.onStart.next();
+        nexTickPromise().then(async () => {
+            this.onStart.next();
+            while (true) {
+                await nexTickPromise();
 
-        while (true) {
-            await nexTickPromise();
+                if (this._terminateFlag) {
+                    this._terminate();
+                    return;
+                }
 
-            if (this._terminateFlag) {
-                this._terminate();
-                return;
+                const job = this._queue.shift();
+                if (job) {
+                    this.onJob.next(job);
+
+                    await this._runJob(job).catch(e => {
+                        console.error(e);
+                        if (this.opts.stopOnError) {
+                            this._terminate(e);
+                            throw e;
+                        } else {
+                            return null;
+                        }
+                    });
+                } else {
+                    this._terminate();
+                    break;
+                }
             }
-
-            const job = this._queue.shift();
-            if (job) {
-                await this._runJob(job);
-            } else {
-                this._isRunning = false;
-                this.onStop.next();
-                break;
-            }
-        }
+        });
     }
 
     /**
      * @protected
      */
-    protected _terminate() {
+    protected _terminate(e?: Error) {
         this._isRunning = false;
         this._terminateFlag = false;
         this._queue.length = 0;
-        this.onStop.next();
+        this.onStop.next(e || null);
     }
 
 
@@ -123,18 +140,9 @@ export class QueueWorker<T, R = any> {
      * @param {T} job
      */
     protected _runJob(job: T): Promise<R | null> {
-        this.onJob.next(job);
-
         return Promise.resolve()
             .then(() => {
                 return this.worker(job);
-            }).catch(e => {
-                if (this.opts.stopOnError) {
-                    throw e;
-                } else {
-                    console.log(e);
-                    return null;
-                }
             });
     }
 

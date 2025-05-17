@@ -1,6 +1,7 @@
 import { Analyzer } from './Analyzer';
 import * as path from 'path';
-
+import { beforeEach, describe, it } from 'node:test';
+import assert from 'node:assert';
 
 
 /**
@@ -53,7 +54,7 @@ describe('Analyzer', function () {
                 'file3.txt:14': [inputArr[2]],
             };
             analyzer.loadTorrentFileSync(torrentLocation);
-            expect(analyzer._hash).toStrictEqual(expected);
+            assert.deepEqual(analyzer._hash, expected);
         });
 
 
@@ -73,7 +74,7 @@ describe('Analyzer', function () {
             for (const fileInfo of filesToMatch) {
                 analyzer.matchFile(fileInfo.name, fileInfo.size);
             }
-            expect(analyzer._hash['file1.txt:13']).toStrictEqual([expected]);
+            assert.deepEqual(analyzer._hash['file1.txt:13'], [expected]);
 
         });
 
@@ -99,7 +100,7 @@ describe('Analyzer', function () {
             ];
 
             analyzer.analyzeCacheData();
-            expect(analyzer._decision).toStrictEqual(expected);
+            assert.deepEqual(analyzer._decision, expected);
         });
     });
 

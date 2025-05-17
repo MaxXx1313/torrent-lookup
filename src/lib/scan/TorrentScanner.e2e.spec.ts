@@ -60,13 +60,16 @@ describe('TorrentScanner.e2e', function () {
 
 });
 
+/**
+ *
+ */
 function assertArray(expectedArray: any[], actualArray: any[]) {
     for (const elem of actualArray) {
-        assert(expectedArray.includes(elem));
+        assert.equal(expectedArray.includes(elem), true);
     }
     // make it easy to recognize error
     for (const elem of expectedArray) {
-        assert(actualArray.includes(elem));
+        assert.equal(actualArray.includes(elem), true);
     }
     assert.equal(expectedArray.length, actualArray.length);
 }
