@@ -1,16 +1,12 @@
 import { Subject } from "rxjs";
 import { nexTickPromise } from "../utils/tools";
 
-/**
- * Created by maksim on 01/12/16.
- */
-
-declare const Promise: any;
+export type JobWorkerFn<T, R> = (job: T) => R | Promise<R>;
 
 /**
  * @template T
  */
-export class QueueWorker<T> {
+export class QueueWorker<T, R = any> {
 
     public readonly onStart: Subject<void> = new Subject();
     public readonly onStop: Subject<void> = new Subject();
@@ -22,16 +18,17 @@ export class QueueWorker<T> {
      */
     private _queue: T[] = [];
 
-    /**
-     * @type {function}
-     */
-    private _worker: Function;
-
+    private _isRunning = false;
+    private _terminateFlag = false;
 
     /**
      */
-    constructor(worker: Function = null) {
-        this._worker = worker;
+    constructor(
+        private worker: JobWorkerFn<T, R> = null,
+        private opts?: {
+            autostart?: boolean,
+            stopOnError?: boolean,
+        }) {
     }
 
     /**
@@ -44,6 +41,9 @@ export class QueueWorker<T> {
         } else {
             this._queue.unshift(jobItem);
         }
+        if (this.opts.autostart) {
+            this._digest();
+        }
     }
 
     /**
@@ -55,6 +55,9 @@ export class QueueWorker<T> {
             this._queue.push.apply(this._queue, jobItems);
         } else {
             this._queue.unshift.apply(this._queue, jobItems);
+        }
+        if (this.opts.autostart) {
+            this._digest();
         }
     }
 
@@ -69,34 +72,69 @@ export class QueueWorker<T> {
     }
 
     /**
+     *
+     */
+    terminate() {
+        this._terminateFlag = true;
+    }
+
+    /**
      * @private
      */
     protected async _digest() {
+        if (this._isRunning === true) {
+            return;
+        }
+        this._isRunning = true;
+
         this.onStart.next();
 
         while (true) {
             await nexTickPromise();
 
+            if (this._terminateFlag) {
+                this._terminate();
+                return;
+            }
+
             const job = this._queue.shift();
             if (job) {
-                await this.runJob(job);
+                await this._runJob(job);
             } else {
+                this._isRunning = false;
                 this.onStop.next();
                 break;
             }
         }
     }
 
+    /**
+     * @protected
+     */
+    protected _terminate() {
+        this._isRunning = false;
+        this._terminateFlag = false;
+        this._queue.length = 0;
+        this.onStop.next();
+    }
+
 
     /**
      * @param {T} job
      */
-    protected runJob(job: T): Promise<any> {
+    protected _runJob(job: T): Promise<R | null> {
         this.onJob.next(job);
 
         return Promise.resolve()
             .then(() => {
-                return this._worker(job);
+                return this.worker(job);
+            }).catch(e => {
+                if (this.opts.stopOnError) {
+                    throw e;
+                } else {
+                    console.log(e);
+                    return null;
+                }
             });
     }
 
