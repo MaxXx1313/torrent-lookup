@@ -39,19 +39,13 @@ function isAbsolute(filepath: string, opts: { platform: string }) {
 
 
 function createTestFunction(pattern: string, opts: { platform: string }) {
-    const patternWithSlash = path.normalize(pattern + path.sep);
+    const patternPrepared = path.normalize(pattern + path.sep)
+        .replace(/\//g, '\/')
+        .replace(/\*/g, '.+');
+    const patternRegEx = new RegExp(patternPrepared);
+
     return function (filepath: string) {
         const filepathWithSlash = path.normalize(filepath + path.sep);
-
-        // console.log('createTestFunction: test', filepathWithSlash, patternWithSlash);
-        if (isAbsolute(patternWithSlash, opts)) {
-            // pattern is an absolute path
-            // console.log('createTestFunction: absolute', patternWithSlash);
-            return filepathWithSlash.startsWith(patternWithSlash);
-        } else {
-            // relative/name-only
-            // console.log('createTestFunction: relative', patternWithSlash);
-            return filepathWithSlash.indexOf(path.sep + patternWithSlash) >= 0;
-        }
+        return patternRegEx.test(filepathWithSlash);
     };
 }

@@ -15,6 +15,11 @@ describe('Glob base usage', () => {
         assert.equal(matchCustom('/root/lib/.npm/project/lib/somefile.js', '/root/.npm'), false);
     });
 
+    it('single wildcard', () => {
+        assert.equal(matchCustom('/root/.npm/project/lib/somefile.js', '*.js'), true);
+        assert.equal(matchCustom('/root/.npm/project/lib/somefile.js', '*.json'), false);
+    });
+
     it('trailing slash in file', function () {
         assert.equal(matchCustom('/root/.npm', '.npm'), true);
         assert.equal(matchCustom('/root/.npm/', '.npm'), true);

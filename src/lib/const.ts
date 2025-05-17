@@ -39,4 +39,6 @@ export const SCAN_EXCLUDE_DEFAULT = [
     // mac specific
     '.cocoapods',
     'Xcode',
+    '*.app',
+    '*.ipa',
 ];
