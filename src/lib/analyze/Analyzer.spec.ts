@@ -7,7 +7,7 @@ import assert from 'node:assert';
 /**
  * Maybe someday I'll review this, the approach is not correct
  */
-describe('Analyzer', function () {
+describe('Analyzer.spec', function () {
 
     // normalize path
     const workdir = path.resolve(__dirname + '/../../../test/analyzer');
@@ -20,6 +20,13 @@ describe('Analyzer', function () {
         beforeEach(() => {
             analyzer = new Analyzer();
         });
+
+
+        const filesToMatch = [
+            {name: '/firstpath/sourcefolder/file1.txt', size: 13},
+            {name: '/secondpath/sourcefolder/file1.txt', size: 13},
+            {name: '/otherpath/wrongfolder/file1.txt', size: 13},
+        ];
 
         const torrentLocation = assetsPath + '/t2/fixture2 - sourcefolder.torrent';
         const inputArr = [
@@ -60,15 +67,9 @@ describe('Analyzer', function () {
 
         it('matchFile', function () {
             analyzer.loadTorrentFile(torrentLocation);
-
-            const filesToMatch = [
-                {name: '/somepath/sourcefolder/file1.txt', size: 13},
-                {name: '/secondpath/sourcefolder/file1.txt', size: 13},
-                {name: '/otherpath/wrongfolder/file1.txt', size: 13},
-            ];
             const expected = {
                 ...inputArr[0],
-                match: ['/somepath', '/secondpath'],
+                match: ['/firstpath', '/secondpath'],
             };
 
             for (const fileInfo of filesToMatch) {
@@ -82,11 +83,6 @@ describe('Analyzer', function () {
         it('analyzeCacheData', function () {
 
             analyzer.loadTorrentFile(torrentLocation);
-            const filesToMatch = [
-                {name: '/somepath/sourcefolder/file1.txt', size: 13},
-                {name: '/somepath/sourcefolder/file2.txt', size: 14},
-                {name: '/otherpath/sourcefolder/file1.txt', size: 13},
-            ];
             for (const fileInfo of filesToMatch) {
                 analyzer.matchFile(fileInfo.name, fileInfo.size);
             }
@@ -95,11 +91,11 @@ describe('Analyzer', function () {
             const expected = [
                 {
                     torrent: torrentLocation,
-                    saveTo: '/somepath'
+                    saveTo: '/firstpath'
                 },
             ];
 
-            analyzer._analyzeCacheData();
+            analyzer.makeDecision();
             assert.deepEqual(analyzer._decision, expected);
         });
     });
