@@ -6,7 +6,7 @@
     "torrents"
   ],
   "author": "MaxXx1313 <fomy.smap@gmail.com>",
-  "license": "ISC",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/MaxXx1313/torrent-lookup.git"
