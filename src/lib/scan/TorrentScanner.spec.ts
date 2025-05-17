@@ -4,7 +4,6 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert';
 
 
-
 describe('TorrentScanner', function () {
 
     it('isTorrentFile', function () {
@@ -19,7 +18,7 @@ describe('TorrentScanner', function () {
     it('isExcluded', function () {
 
         const scanner = new FileScanner({
-            exclude: ['.skippedfolder'],
+            exclude: ['.skippedfolder', 'node_modules'],
             cbFileFound: () => null,
         });
 
@@ -29,9 +28,9 @@ describe('TorrentScanner', function () {
             ['/subfolder/nodemodules', false],
         ];
 
-        tests.forEach(test => {
-            assert.equal(scanner.isExcluded(test[0]), test[1]);
-        });
+        for (const test of tests) {
+            assert.equal(scanner.isExcluded(test[0]), test[1], 'path failed: ' + test[0]);
+        }
 
     });
 
