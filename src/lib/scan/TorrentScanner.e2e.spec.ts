@@ -1,7 +1,7 @@
 import { TorrentScanner } from './TorrentScanner';
 import path from 'node:path';
 import { describe, it } from 'node:test';
-import assert = require('node:assert');
+import assert from 'node:assert';
 
 
 describe('TorrentScanner.e2e', function () {

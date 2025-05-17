@@ -20,7 +20,7 @@ export interface PusherOptions {
 /**
  *
  */
-export class Pusher {
+export class PushManager {
 
     public readonly opStatus: Subject<string> = new Subject();
 
@@ -37,7 +37,7 @@ export class Pusher {
             ...options,
         };
 
-        this.client = Pusher.getClient(options);
+        this.client = PushManager.getClient(options);
     }
 
     /**

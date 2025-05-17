@@ -4,7 +4,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert';
 
 
-describe('TorrentScanner', function () {
+describe('TorrentScanner.spec', function () {
 
     it('isTorrentFile', function () {
 

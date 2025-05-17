@@ -30,7 +30,7 @@
     "tlookup": "dist/bin/tlookup.js"
   },
   "scripts": {
-    "test": "npx bun test",
+    "test": "./scripts/bun_test.sh",
     "tsc": "tsc",
     "dev": "npm run tsc && npm start -- ",
     "build": "npm run tsc; chmod +x ./dist/bin/tlookup.js",

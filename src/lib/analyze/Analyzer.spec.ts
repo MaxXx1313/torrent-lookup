@@ -1,5 +1,5 @@
 import { Analyzer } from './Analyzer';
-import * as path from 'path';
+import path from 'path';
 import { beforeEach, describe, it } from 'node:test';
 import assert from 'node:assert';
 

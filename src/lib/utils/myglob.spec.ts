@@ -1,9 +1,9 @@
 import { describe, it } from 'node:test';
-import * as assert from 'node:assert';
+import assert from 'node:assert';
 import { matchCustom } from './myglob';
 
 
-describe('Glob base usage', () => {
+describe('matchCustom.spec', () => {
 
     it('template match', () => {
         assert.equal(matchCustom('/root/.npm/project/lib/somefile.js', '.npm'), true);

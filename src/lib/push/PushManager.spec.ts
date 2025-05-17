@@ -1,4 +1,4 @@
-import { Pusher } from './Pusher';
+import { PushManager } from './PushManager';
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
 
@@ -6,12 +6,12 @@ import assert from 'node:assert';
 /**
  * this test makes no sense
  */
-describe('Pusher', function () {
+describe('Pusher.spec', function () {
 
     let torrents = {};
     let i = 0;
 
-    const pushManager = new Pusher({client: 't'});
+    const pushManager = new PushManager({client: 't'});
 
     // fake push
     pushManager.client.push = function (location, saveTo) {
@@ -27,7 +27,7 @@ describe('Pusher', function () {
                 "torrent": "/tmp/1.torrent"
             },
             {
-                "saveTo": "/tmp/download-1",
+                "saveTo": "/tmp/download-2",
                 "torrent": "/tmp/2.torrent"
             },
         ];
