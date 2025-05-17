@@ -1,5 +1,6 @@
 import { Pusher } from './Pusher';
-
+import { describe, it } from 'node:test';
+import assert from 'node:assert';
 
 
 /**
@@ -22,23 +23,23 @@ describe('Pusher', function () {
     it('_pushAll', function () {
         const input = [
             {
-                "saveTo": "/home/maksim/Downloads/1",
-                "torrent": "/home/1.torrent"
+                "saveTo": "/tmp/download-1",
+                "torrent": "/tmp/1.torrent"
             },
             {
-                "saveTo": "/home/maksim/Downloads/2",
-                "torrent": "/home/2.torrent"
+                "saveTo": "/tmp/download-1",
+                "torrent": "/tmp/2.torrent"
             },
         ];
 
         const expected = {
-            "/home/1.torrent": "/home/maksim/Downloads/1",
-            "/home/2.torrent": "/home/maksim/Downloads/2"
+            "/tmp/1.torrent": "/tmp/download-1",
+            "/tmp/2.torrent": "/tmp/download-2"
         };
 
         return pushManager._pushAll(input)
             .then(() => {
-                expect(torrents).toStrictEqual(expected);
+                assert.deepEqual(torrents, expected);
             })
     })
 

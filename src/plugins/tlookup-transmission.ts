@@ -3,9 +3,8 @@ import { ITorrentClient, PushResult } from "../lib/push/ITorrentClient";
 import { UrlWithStringQuery } from 'url';
 
 
-
-const assert = require('assert');
-const url = require('url');
+import assert from 'node:assert';
+import url from 'node:url';
 
 
 const CSRF_HEADER = 'x-transmission-session-id';
@@ -97,7 +96,12 @@ export class TlookupTransmission implements ITorrentClient {
      *
      * @more: https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt#L356
      */
-    torrentAdd(filename: string, downloadDir: string, opts = {}): Promise<{ id: number, name: string, hashString: string, isNew: boolean }> {
+    torrentAdd(filename: string, downloadDir: string, opts = {}): Promise<{
+        id: number,
+        name: string,
+        hashString: string,
+        isNew: boolean
+    }> {
         opts['filename'] = filename;
         opts['download-dir'] = downloadDir;
 
