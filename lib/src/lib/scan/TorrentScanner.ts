@@ -123,6 +123,13 @@ export class TorrentScanner {
     }
 
     /**
+     *
+     */
+    terminate() {
+        return this.scanner.terminate();
+    }
+
+    /**
      * Perform operations before scan
      */
     protected _beforeScan(): void {

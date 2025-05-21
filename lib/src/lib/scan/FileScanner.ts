@@ -87,6 +87,13 @@ export class FileScanner {
         return this.jobWorker.run();
     }
 
+    /**
+     *
+     */
+    terminate() {
+        return this.jobWorker.terminate();
+    }
+
 
     /**
      * @param filepath
