@@ -1,5 +1,5 @@
-import { CliOptions } from './CliOptions';
-import { Info } from '../lib';
+import { CliOptions } from './CliOptions.js';
+import { Info } from '../lib/analyze/Info.js';
 
 
 

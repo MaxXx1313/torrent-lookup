@@ -1,5 +1,5 @@
-import { clone, request } from "../lib/utils/tools";
-import { ITorrentClient, PushResult } from "../lib/push/ITorrentClient";
+import { clone, request } from "../lib/utils/tools.js";
+import { ITorrentClient, PushResult } from "../lib/push/ITorrentClient.js";
 import { UrlWithStringQuery } from 'url';
 
 

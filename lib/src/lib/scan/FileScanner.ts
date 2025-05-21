@@ -1,8 +1,8 @@
 import * as fs from 'node:fs/promises';
 import { Stats } from 'node:fs';
 import * as path from 'node:path';
-import { QueueWorker } from "./QueueWorker";
-import { matchCustom } from "../utils/myglob";
+import { QueueWorker } from "./QueueWorker.js";
+import { matchCustom } from "../utils/myglob.js";
 import ErrnoException = NodeJS.ErrnoException;
 
 

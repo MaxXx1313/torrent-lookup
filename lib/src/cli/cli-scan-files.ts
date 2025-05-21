@@ -1,8 +1,8 @@
-import { CliOptions } from './CliOptions';
+import { CliOptions } from './CliOptions.js';
 import * as assert from 'assert';
-import { debounce } from '../lib/utils/tools';
-import { TorrentScanner, TorrentScannerEntry } from '../lib';
-import { LopConsole } from './LopConsole';
+import { debounce } from '../lib/utils/tools.js';
+import { TorrentScanner, TorrentScannerEntry } from '../lib/scan/TorrentScanner.js';
+import { LopConsole } from './LopConsole.js';
 
 const logger = new LopConsole();
 

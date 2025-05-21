@@ -1,11 +1,11 @@
-import { DEFAULT_WORKDIR_LOCATION, FN_MAPS_FILE } from "../const";
+import { DEFAULT_WORKDIR_LOCATION, FN_MAPS_FILE } from "../const.js";
 import { Subject } from "rxjs";
-import { TorrentMapping } from "../analyze/Analyzer";
+import { TorrentMapping } from "../analyze/Analyzer.js";
 
 import * as fs from 'node:fs';
 import * as  path from 'node:path';
-import { ITorrentClient } from "./ITorrentClient";
-import { TlookupTransmission } from "../../plugins/tlookup-transmission";
+import { ITorrentClient } from "./ITorrentClient.js";
+import { TlookupTransmission } from "../../plugins/tlookup-transmission.js";
 
 
 /**

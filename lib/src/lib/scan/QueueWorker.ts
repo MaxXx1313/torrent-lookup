@@ -1,5 +1,5 @@
 import { Subject, take } from "rxjs";
-import { nexTickPromise } from "../utils/tools";
+import { nexTickPromise } from "../utils/tools.js";
 
 export type JobWorkerFn<T, R> = (job: T) => R | Promise<R>;
 

@@ -15,13 +15,12 @@
     "url": "https://github.com/MaxXx1313/torrent-lookup/issues",
     "email": "fomy.smap@gmail.com"
   },
-  "main": "dist/lib.js",
+  "main": "dist/lib/index.js",
   "files": [
     "dist/**"
   ],
   "directories": {
-    "bin": "dist/bin",
-    "lib": "dist/lib"
+    "bin": "dist"
   },
   "engines": {
     "node": ">=20"
@@ -47,6 +46,7 @@
     "single-line-log": "^1.1.2"
   },
   "devDependencies": {
+    "@types/bencode": "^2.0.4",
     "@types/command-line-args": "^5.2.3",
     "@types/command-line-usage": "^5.0.4",
     "@types/node": "^20.17.47",

@@ -1,4 +1,4 @@
-import { OptionsParsed } from './cli-parse-option';
+import { OptionsParsed } from './cli-parse-option.js';
 
 
 

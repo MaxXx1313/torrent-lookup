@@ -1,6 +1,6 @@
 {
   "files": [
-    "./node_modules/@types/node/index.d.ts",
+    "./node_modules/@types/node/index.d.ts"
   ],
   "include": [
     "src/**/*.ts"
@@ -10,14 +10,13 @@
     "src/test.ts",
     "src/**/*.spec.ts"
   ],
-
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es6",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "target": "ES2019",
     "sourceMap": false,
     "allowJs": true,
     "outDir": "dist",
-
     "types": [
       "node"
     ],

@@ -1,8 +1,8 @@
-import { DEFAULT_WORKDIR_LOCATION, FN_MAPS_FILE } from "../const";
+import { DEFAULT_WORKDIR_LOCATION, FN_MAPS_FILE } from "../const.js";
 
 import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
-import { TorrentMapping } from "./Analyzer";
+import { TorrentMapping } from "./Analyzer.js";
 
 
 /**

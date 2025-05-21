@@ -1,12 +1,12 @@
-import { DEFAULT_WORKDIR_LOCATION, FN_DATA_FILE, FN_MAPS_FILE, FN_TORRENTS_FILE } from "../const";
+import { DEFAULT_WORKDIR_LOCATION, FN_DATA_FILE, FN_MAPS_FILE, FN_TORRENTS_FILE } from "../const.js";
 
 import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
 import { Subject } from "rxjs";
-import { promiseByLine } from '../utils/line-by-line';
-import { bencodeReadSync } from '../utils/bencode/bencode';
-import { FileMatcher } from '../utils/FileMatcher';
-import { extractBasePath } from '../utils/tools';
+import { promiseByLine } from '../utils/line-by-line.js';
+import { bencodeReadSync } from '../utils/bencode/bencode.js';
+import { FileMatcher } from '../utils/FileMatcher.js';
+import { extractBasePath } from '../utils/tools.js';
 
 
 /**

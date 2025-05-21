@@ -1,21 +1,17 @@
 #!/usr/bin/env node
 
-import { tick } from "../lib/utils/tools";
+import { tick } from "../lib/utils/tools.js";
 
 import commandLineArgs from 'command-line-args';
 import commandLineUsage from 'command-line-usage';
 
-// TODO: nodejs is not working here
-// import * as commandLineArgs from 'command-line-args';
-// import * as commandLineUsage from 'command-line-usage';
-
-import { DEFAULT_WORKDIR_LOCATION } from "../lib/const";
-import { CliOptions } from '../cli/CliOptions';
-import { parseOptions } from '../cli/cli-parse-option';
-import { cliScanFiles } from '../cli/cli-scan-files';
-import { cliAnalyzeFiles } from '../cli/cli-analyze-files';
-import { cliPushFiles } from '../cli/cli-push-files';
-import { cliInfoFiles } from '../cli/cli-info-files';
+import { DEFAULT_WORKDIR_LOCATION } from "../lib/const.js";
+import { CliOptions } from '../cli/CliOptions.js';
+import { parseOptions } from '../cli/cli-parse-option.js';
+import { cliScanFiles } from '../cli/cli-scan-files.js';
+import { cliAnalyzeFiles } from '../cli/cli-analyze-files.js';
+import { cliPushFiles } from '../cli/cli-push-files.js';
+import { cliInfoFiles } from '../cli/cli-info-files.js';
 
 
 type OptionDefinition = commandLineArgs.OptionDefinition & { description?: string };

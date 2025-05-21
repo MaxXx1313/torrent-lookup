@@ -1,5 +1,5 @@
-import { CliOptions } from './CliOptions';
-import { PushManager } from '../lib';
+import { CliOptions } from './CliOptions.js';
+import { PushManager } from '../lib/push/PushManager.js';
 
 
 

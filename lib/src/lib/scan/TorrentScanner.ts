@@ -7,10 +7,10 @@ import {
     FN_TORRENTS_FILE,
     SCAN_EXCLUDE_DEFAULT,
     TORRENT_EXTENSION
-} from "../const";
-import { FileScanner } from "./FileScanner";
+} from "../const.js";
+import { FileScanner } from "./FileScanner.js";
 import { Subject } from "rxjs";
-import { FileMatcher } from '../utils/FileMatcher';
+import { FileMatcher } from '../utils/FileMatcher.js';
 
 
 export interface TorrentScannerOptions {
