@@ -1,8 +1,9 @@
 // main.js
 
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, ipcMain} = require('electron');
 const path = require('node:path');
+const {handleScan} = require('./core-lib/scan');
 
 const createWindow = () => {
     // Create the browser window.
@@ -10,7 +11,7 @@ const createWindow = () => {
         width: 800,
         height: 600,
         webPreferences: {
-            preload: path.join(__dirname, 'app/preload.js'),
+            preload: path.join(__dirname, 'core-lib/preload.js'),
         },
     });
 
@@ -26,6 +27,9 @@ const createWindow = () => {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
     createWindow();
+
+
+    ipcMain.on('set-title', handleScan);
 
     app.on('activate', () => {
         // On macOS it's common to re-create a window in the app when the

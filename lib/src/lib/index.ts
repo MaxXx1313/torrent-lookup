@@ -1,8 +1,8 @@
 /**
  *
  */
-export * from "./analyze/Analyzer";
-export * from "./analyze/Info";
-export * from "./push/PushManager";
-export * from "./scan/TorrentScanner";
+export * from "./analyze/Analyzer.js";
+export * from "./analyze/Info.js";
+export * from "./push/PushManager.js";
+export * from "./scan/TorrentScanner.js";
 

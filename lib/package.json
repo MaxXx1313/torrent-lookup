@@ -16,6 +16,11 @@
     "email": "fomy.smap@gmail.com"
   },
   "main": "dist/lib/index.js",
+
+  "type": "module",
+  "exports": {
+    "import": "./dist/lib/index.js"
+  },
   "files": [
     "dist/**"
   ],
