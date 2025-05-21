@@ -19,5 +19,7 @@ window.addEventListener('DOMContentLoaded', () => {
 const { contextBridge, ipcRenderer } = require('electron/renderer');
 
 contextBridge.exposeInMainWorld('electronAPI', {
-    scan: (targets) => ipcRenderer.send('scan', targets),
+    scan: (targets) => ipcRenderer.send('scan:start', targets),
+    onScanProgress: (callback) => ipcRenderer.on('scan:progress', (_event, value) => callback(value)),
+    onScanFound: (callback) => ipcRenderer.on('scan:found', (_event, value) => callback(value)),
 });

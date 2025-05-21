@@ -1,5 +1,7 @@
 export interface IElectronAPI {
-    loadPreferences: () => Promise<void>,
+    scan: (opts: { targets: string | string[] }) => Promise<void>,
+    onScanProgress: (callback: (filepath: string) => void) => void,
+    onScanFound: (callback: (filepath: string) => void) => void,
 }
 
 declare global {

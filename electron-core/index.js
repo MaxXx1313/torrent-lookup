@@ -3,9 +3,12 @@
 // Modules to control application life and create native browser window
 const {app, BrowserWindow, ipcMain} = require('electron');
 const path = require('node:path');
-const {handleScan} = require('./core-lib/scan');
+const { scanFolder} = require('./core-lib/scan');
 
-const createWindow = () => {
+
+let _mainWindow = null;
+
+function createWindow() {
     // Create the browser window.
     const mainWindow = new BrowserWindow({
         width: 800,
@@ -19,7 +22,24 @@ const createWindow = () => {
     mainWindow.loadFile('app/index.html');
 
     // Open the DevTools.
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
+
+    _mainWindow = mainWindow;
+}
+
+/**
+ * @param {function} factoryFn
+ * @private
+ */
+function _myHandler(factoryFn) {
+    return (event, data) => {
+        console.log(event, data);
+        if (_mainWindow) {
+            return factoryFn(_mainWindow, data);
+        } else {
+            console.warn('No active windows');
+        }
+    }
 }
 
 // This method will be called when Electron has finished
@@ -29,7 +49,7 @@ app.whenReady().then(() => {
     createWindow();
 
 
-    ipcMain.on('set-title', handleScan);
+    ipcMain.on('scan:start', _myHandler(scanFolder));
 
     app.on('activate', () => {
         // On macOS it's common to re-create a window in the app when the
