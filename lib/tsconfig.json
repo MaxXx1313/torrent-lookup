@@ -11,6 +11,7 @@
     "src/**/*.spec.ts"
   ],
   "compilerOptions": {
+    "declaration": true,
     "module": "ESNext",
     "moduleResolution": "node",
     "target": "ES2019",

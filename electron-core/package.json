@@ -1,0 +1,17 @@
+{
+  "name": "electron-core",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "electron": "^36.2.1",
+    "tlookup": "file:../lib"
+  }
+}
