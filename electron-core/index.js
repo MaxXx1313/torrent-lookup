@@ -4,6 +4,7 @@
 const {app, BrowserWindow, ipcMain} = require('electron');
 const path = require('node:path');
 const { scanFolder} = require('./core-lib/scan');
+const fs = require('node:fs');
 
 
 let _mainWindow = null;
@@ -19,7 +20,8 @@ function createWindow() {
     });
 
     // and load the index.html of the app.
-    mainWindow.loadFile('app/index.html');
+    // mainWindow.loadFile('app/index.html');
+    mainWindow.loadURL('http://localhost:5173');
 
     // Open the DevTools.
     // mainWindow.webContents.openDevTools();
@@ -60,7 +62,7 @@ app.whenReady().then(() => {
         if (BrowserWindow.getAllWindows().length === 0) {
             createWindow();
         }
-    })
+    });
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common

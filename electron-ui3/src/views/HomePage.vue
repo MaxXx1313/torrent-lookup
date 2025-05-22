@@ -1,5 +1,16 @@
 <script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonSegment, IonSegmentContent, IonTitle, IonToolbar } from '@ionic/vue';
+import {
+  IonContent,
+  IonHeader,
+  IonPage,
+  IonSegment,
+  IonSegmentButton,
+  IonLabel,
+  IonSegmentContent,
+  IonSegmentView,
+  IonTitle,
+  IonToolbar
+} from '@ionic/vue';
 import TargetsList from '@/components/TargetsList.vue';
 </script>
 

@@ -32,6 +32,7 @@ import '@ionic/vue/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import './register-icons';
 
 const app = createApp(App)
     .use(IonicVue)
@@ -43,3 +44,4 @@ router.isReady().then(() => {
     IonicVue!.install!(app, {mode: 'ios'});
     app.mount('#app');
 });
+

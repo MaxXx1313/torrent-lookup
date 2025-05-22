@@ -1,6 +1,7 @@
 <template>
   <ion-list>
     <ion-item v-for="target in targets">
+      <ion-img class="folder" src="folder-icon.png"></ion-img>
       <ion-label>{{ target }}</ion-label>
       <ion-button slot="end">
         <ion-icon name="trash-outline"></ion-icon>
@@ -13,10 +14,16 @@
 
 <!-- -->
 <style scoped>
+.folder {
+  height: 24px;
+  width: 24px;
+  margin-right: 8px;
+}
 </style>
+
 <!-- -->
 <script setup lang="ts">
-import { IonIcon, IonList } from '@ionic/vue';
+import { IonButton, IonIcon, IonItem, IonLabel, IonList } from '@ionic/vue';
 import { onUnmounted, ref } from 'vue';
 import { DataService, ScanOptions } from '@/data/data.service';
 import { Subject, takeUntil } from 'rxjs';
