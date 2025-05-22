@@ -42,12 +42,23 @@ ion-toolbar {
   z-index: 1;
 }
 
+ion-header {
+  background: var(--ion-background-color, #fff);
+}
+
 .segment-wrapper {
   position: relative;
   z-index: 2;
   transform: translateY(-16px);
   margin: 0 auto;
   max-width: 480px;
-  background: var(--ion-toolbar-background);
+  --background: var(--my-segment-background);
+  --color: var(--my-segment-color);
+}
+
+ion-segment {
+  color: var(--my-segment-color);
+  --background: var(--my-segment-background);
+  border: 1px solid var(--my-segment-border-color);
 }
 </style>
