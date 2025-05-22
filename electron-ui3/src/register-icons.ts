@@ -1,4 +1,4 @@
-import { folderOutline, trashOutline, } from 'ionicons/icons';
+import { folderOutline, trashOutline, addCircleOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 
-addIcons({folderOutline, trashOutline});
+addIcons({folderOutline, trashOutline, addCircleOutline});
