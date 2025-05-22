@@ -22,7 +22,7 @@ function createWindow() {
     mainWindow.loadFile('app/index.html');
 
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
 
     _mainWindow = mainWindow;
 }
@@ -49,6 +49,9 @@ app.whenReady().then(() => {
     createWindow();
 
 
+    ipcMain.on('app:devtools', _myHandler((mainWnd)=>{
+        mainWnd.webContents.openDevTools();
+    }));
     ipcMain.on('scan:start', _myHandler(scanFolder));
 
     app.on('activate', () => {
