@@ -1,4 +1,5 @@
 import {TorrentScanner} from 'tlookup';
+import {dialog} from 'electron';
 
 
 /**
@@ -27,10 +28,25 @@ export function scanFolder(mainWindow, options) {
 // SCAN
     scanner.onEntry.subscribe(_onProgress);
 
-    console.log('scan started', options.targets);
+    console.log('[scan] started', options.targets);
     return scanner.run().then(() => {
         console.log('Scanned %s files, found %s torrent files', scanner.stats.files, scanner.stats.torrents);
     }).catch((e) => {
         throw e;
     });
 }
+
+/**
+ *
+ */
+export async function selectFolder() {
+    console.log('[scan] selectFolder');
+    const results = await dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
+    console.log('[scan] selectFolder results', results);
+    if (results.canceled) {
+        return null;
+    } else {
+        return results.filePaths || null;
+    }
+}
+

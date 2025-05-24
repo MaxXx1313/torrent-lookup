@@ -17,10 +17,29 @@ export class DataService {
         targets: ['~'],
     });
 
+    readonly isScanning$ = new BehaviorSubject(false);
+
     getTargets(): Observable<ScanOptions['targets']> {
         return this._options.pipe(
             map(v => v.targets),
         );
+    }
+
+    addTarget() {
+        window.electronAPI.selectFolder().then(folder => {
+            console.log('selectFolder', folder);
+            if (!folder) {
+                return;
+            }
+
+            const options = {...this._options.getValue()};
+            if (Array.isArray(folder)) {
+                options.targets.push(...folder);
+            } else {
+                options.targets.push(folder);
+            }
+            this._options.next(options);
+        });
     }
 
     startScan(): Observable<string> {

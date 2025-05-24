@@ -1,8 +1,17 @@
 <template>
   <div class="layout">
-    Scan results
+    <div class="progress">
+      <ion-spinner class="progress__spinner"></ion-spinner>
+      <span>scanning:</span>
+      <div class="progress__target">{{ currentTarget }}</div>
+      <ion-button size="small" color="medium" @click="startScan">
+        scan
+      </ion-button>
+      <ion-button size="small" color="medium">
+        stop
+      </ion-button>
+    </div>
   </div>
-
 </template>
 
 <!-- -->
@@ -16,11 +25,32 @@
   */
 }
 
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ion-color-medium);
+  //font-size: 12px;
+  font-weight: 200;
+}
+
+.progress__spinner {
+  height: 18px;
+}
+
+.progress__target {
+  flex-grow: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 </style>
 
 <!-- -->
 <script setup lang="ts">
 import { inject, onUnmounted, ref } from 'vue';
+import { IonButton, IonSpinner } from '@ionic/vue';
 import { DATA_SERVICE_KEY, DataService, ScanOptions } from '@/data/data.service';
 import { Subject } from 'rxjs';
 
@@ -32,7 +62,14 @@ onUnmounted(() => {
   destroy$.complete();
 });
 
-
+let currentTarget = ref('...');
 const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
+let scanProgress$;
+
+function startScan() {
+  scanProgress$ = dataService.startScan().subscribe(data => {
+    currentTarget.value = data;
+  });
+}
 
 </script>

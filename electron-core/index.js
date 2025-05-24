@@ -3,7 +3,7 @@
 // Modules to control application life and create native browser window
 const {app, BrowserWindow, ipcMain} = require('electron');
 const path = require('node:path');
-const { scanFolder} = require('./core-lib/scan');
+const { scanFolder, selectFolder} = require('./core-lib/scan');
 const fs = require('node:fs');
 
 
@@ -54,6 +54,8 @@ app.whenReady().then(() => {
     ipcMain.on('app:devtools', _myHandler((mainWnd)=>{
         mainWnd.webContents.openDevTools();
     }));
+
+    ipcMain.handle('scan:select-folder', _myHandler(selectFolder));
     ipcMain.on('scan:start', _myHandler(scanFolder));
 
     app.on('activate', () => {
