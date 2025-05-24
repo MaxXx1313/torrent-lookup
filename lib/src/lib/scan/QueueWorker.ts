@@ -28,7 +28,8 @@ export class QueueWorker<T, R = any> {
         private opts?: {
             autostart?: boolean,
             stopOnError?: boolean,
-        }) {
+        },
+    ) {
     }
 
     /**
@@ -82,7 +83,12 @@ export class QueueWorker<T, R = any> {
      *
      */
     terminate() {
-        this._terminateFlag = true;
+        if (this._isRunning) {
+            this._terminateFlag = true;
+            return this.onStop.pipe(take(1)).toPromise();
+        } else {
+            return Promise.resolve();
+        }
     }
 
     /**

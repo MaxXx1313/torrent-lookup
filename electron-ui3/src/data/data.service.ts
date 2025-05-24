@@ -58,4 +58,8 @@ export class DataService {
             })
         });
     }
+
+    stopScan() {
+        return window.electronAPI.stopScan();
+    }
 }

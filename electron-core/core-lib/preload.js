@@ -23,6 +23,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
     selectFolder: () => ipcRenderer.invoke('scan:select-folder'),
     scan: (targets) => ipcRenderer.send('scan:start', targets),
+    stopScan: () => ipcRenderer.send('scan:stop'),
     onScanProgress: (callback) => ipcRenderer.on('scan:progress', (_event, value) => callback(value)),
     onScanFound: (callback) => ipcRenderer.on('scan:found', (_event, value) => callback(value)),
 });

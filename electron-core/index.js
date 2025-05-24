@@ -3,9 +3,49 @@
 // Modules to control application life and create native browser window
 const {app, BrowserWindow, ipcMain} = require('electron');
 const path = require('node:path');
-const {scanFolder, selectFolder} = require('./core-lib/scan');
+const {scanFolder, selectFolder, Scanner} = require('./core-lib/scan');
 const fs = require('node:fs');
 
+
+const myBridge = {
+    send: (topic, message) => {
+        console.log('[send]\t', topic, message);
+        if (_mainWindow) {
+            _mainWindow.webContents.send(topic, message);
+        } else {
+            // no active window
+        }
+    },
+    on: (topic, handler) => {
+        console.log('[on]\t', topic);
+        ipcMain.on(topic, (event, data) => {
+            return handler(data);
+        });
+    },
+    handle: (topic, handler) => {
+        console.log('[handle]\t', topic);
+        ipcMain.handle(topic, (event, data) => {
+            return handler(data);
+        });
+    },
+};
+
+const scanner = new Scanner(myBridge);
+
+
+/**
+ *
+ * @param target
+ * @param {'windowCreated' | 'windowDestroyed'} event
+ * @param data
+ */
+function triggerLifecycleEvent(target, event, data) {
+    if (typeof target['event'] === 'function') {
+        target['event'](data);
+    }
+}
+
+/////////////////////////////
 
 let _mainWindow = null;
 
@@ -27,32 +67,14 @@ function createWindow() {
     // mainWindow.webContents.openDevTools();
 
     _mainWindow = mainWindow;
+    triggerLifecycleEvent(scanner, 'windowCreated', mainWindow);
 
     mainWindow.on('closed', function () {
+        triggerLifecycleEvent(scanner, 'windowDestroyed', mainWindow);
         _mainWindow = null;
     });
 }
 
-const myHandlerCaller = {
-    send: (topic, message) => {
-        if (_mainWindow) {
-            _mainWindow.webContents.send(topic, message);
-        } else {
-            // no active window
-        }
-    },
-};
-
-/**
- * @param {function} factoryFn
- * @private
- */
-function _myHandler(factoryFn) {
-    return (event, data) => {
-        console.log(data);
-        return factoryFn(myHandlerCaller, data);
-    }
-}
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -60,13 +82,11 @@ function _myHandler(factoryFn) {
 app.whenReady().then(() => {
     createWindow();
 
-
-    ipcMain.on('app:devtools', _myHandler((mainWnd) => {
-        mainWnd.webContents.openDevTools();
-    }));
-
-    ipcMain.handle('scan:select-folder', _myHandler(selectFolder));
-    ipcMain.on('scan:start', _myHandler(scanFolder));
+    ipcMain.on('app:devtools', () => {
+        if (_mainWindow) {
+            _mainWindow.webContents.openDevTools();
+        }
+    });
 
     app.on('activate', () => {
         // On macOS it's common to re-create a window in the app when the

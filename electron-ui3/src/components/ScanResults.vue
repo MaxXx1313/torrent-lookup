@@ -1,16 +1,24 @@
 <template>
   <div class="layout">
-    <div class="progress">
+
+    <div class="progress" v-if="scanInProgress">
+      <ion-spinner class="progress__spinner"></ion-spinner>
+      <span>scanning:</span>
+      <div class="progress__target">{{ currentTarget }}</div>
+      <ion-button size="small" color="medium" @click="stopScan">
+        stop
+      </ion-button>
+    </div>
+
+    <div class="progress" v-if="!scanInProgress">
       <ion-spinner class="progress__spinner"></ion-spinner>
       <span>scanning:</span>
       <div class="progress__target">{{ currentTarget }}</div>
       <ion-button size="small" color="medium" @click="startScan">
         scan
       </ion-button>
-      <ion-button size="small" color="medium">
-        stop
-      </ion-button>
     </div>
+
   </div>
 </template>
 
@@ -54,7 +62,7 @@ import { IonButton, IonSpinner } from '@ionic/vue';
 import { DATA_SERVICE_KEY, DataService, ScanOptions } from '@/data/data.service';
 import { Subject } from 'rxjs';
 
-const targets = ref<ScanOptions['targets']>([]);
+const scanInProgress = ref<boolean>(false);
 
 const destroy$ = new Subject<void>();
 onUnmounted(() => {
@@ -68,6 +76,11 @@ let scanProgress$;
 
 function startScan() {
   scanProgress$ = dataService.startScan().subscribe(data => {
+    currentTarget.value = data;
+  });
+}
+function stopScan() {
+  scanProgress$ = dataService.stopScan().subscribe(data => {
     currentTarget.value = data;
   });
 }
