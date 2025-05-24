@@ -1,4 +1,4 @@
-import { DEFAULT_WORKDIR_LOCATION, FN_DATA_FILE, FN_MAPS_FILE, FN_TORRENTS_FILE } from "../const.js";
+import { DEFAULT_WORKDIR_LOCATION, FILE_DATA, FILEN_MAPS, FILE_TORRENTS } from "../const.js";
 
 import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
@@ -128,9 +128,9 @@ export class Analyzer {
      * Main flow
      */
     async analyze(): Promise<any> {
-        const torrentsFileName = path.join(this.options.workdir, FN_TORRENTS_FILE);
-        const dataFileName = path.join(this.options.workdir, FN_DATA_FILE);
-        const mapsFileName = path.join(this.options.workdir, FN_MAPS_FILE);
+        const torrentsFileName = path.join(this.options.workdir, FILE_TORRENTS);
+        const dataFileName = path.join(this.options.workdir, FILE_DATA);
+        const mapsFileName = path.join(this.options.workdir, FILEN_MAPS);
 
         await this._loadTorrentFilesFromFile(torrentsFileName);
         await this._matchFilesFromFile(dataFileName);

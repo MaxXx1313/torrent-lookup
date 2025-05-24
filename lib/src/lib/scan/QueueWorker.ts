@@ -86,6 +86,13 @@ export class QueueWorker<T, R = any> {
     }
 
     /**
+     *
+     */
+    isRunning(): boolean {
+        return this._isRunning;
+    }
+
+    /**
      * @private
      */
     protected _digest(): void {

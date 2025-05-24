@@ -3,8 +3,8 @@ import { Stats, WriteStream } from 'node:fs';
 import * as path from 'node:path';
 import {
     DEFAULT_WORKDIR_LOCATION,
-    FN_DATA_FILE,
-    FN_TORRENTS_FILE,
+    FILE_DATA,
+    FILE_TORRENTS,
     SCAN_EXCLUDE_DEFAULT,
     TORRENT_EXTENSION
 } from "../const.js";
@@ -60,8 +60,6 @@ export interface TorrentScannerEntry {
  *   1.1 check is that file is a torrent file
  *     1.1.1 write torrent file into one list
  *     1.1.2 write ordinary file into another list(with file size)
- *
- * @emit TorrentScanner#torrentfile    - when torrent file is found
  */
 export class TorrentScanner {
 
@@ -130,13 +128,20 @@ export class TorrentScanner {
     }
 
     /**
+     *
+     */
+    isRunning() {
+        return this.scanner.isRunning();
+    }
+
+    /**
      * Perform operations before scan
      */
     protected _beforeScan(): void {
         fs.mkdirSync(this.options.workdir, {recursive: true});
 
-        const dataFileName = path.join(this.options.workdir, FN_DATA_FILE);
-        const torrFileName = path.join(this.options.workdir, FN_TORRENTS_FILE);
+        const dataFileName = path.join(this.options.workdir, FILE_DATA);
+        const torrFileName = path.join(this.options.workdir, FILE_TORRENTS);
 
         this.resetStats();
         // this._lastFile = null;

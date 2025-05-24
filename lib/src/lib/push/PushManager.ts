@@ -1,4 +1,4 @@
-import { DEFAULT_WORKDIR_LOCATION, FN_MAPS_FILE } from "../const.js";
+import { DEFAULT_WORKDIR_LOCATION, FILEN_MAPS } from "../const.js";
 import { Subject } from "rxjs";
 import { TorrentMapping } from "../analyze/Analyzer.js";
 
@@ -88,7 +88,7 @@ export class PushManager {
      * @private
      */
     protected loadMapping(): TorrentMapping[] {
-        const mapsFileName = path.join(this.options.workdir, FN_MAPS_FILE);
+        const mapsFileName = path.join(this.options.workdir, FILEN_MAPS);
         return JSON.parse(fs.readFileSync(mapsFileName, {encoding: 'utf-8'}).toString());
     }
 

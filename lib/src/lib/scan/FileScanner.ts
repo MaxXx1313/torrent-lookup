@@ -14,8 +14,7 @@ export interface FileScannerOption {
 
     /**
      * Patten for excluding files/folders from scan.
-     * @type {Array<string>}Array of globs string
-     * @see [Glob syntax](https://en.wikipedia.org/wiki/Glob_(programming)) for more details
+     * @type {Array<string>} Array of CUSTOM globs string
      */
     exclude?: Array<string>;
     followLinks?: boolean;
@@ -95,6 +94,13 @@ export class FileScanner {
      */
     terminate() {
         return this.jobWorker.terminate();
+    }
+
+    /**
+     *
+     */
+    isRunning(): boolean {
+        return this.jobWorker.isRunning();
     }
 
 

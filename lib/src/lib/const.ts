@@ -1,9 +1,9 @@
 import * as path from 'node:path';
 import * as os from 'node:os';
 
-export const FN_DATA_FILE = 'files.txt';
-export const FN_TORRENTS_FILE = 'torrents.txt';
-export const FN_MAPS_FILE = 'maps.json';
+export const FILE_DATA = 'files.txt';
+export const FILE_TORRENTS = 'torrents.txt';
+export const FILEN_MAPS = 'maps.json';
 
 export const DEFAULT_WORKDIR_LOCATION = path.join(os.tmpdir(), 'tlookup'); // '~/tmp'
 export const TORRENT_EXTENSION = '.torrent';
