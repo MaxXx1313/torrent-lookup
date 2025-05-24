@@ -28,7 +28,7 @@ export class Scanner {
 
         this.scanner.onEntry.subscribe(_onProgress);
 
-        let _lastReport = 0;
+        let _lastReportTime = 0;
 
         function _onProgress(entry) {
             if (entry.isTorrent) {
@@ -37,10 +37,10 @@ export class Scanner {
 
                 // debounce logic
                 const now = Date.now();
-                if (now - _lastReport < reportDebounceTime) {
+                if (now - _lastReportTime < reportDebounceTime) {
                     return;
                 }
-                _lastReport = now;
+                _lastReportTime = now;
 
                 myBridge.send('scan:progress', entry.location);
             }
@@ -51,7 +51,7 @@ export class Scanner {
      *
      */
     windowCreated() {
-
+        this._myBridge.send('scan:status', this.scanner.isRunning());
     }
 
     /**

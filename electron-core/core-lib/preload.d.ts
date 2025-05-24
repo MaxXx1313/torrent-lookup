@@ -2,8 +2,9 @@ export interface IElectronAPI {
     scan: (opts: { targets: string | string[] }) => Promise<void>,
     stopScan: () => void,
     selectFolder: () => Promise<string | string[] | null>,
-    onScanProgress: (callback: (filepath: string) => void) => void,
-    onScanFound: (callback: (filepath: string) => void) => void,
+    onScanProgress: MyEventBinding<string>,
+    onScanStatus: MyEventBinding<boolean>,
+    onScanFound: MyEventBinding<string>,
     openDevTools: () => void,
 }
 
@@ -12,3 +13,9 @@ declare global {
         electronAPI: IElectronAPI;
     }
 }
+
+
+/**
+ * return unsubscribe function
+ */
+type MyEventBinding<T> = (callback: (arg: T) => void) => () => void;

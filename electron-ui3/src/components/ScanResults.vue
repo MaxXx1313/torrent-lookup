@@ -11,9 +11,9 @@
     </div>
 
     <div class="progress" v-if="!scanInProgress">
-      <ion-spinner class="progress__spinner"></ion-spinner>
-      <span>scanning:</span>
-      <div class="progress__target">{{ currentTarget }}</div>
+      <ion-icon class="progress__spinner"></ion-icon>
+      <span>Scanning is not started</span>
+      <div class="progress__target"></div>
       <ion-button size="small" color="medium" @click="startScan">
         scan
       </ion-button>
@@ -58,8 +58,8 @@
 <!-- -->
 <script setup lang="ts">
 import { inject, onUnmounted, ref } from 'vue';
-import { IonButton, IonSpinner } from '@ionic/vue';
-import { DATA_SERVICE_KEY, DataService, ScanOptions } from '@/data/data.service';
+import { IonButton, IonSpinner, IonIcon } from '@ionic/vue';
+import { DATA_SERVICE_KEY, DataService } from '@/data/data.service';
 import { Subject } from 'rxjs';
 
 const scanInProgress = ref<boolean>(false);
@@ -72,17 +72,20 @@ onUnmounted(() => {
 
 let currentTarget = ref('...');
 const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
-let scanProgress$;
 
 function startScan() {
-  scanProgress$ = dataService.startScan().subscribe(data => {
+  dataService.startScan().subscribe(data => {
     currentTarget.value = data;
   });
 }
+
 function stopScan() {
-  scanProgress$ = dataService.stopScan().subscribe(data => {
-    currentTarget.value = data;
-  });
+  dataService.stopScan();
 }
+
+dataService.isScanning$.subscribe(result => {
+  console.log('isScanning$', result)
+  scanInProgress.value = !!result;
+});
 
 </script>

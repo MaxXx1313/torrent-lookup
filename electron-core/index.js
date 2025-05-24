@@ -3,28 +3,37 @@
 // Modules to control application life and create native browser window
 const {app, BrowserWindow, ipcMain} = require('electron');
 const path = require('node:path');
-const {scanFolder, selectFolder, Scanner} = require('./core-lib/scan');
-const fs = require('node:fs');
+const {Scanner} = require('./core-lib/scan');
 
 
 const myBridge = {
+    /**
+     * Send message to UI
+     */
     send: (topic, message) => {
         console.log('[send]\t', topic, message);
         if (_mainWindow) {
             _mainWindow.webContents.send(topic, message);
         } else {
             // no active window
+            console.debug('[send]\t(no active window)', topic, message);
         }
     },
+    /**
+     * Receive message from UI
+     */
     on: (topic, handler) => {
-        console.log('[on]\t', topic);
         ipcMain.on(topic, (event, data) => {
+            console.log('[on]\t', topic);
             return handler(data);
         });
     },
+    /**
+     * UI calls method and provide a result
+     */
     handle: (topic, handler) => {
-        console.log('[handle]\t', topic);
         ipcMain.handle(topic, (event, data) => {
+            console.log('[handle]\t', topic);
             return handler(data);
         });
     },
@@ -37,7 +46,7 @@ const scanner = new Scanner(myBridge);
  *
  * @param target
  * @param {'windowCreated' | 'windowDestroyed'} event
- * @param data
+ * @param [data]
  */
 function triggerLifecycleEvent(target, event, data) {
     if (typeof target['event'] === 'function') {
@@ -70,7 +79,7 @@ function createWindow() {
     triggerLifecycleEvent(scanner, 'windowCreated', mainWindow);
 
     mainWindow.on('closed', function () {
-        triggerLifecycleEvent(scanner, 'windowDestroyed', mainWindow);
+        triggerLifecycleEvent(scanner, 'windowDestroyed');
         _mainWindow = null;
     });
 }

@@ -18,12 +18,25 @@ window.addEventListener('DOMContentLoaded', () => {
 ///
 const {contextBridge, ipcRenderer} = require('electron/renderer');
 
+/**
+ * return unsubscribe function
+ */
+function bindToEvent(eventName) {
+    return (callback) => {
+        const _cb = (_event, value) => callback(value)
+        ipcRenderer.on(eventName, _cb);
+
+        return () => ipcRenderer.off(eventName, _cb);
+    }
+}
+
 contextBridge.exposeInMainWorld('electronAPI', {
     openDevTools: (callback) => ipcRenderer.send('app:devtools'),
 
     selectFolder: () => ipcRenderer.invoke('scan:select-folder'),
     scan: (targets) => ipcRenderer.send('scan:start', targets),
     stopScan: () => ipcRenderer.send('scan:stop'),
-    onScanProgress: (callback) => ipcRenderer.on('scan:progress', (_event, value) => callback(value)),
-    onScanFound: (callback) => ipcRenderer.on('scan:found', (_event, value) => callback(value)),
+    onScanStatus: bindToEvent('scan:status'),
+    onScanProgress: bindToEvent('scan:progress'),
+    onScanFound: bindToEvent('scan:found'),
 });
