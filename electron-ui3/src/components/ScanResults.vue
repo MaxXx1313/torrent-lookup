@@ -3,7 +3,6 @@
 
     <div class="progress" v-if="scanInProgress">
       <ion-spinner class="progress__spinner"></ion-spinner>
-      <span>scanning:</span>
       <div class="progress__target">{{ currentTarget }}</div>
       <ion-button size="small" color="medium" @click="stopScan">
         stop
@@ -11,7 +10,7 @@
     </div>
 
     <div class="progress" v-if="!scanInProgress">
-      <ion-icon class="progress__spinner"></ion-icon>
+      <ion-icon class="progress__spinner" name="stop"></ion-icon>
       <span>Scanning is not started</span>
       <div class="progress__target"></div>
       <ion-button size="small" color="medium" @click="startScan">
@@ -38,12 +37,12 @@
   align-items: center;
   gap: 8px;
   color: var(--ion-color-medium);
-  //font-size: 12px;
   font-weight: 200;
 }
 
 .progress__spinner {
   height: 18px;
+  flex: 0 0 18px;
 }
 
 .progress__target {
@@ -58,7 +57,7 @@
 <!-- -->
 <script setup lang="ts">
 import { inject, onUnmounted, ref } from 'vue';
-import { IonButton, IonSpinner, IonIcon } from '@ionic/vue';
+import { IonButton, IonIcon, IonSpinner } from '@ionic/vue';
 import { DATA_SERVICE_KEY, DataService } from '@/data/data.service';
 import { Subject } from 'rxjs';
 
