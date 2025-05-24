@@ -3,6 +3,7 @@ import { Stats } from 'node:fs';
 import * as path from 'node:path';
 import { QueueWorker } from "./QueueWorker.js";
 import { matchCustom } from "../utils/myglob.js";
+import * as os from 'node:os';
 import ErrnoException = NodeJS.ErrnoException;
 
 
@@ -120,6 +121,12 @@ export class FileScanner {
             // location is a pure drive letter: "C:" o "C:\"
             filepath = filepath.substring(0, 2) + '/';
         }
+
+        // fix home path
+        if (filepath.match(/^\~(?:[\/\\]|$)/)) {
+            // location starting from '~'
+            filepath = os.homedir() + filepath.substring(1);
+        }
         return this._scanFolder(filepath)
             .catch(this._options.cbError.bind(this));
     }
@@ -129,7 +136,7 @@ export class FileScanner {
      */
     protected async _scanFolder(filepath: string): Promise<any> {
         // TODO: verbose log
-        const folderEntries = await fs.readdir(filepath);
+        const folderEntries = await fs.readdir(path.resolve(filepath));
         // console.log('_scanFolder: "%s"', filepath, folderEntries);
 
         for (const fileOrFolder of folderEntries) {
