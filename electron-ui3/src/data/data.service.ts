@@ -29,6 +29,16 @@ export class DataService {
         });
     }).pipe(shareReplay(1));
 
+    readonly _scanFound: string[] = [];
+    readonly scanFound$ = new BehaviorSubject<string[]>([]);
+
+
+    constructor() {
+        window.electronAPI.onScanFound(item => {
+            this._scanFound.push(item);
+            this.scanFound$.next(this._scanFound);
+        });
+    }
 
     getTargets(): Observable<ScanOptions['targets']> {
         return this._targets;
@@ -60,6 +70,9 @@ export class DataService {
     }
 
     startScan() {
+        this._scanFound.length = 0;
+        this.scanFound$.next(this._scanFound);
+
         const targets = this._targets.getValue();
         window.electronAPI.scan({targets});
     }

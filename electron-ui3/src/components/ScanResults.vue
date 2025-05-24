@@ -19,6 +19,13 @@
     </div>
 
   </div>
+  <ion-list>
+    <ion-item v-for="r in scanFound" :key="r">
+      <ion-img class="torrent__icon" src="torrent-icon.png"></ion-img>
+      <ion-label class="torrent__name">{{ r }}</ion-label>
+    </ion-item>
+  </ion-list>
+
 </template>
 
 <!-- -->
@@ -52,18 +59,31 @@
   text-overflow: ellipsis;
 }
 
+.torrent__icon {
+  margin-right: 8px;
+  height: 18px;
+  width: 18px;
+  flex: 0 0 18px;
+}
+
+.torrent__name {
+  font-weight: 300;
+}
+
 </style>
 
 <!-- -->
 <script setup lang="ts">
 import { inject, ref } from 'vue';
-import { IonButton, IonIcon, IonSpinner } from '@ionic/vue';
+import { IonButton, IonIcon, IonImg, IonItem, IonLabel, IonList, IonSpinner } from '@ionic/vue';
 import { DATA_SERVICE_KEY, DataService } from '@/data/data.service';
 import { bindToComponent } from '@/components/async';
 
 const scanInProgress = ref<boolean>(false);
 
 let currentTarget = ref('...');
+let scanFound = ref<string[]>([]);
+
 const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
 
 function startScan() {
@@ -80,6 +100,10 @@ bindToComponent(dataService.scanTarget$).subscribe(data => {
 
 bindToComponent(dataService.isScanning$).subscribe(result => {
   scanInProgress.value = !!result;
+});
+bindToComponent(dataService.scanFound$).subscribe(result => {
+  scanFound.value.splice(0);
+  scanFound.value.push(...result);
 });
 
 </script>

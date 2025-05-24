@@ -16,6 +16,7 @@ import {
 } from '@ionic/vue';
 import TargetsList from '@/components/TargetsList.vue';
 import ScanResults from '@/components/ScanResults.vue';
+import HomePageStatus from '@/views/HomePageStatus.vue';
 
 
 function devTools() {
@@ -60,6 +61,8 @@ function devTools() {
         </ion-segment-content>
       </ion-segment-view>
     </ion-content>
+
+    <HomePageStatus></HomePageStatus>
   </ion-page>
 </template>
 
