@@ -143,7 +143,6 @@ export class TorrentScanner {
         const dataFileName = path.join(this.options.workdir, FILE_DATA);
         const torrFileName = path.join(this.options.workdir, FILE_TORRENTS);
 
-        this.resetStats();
         // this._lastFile = null;
         this._dataFileStream = fs.createWriteStream(dataFileName);
         this._torrFileStream = fs.createWriteStream(torrFileName);

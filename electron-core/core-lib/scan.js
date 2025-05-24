@@ -7,11 +7,13 @@ export class Scanner {
 
     scanner = new TorrentScanner();
 
+    _myBridge;
 
     /**
      * @param myBridge
      */
     constructor(myBridge) {
+        this._myBridge = myBridge;
 
         myBridge.on('scan:start', (data) => {
             return this.startScan(data);
@@ -82,13 +84,21 @@ export class Scanner {
      * @returns {Promise<void>}
      */
     startScan(options) {
+        if (this.scanner.isRunning()) {
+            console.log('[scan] already started');
+            return;
+        }
+
         this.scanner.addTarget(options.targets || []);
 
         console.log('[scan] started', options.targets);
+        this._myBridge.send('scan:status', true);
         return this.scanner.run().then(() => {
             console.log('Scanned %s files, found %s torrent files', this.scanner.stats.files, this.scanner.stats.torrents);
         }).catch((e) => {
             throw e;
+        }).finally(() => {
+            this._myBridge.send('scan:status', false);
         });
     }
 
