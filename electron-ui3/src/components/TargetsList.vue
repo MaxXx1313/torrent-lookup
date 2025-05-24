@@ -59,6 +59,10 @@ ion-item::part(native) {
   padding: 0;
 }
 
+ion-item:last-child {
+  --inner-border-width: 0;
+}
+
 .folder-icon {
   height: 24px;
   width: 24px;
