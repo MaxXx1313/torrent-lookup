@@ -5,7 +5,7 @@
         <ion-item v-for="target in targets" :key="target">
           <ion-img class="folder-icon" src="folder-icon.png"></ion-img>
           <ion-label>{{ target }}</ion-label>
-          <ion-button slot="end" color="danger">
+          <ion-button slot="end" color="danger" @click="deleteTarget(target)">
             <ion-icon name="trash-outline"></ion-icon>
           </ion-button>
         </ion-item>
@@ -19,7 +19,8 @@
     <div>
       <div class="layout-action">
         <ion-fab-button @click="addTarget">
-          <ion-icon name="add-circle-outline"></ion-icon>
+          <ion-icon name="add-circle-outline" v-if="!addInProgress"></ion-icon>
+          <ion-spinner v-if="addInProgress"></ion-spinner>
         </ion-fab-button>
         <ion-fab-button @click="devTools">
           <ion-icon name="bug-outline"></ion-icon>
@@ -70,12 +71,13 @@ ion-item::part(native) {
 
 <!-- -->
 <script setup lang="ts">
-import { IonButton, IonFabButton, IonIcon, IonImg, IonItem, IonLabel, IonList } from '@ionic/vue';
+import { IonButton, IonFabButton, IonIcon, IonImg, IonItem, IonLabel, IonList, IonSpinner } from '@ionic/vue';
 import { inject, onUnmounted, ref } from 'vue';
 import { DATA_SERVICE_KEY, DataService, ScanOptions } from '@/data/data.service';
 import { Subject, takeUntil } from 'rxjs';
 
 const targets = ref<ScanOptions['targets']>([]);
+const addInProgress = ref<boolean>(false);
 
 const destroy$ = new Subject<void>();
 onUnmounted(() => {
@@ -84,6 +86,7 @@ onUnmounted(() => {
 });
 
 const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
+
 dataService.getTargets().pipe(takeUntil(destroy$)).subscribe(data => {
   // TODO: didn't found how to replace an array
   targets.value.splice(0);
@@ -91,7 +94,17 @@ dataService.getTargets().pipe(takeUntil(destroy$)).subscribe(data => {
 });
 
 function addTarget() {
-  dataService.addTarget();
+  if (addInProgress.value) {
+    return;
+  }
+  addInProgress.value = true;
+  dataService.addTarget().finally(() => {
+    addInProgress.value = false;
+  });
+}
+
+function deleteTarget(target: string) {
+  dataService.deleteTarget(target);
 }
 
 function devTools() {

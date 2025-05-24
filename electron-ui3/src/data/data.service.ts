@@ -1,4 +1,4 @@
-import { BehaviorSubject, map, Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 
 export interface ScanOptions {
@@ -13,38 +13,44 @@ export const DATA_SERVICE_KEY = Symbol();
  */
 export class DataService {
 
-    private _options = new BehaviorSubject<ScanOptions>({
-        targets: ['~'],
-    });
+    private _targets = new BehaviorSubject<ScanOptions['targets']>([
+        '~'
+    ]);
 
     readonly isScanning$ = new BehaviorSubject(false);
 
     getTargets(): Observable<ScanOptions['targets']> {
-        return this._options.pipe(
-            map(v => v.targets),
-        );
+        return this._targets;
     }
 
     addTarget() {
-        window.electronAPI.selectFolder().then(folder => {
-            console.log('selectFolder', folder);
+        return window.electronAPI.selectFolder().then(folder => {
             if (!folder) {
                 return;
             }
 
-            const options = {...this._options.getValue()};
+            const targets = [...this._targets.getValue()];
             if (Array.isArray(folder)) {
-                options.targets.push(...folder);
+                targets.push(...folder);
             } else {
-                options.targets.push(folder);
+                targets.push(folder);
             }
-            this._options.next(options);
+            this._targets.next(targets);
         });
     }
 
+    deleteTarget(toDelete: string) {
+        const targets = [...this._targets.getValue()];
+        const idx = targets.indexOf(toDelete);
+        if (idx > -1) {
+            targets.splice(idx, 1);
+        }
+        this._targets.next(targets);
+    }
+
     startScan(): Observable<string> {
-        const options = this._options.getValue();
-        window.electronAPI.scan(options);
+        const targets = this._targets.getValue();
+        window.electronAPI.scan({targets});
 
         return new Observable<string>((observer) => {
             window.electronAPI.onScanProgress((filepath) => {

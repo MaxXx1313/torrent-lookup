@@ -41,8 +41,10 @@ export function scanFolder(mainWindow, options) {
  */
 export async function selectFolder() {
     console.log('[scan] selectFolder');
-    const results = await dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
-    console.log('[scan] selectFolder results', results);
+    const results = await dialog.showOpenDialog({
+        properties: ['openDirectory', 'multiSelections', 'dontAddToRecent'],
+    });
+    console.debug('[scan] selectFolder results', results);
     if (results.canceled) {
         return null;
     } else {
