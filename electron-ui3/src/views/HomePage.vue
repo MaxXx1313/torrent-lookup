@@ -54,9 +54,11 @@ function devTools() {
     <ion-content>
       <ion-segment-view>
         <ion-segment-content id="scan">
+          <div class="spacer"></div>
           <TargetsList></TargetsList>
         </ion-segment-content>
         <ion-segment-content id="results">
+          <div class="spacer"></div>
           <ScanResults></ScanResults>
         </ion-segment-content>
       </ion-segment-view>
@@ -78,9 +80,16 @@ ion-header {
   background: var(--ion-background-color, #fff);
 }
 
+.spacer {
+  height: 26px;
+}
+
 .segment-wrapper {
+  position: absolute;
+  left: 0;
+  right: 0;
+
   padding: 0 16px;
-  position: relative;
   z-index: 2;
   transform: translateY(-16px);
   margin: 0 auto;
