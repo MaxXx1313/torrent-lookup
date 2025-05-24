@@ -22,9 +22,6 @@
           <ion-icon name="add-circle-outline" v-if="!addInProgress"></ion-icon>
           <ion-spinner v-if="addInProgress"></ion-spinner>
         </ion-fab-button>
-        <ion-fab-button @click="devTools">
-          <ion-icon name="bug-outline"></ion-icon>
-        </ion-fab-button>
       </div>
     </div>
   </div>
@@ -101,8 +98,5 @@ function deleteTarget(target: string) {
   dataService.deleteTarget(target);
 }
 
-function devTools() {
-  window.electronAPI.openDevTools();
-}
 
 </script>

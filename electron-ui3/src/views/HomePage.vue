@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import {
+  IonButton,
+  IonButtons,
   IonContent,
   IonHeader,
+  IonIcon,
+  IonLabel,
   IonPage,
   IonSegment,
   IonSegmentButton,
-  IonLabel,
   IonSegmentContent,
   IonSegmentView,
   IonTitle,
@@ -13,6 +16,11 @@ import {
 } from '@ionic/vue';
 import TargetsList from '@/components/TargetsList.vue';
 import ScanResults from '@/components/ScanResults.vue';
+
+
+function devTools() {
+  window.electronAPI.openDevTools();
+}
 </script>
 
 <!-- -->
@@ -21,6 +29,13 @@ import ScanResults from '@/components/ScanResults.vue';
     <ion-header>
       <ion-toolbar>
         <ion-title>Torrent lookup</ion-title>
+
+        <ion-buttons slot="end">
+          <ion-button class="debug-btn" fill="clear" color="medium" @click="devTools">
+            <ion-icon name="bug-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+
       </ion-toolbar>
 
       <div class="segment-wrapper">
@@ -75,5 +90,9 @@ ion-segment {
   color: var(--my-segment-color);
   --background: var(--my-segment-background);
   border: 1px solid var(--my-segment-border-color);
+}
+
+.debug-btn {
+  opacity: .2;
 }
 </style>
