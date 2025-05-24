@@ -68,6 +68,8 @@ export class FileScanner {
         if (this._options.exclude) {
             this._exclude.push.apply(this._exclude, this._options.exclude);
         }
+
+        this._exclude = this._exclude.map(_normalizePath);
     }
 
 
@@ -116,18 +118,7 @@ export class FileScanner {
      * @param filepath
      */
     protected async scanFolder(filepath: string): Promise<any> {
-        // fix windows drive root
-        if (filepath.match(/^\w{1}:\\?$/)) {
-            // location is a pure drive letter: "C:" o "C:\"
-            filepath = filepath.substring(0, 2) + '/';
-        }
-
-        // fix home path
-        if (filepath.match(/^\~(?:[\/\\]|$)/)) {
-            // location starting from '~'
-            filepath = os.homedir() + filepath.substring(1);
-        }
-        return this._scanFolder(filepath)
+        return this._scanFolder(_normalizePath(filepath))
             .catch(this._options.cbError.bind(this));
     }
 
@@ -199,3 +190,23 @@ export class FileScanner {
 
 
 } //- FileScanner
+
+
+/**
+ * @param filepath
+ * @protected
+ */
+function _normalizePath(filepath: string) {
+    // fix windows drive root
+    if (filepath.match(/^\w{1}:\\?$/)) {
+        // location is a pure drive letter: "C:" o "C:\"
+        filepath = filepath.substring(0, 2) + '/';
+    }
+
+    // fix home path
+    if (filepath.match(/^\~(?:[\/\\]|$)/)) {
+        // location starting from '~'
+        filepath = os.homedir() + filepath.substring(1);
+    }
+    return filepath;
+}

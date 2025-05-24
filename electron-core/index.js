@@ -49,7 +49,7 @@ const myHandlerCaller = {
  */
 function _myHandler(factoryFn) {
     return (event, data) => {
-        console.log(event, data);
+        console.log(data);
         return factoryFn(myHandlerCaller, data);
     }
 }
