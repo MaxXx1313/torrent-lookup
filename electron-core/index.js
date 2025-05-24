@@ -3,7 +3,7 @@
 // Modules to control application life and create native browser window
 const {app, BrowserWindow, ipcMain} = require('electron');
 const path = require('node:path');
-const { scanFolder, selectFolder} = require('./core-lib/scan');
+const {scanFolder, selectFolder} = require('./core-lib/scan');
 const fs = require('node:fs');
 
 
@@ -27,7 +27,21 @@ function createWindow() {
     // mainWindow.webContents.openDevTools();
 
     _mainWindow = mainWindow;
+
+    mainWindow.on('closed', function () {
+        _mainWindow = null;
+    });
 }
+
+const myHandlerCaller = {
+    send: (topic, message) => {
+        if (_mainWindow) {
+            _mainWindow.webContents.send(topic, message);
+        } else {
+            // no active window
+        }
+    },
+};
 
 /**
  * @param {function} factoryFn
@@ -36,11 +50,7 @@ function createWindow() {
 function _myHandler(factoryFn) {
     return (event, data) => {
         console.log(event, data);
-        if (_mainWindow) {
-            return factoryFn(_mainWindow, data);
-        } else {
-            console.warn('No active windows');
-        }
+        return factoryFn(myHandlerCaller, data);
     }
 }
 
@@ -51,7 +61,7 @@ app.whenReady().then(() => {
     createWindow();
 
 
-    ipcMain.on('app:devtools', _myHandler((mainWnd)=>{
+    ipcMain.on('app:devtools', _myHandler((mainWnd) => {
         mainWnd.webContents.openDevTools();
     }));
 

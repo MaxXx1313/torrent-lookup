@@ -3,12 +3,12 @@ import {dialog} from 'electron';
 
 
 /**
- * @param {object} mainWindow
+ * @param {object} mainContext
  * @param {object} options
  * @param {string[]} options.targets
  * @returns {Promise<void>}
  */
-export function scanFolder(mainWindow, options) {
+export function scanFolder(mainContext, options) {
     const scanner = new TorrentScanner({
         target: options.targets || [],
     });
@@ -17,11 +17,11 @@ export function scanFolder(mainWindow, options) {
     function _onProgress(entry) {
         if (entry.isTorrent) {
             console.log('scan:found', entry.location);
-            mainWindow.webContents.send('scan:found', entry.location);
+            mainContext.send('scan:found', entry.location);
         } else {
             // logger.logLOP(entry.location);
             console.log('scan:progress:', entry.location);
-            mainWindow.webContents.send('scan:progress', entry.location);
+            mainContext.send('scan:progress', entry.location);
         }
     }
 
