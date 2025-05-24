@@ -21,7 +21,7 @@
   </div>
   <ion-list>
     <ion-item v-for="r in scanFound" :key="r">
-      <ion-img class="torrent__icon" src="torrent-icon.png"></ion-img>
+      <ion-img class="torrent__icon" src="torrent-icon.svg"></ion-img>
       <ion-label class="torrent__name">{{ r }}</ion-label>
     </ion-item>
   </ion-list>
