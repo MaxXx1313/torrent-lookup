@@ -1,23 +1,25 @@
 <template>
   <div class="layout">
-    <div>
+    <div class="list-wrapper">
       <ion-list>
         <ion-item v-for="target in targets">
-          <ion-img class="folder" src="folder-icon.png"></ion-img>
+          <ion-img class="folder-icon" src="folder-icon.png"></ion-img>
           <ion-label>{{ target }}</ion-label>
-          <ion-button slot="end">
+          <ion-button slot="end" color="danger">
             <ion-icon name="trash-outline"></ion-icon>
           </ion-button>
         </ion-item>
 
         <!--    <MessageListItem v-for="message in messages" :key="message.id" :message="message"/>-->
       </ion-list>
-      <div>
+      <div class="add-target-container">
         <ion-button size="small">
           <ion-icon name="add-circle-outline"></ion-icon>
         </ion-button>
       </div>
     </div>
+
+    <div class="layout-space"></div>
 
     <div>
       <div class="layout-action">
@@ -33,11 +35,16 @@
 <!-- -->
 <style scoped>
 .layout {
+  padding: 0 16px;
   /*
   display: grid;
   grid-template-columns: 1fr 1fr;
   height: 100%;
   */
+}
+
+.layout-space {
+  height: 32px;
 }
 
 .layout-action {
@@ -47,7 +54,20 @@
   height: 100%;
 }
 
-.folder {
+.add-target-container {
+  padding: 3px 16px;
+}
+
+.list-wrapper {
+  border: 1px solid var(--ion-color-light);
+  border-radius: 6px;
+}
+
+ion-item::part(native) {
+  padding: 0;
+}
+
+.folder-icon {
   height: 24px;
   width: 24px;
   margin-right: 8px;

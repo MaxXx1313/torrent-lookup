@@ -58,6 +58,7 @@ ion-header {
 }
 
 .segment-wrapper {
+  padding: 0 16px;
   position: relative;
   z-index: 2;
   transform: translateY(-16px);

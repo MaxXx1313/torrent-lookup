@@ -1,0 +1,12 @@
+
+ion-list {
+    --ion-item-background: transparent;
+}
+
+ion-item {
+    /*--inner-border-width: 0;*/
+    --border-color: var(--ion-color-light);
+
+    --inner-padding-start: 16px;
+    --inner-padding-end: 16px;
+}
