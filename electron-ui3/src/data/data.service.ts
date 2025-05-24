@@ -23,6 +23,12 @@ export class DataService {
         });
     }).pipe(shareReplay(1));
 
+    readonly scanTarget$ = new Observable<string>((observer) => {
+        return window.electronAPI.onScanProgress((filepath) => {
+            observer.next(filepath);
+        });
+    }).pipe(shareReplay(1));
+
 
     getTargets(): Observable<ScanOptions['targets']> {
         return this._targets;
@@ -53,15 +59,9 @@ export class DataService {
         this._targets.next(targets);
     }
 
-    startScan(): Observable<string> {
+    startScan() {
         const targets = this._targets.getValue();
         window.electronAPI.scan({targets});
-
-        return new Observable<string>((observer) => {
-            window.electronAPI.onScanProgress((filepath) => {
-                observer.next(filepath);
-            })
-        });
     }
 
     stopScan() {

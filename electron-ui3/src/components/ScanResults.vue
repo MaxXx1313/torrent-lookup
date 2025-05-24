@@ -56,34 +56,29 @@
 
 <!-- -->
 <script setup lang="ts">
-import { inject, onUnmounted, ref } from 'vue';
+import { inject, ref } from 'vue';
 import { IonButton, IonIcon, IonSpinner } from '@ionic/vue';
 import { DATA_SERVICE_KEY, DataService } from '@/data/data.service';
-import { Subject } from 'rxjs';
+import { bindToComponent } from '@/components/async';
 
 const scanInProgress = ref<boolean>(false);
-
-const destroy$ = new Subject<void>();
-onUnmounted(() => {
-  destroy$.next();
-  destroy$.complete();
-});
 
 let currentTarget = ref('...');
 const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
 
 function startScan() {
-  dataService.startScan().subscribe(data => {
-    currentTarget.value = data;
-  });
+  dataService.startScan();
 }
 
 function stopScan() {
   dataService.stopScan();
 }
 
-dataService.isScanning$.subscribe(result => {
-  console.log('isScanning$', result)
+bindToComponent(dataService.scanTarget$).subscribe(data => {
+  currentTarget.value = data;
+});
+
+bindToComponent(dataService.isScanning$).subscribe(result => {
   scanInProgress.value = !!result;
 });
 

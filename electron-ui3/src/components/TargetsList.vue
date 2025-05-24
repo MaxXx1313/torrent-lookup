@@ -72,22 +72,16 @@ ion-item::part(native) {
 <!-- -->
 <script setup lang="ts">
 import { IonButton, IonFabButton, IonIcon, IonImg, IonItem, IonLabel, IonList, IonSpinner } from '@ionic/vue';
-import { inject, onUnmounted, ref } from 'vue';
+import { inject, ref } from 'vue';
 import { DATA_SERVICE_KEY, DataService, ScanOptions } from '@/data/data.service';
-import { Subject, takeUntil } from 'rxjs';
+import { bindToComponent } from '@/components/async';
 
 const targets = ref<ScanOptions['targets']>([]);
 const addInProgress = ref<boolean>(false);
 
-const destroy$ = new Subject<void>();
-onUnmounted(() => {
-  // destroy$.next();
-  // destroy$.complete();
-});
-
 const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
 
-dataService.getTargets().pipe(takeUntil(destroy$)).subscribe(data => {
+bindToComponent(dataService.getTargets()).subscribe(data => {
   // TODO: didn't found how to replace an array
   targets.value.splice(0);
   targets.value.push(...data);
