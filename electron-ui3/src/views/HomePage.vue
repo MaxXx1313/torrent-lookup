@@ -12,6 +12,7 @@ import {
   IonToolbar
 } from '@ionic/vue';
 import TargetsList from '@/components/TargetsList.vue';
+import ScanResults from '@/components/ScanResults.vue';
 </script>
 
 <!-- -->
@@ -39,7 +40,9 @@ import TargetsList from '@/components/TargetsList.vue';
         <ion-segment-content id="scan">
           <TargetsList></TargetsList>
         </ion-segment-content>
-        <ion-segment-content id="results">Results</ion-segment-content>
+        <ion-segment-content id="results">
+          <ScanResults></ScanResults>
+        </ion-segment-content>
       </ion-segment-view>
     </ion-content>
   </ion-page>

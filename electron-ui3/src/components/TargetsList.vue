@@ -23,7 +23,7 @@
 
     <div>
       <div class="layout-action">
-        <ion-fab-button>
+        <ion-fab-button @click="startScan">
           <div>Scan</div>
         </ion-fab-button>
       </div>
@@ -77,8 +77,8 @@ ion-item::part(native) {
 <!-- -->
 <script setup lang="ts">
 import { IonButton, IonIcon, IonItem, IonLabel, IonList } from '@ionic/vue';
-import { onUnmounted, ref } from 'vue';
-import { DataService, ScanOptions } from '@/data/data.service';
+import { inject, onUnmounted, ref } from 'vue';
+import { DATA_SERVICE_KEY, DataService, ScanOptions } from '@/data/data.service';
 import { Subject, takeUntil } from 'rxjs';
 
 const targets = ref<ScanOptions['targets']>([]);
@@ -89,7 +89,12 @@ onUnmounted(() => {
   destroy$.complete();
 });
 
-DataService.getTargets().pipe(takeUntil(destroy$)).subscribe(data => {
+const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
+dataService.getTargets().pipe(takeUntil(destroy$)).subscribe(data => {
   targets.value = data;
 });
+
+function startScan() {
+  dataService.startScan();
+}
 </script>
