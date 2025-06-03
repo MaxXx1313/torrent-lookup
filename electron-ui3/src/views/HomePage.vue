@@ -33,7 +33,7 @@ function devTools() {
 
         <ion-buttons slot="end">
           <ion-button class="debug-btn" fill="clear" color="medium" @click="devTools">
-            <ion-icon name="bug-outline"></ion-icon>
+            <ion-icon name="code-slash-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
 
