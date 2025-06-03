@@ -8,6 +8,7 @@ export interface ScanOptions {
 
 export const DATA_SERVICE_KEY = Symbol();
 
+export type ScanStatus = 'idle' | 'scan' | 'analyze' | 'export';
 /**
  *
  */
@@ -17,15 +18,11 @@ export class DataService {
         '~'
     ]);
 
-    readonly status$ = new Observable<'idle' | 'scan' | 'analyze' | 'export'>(observer => {
+    readonly status$ = new Observable<ScanStatus>(observer => {
         return window.electronAPI.onScanStatus(isRunning => {
             observer.next(isRunning);
         });
     }).pipe(shareReplay(1));
-
-    readonly isScanning$ = this.status$.pipe(
-        map(s => s === 'scan'),
-    );
 
     readonly scanTarget$ = new Observable<string>((observer) => {
         return window.electronAPI.onScanProgress((filepath) => {

@@ -1,20 +1,28 @@
 <template>
   <div class="layout">
 
-    <div class="progress" v-if="scanInProgress">
+
+    <div class="progress" v-if="status=='idle'">
+      <ion-icon class="progress__spinner" name="stop"></ion-icon>
+      <span>Scanning is not started</span>
+      <div class="progress__target"></div>
+      <ion-button size="small" color="medium" @click="startScan">
+        scan
+      </ion-button>
+    </div>
+
+    <div class="progress" v-if="status=='scan'">
       <ion-spinner class="progress__spinner"></ion-spinner>
       <div class="progress__target">{{ currentTarget }}</div>
       <ion-button size="small" color="medium" @click="stopScan">
         stop
       </ion-button>
     </div>
-
-    <div class="progress" v-if="!scanInProgress">
-      <ion-icon class="progress__spinner" name="stop"></ion-icon>
-      <span>Scanning is not started</span>
-      <div class="progress__target"></div>
-      <ion-button size="small" color="medium" @click="startScan">
-        scan
+    <div class="progress" v-if="status=='analyze'">
+      <ion-spinner class="progress__spinner"></ion-spinner>
+      <div class="progress__target">Analyzing...</div>
+      <ion-button size="small" v-bind:disabled="true" color="medium" @click="stopScan">
+        stop
       </ion-button>
     </div>
 
@@ -76,10 +84,10 @@
 <script setup lang="ts">
 import { inject, ref } from 'vue';
 import { IonButton, IonIcon, IonImg, IonItem, IonLabel, IonList, IonSpinner } from '@ionic/vue';
-import { DATA_SERVICE_KEY, DataService } from '@/data/data.service';
+import { DATA_SERVICE_KEY, DataService, ScanStatus } from '@/data/data.service';
 import { bindToComponent } from '@/components/async';
 
-const scanInProgress = ref<boolean>(false);
+const status = ref<ScanStatus>('idle');
 
 let currentTarget = ref('...');
 let scanFound = ref<string[]>([]);
@@ -98,8 +106,8 @@ bindToComponent(dataService.scanTarget$).subscribe(data => {
   currentTarget.value = data;
 });
 
-bindToComponent(dataService.isScanning$).subscribe(result => {
-  scanInProgress.value = !!result;
+bindToComponent(dataService.status$).subscribe(result => {
+  status.value = result;
 });
 bindToComponent(dataService.scanFound$).subscribe(result => {
   scanFound.value.splice(0);
