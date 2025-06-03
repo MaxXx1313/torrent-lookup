@@ -9,6 +9,8 @@ export class Scanner {
 
     _myBridge;
 
+    _status = 'idle';
+
     /**
      * @param myBridge
      */
@@ -51,7 +53,7 @@ export class Scanner {
      *
      */
     windowCreated() {
-        this._myBridge.send('scan:status', this.scanner.isRunning());
+        this._myBridge.send('scan:status', this._status);
     }
 
     /**
@@ -83,23 +85,29 @@ export class Scanner {
      * @param {string[]} options.targets
      * @returns {Promise<void>}
      */
-    startScan(options) {
+    async startScan(options) {
         if (this.scanner.isRunning()) {
             console.log('[scan] already started');
             return;
         }
 
+        await this.scanner.terminate();
         this.scanner.addTarget(options.targets || []);
 
         console.log('[scan] started', options.targets);
-        this._myBridge.send('scan:status', true);
+        this._setStatus('scan');
         return this.scanner.run().then(() => {
             console.log('Scanned %s files, found %s torrent files', this.scanner.stats.files, this.scanner.stats.torrents);
         }).catch((e) => {
             throw e;
         }).finally(() => {
-            this._myBridge.send('scan:status', false);
+            this._setStatus('idle');
         });
+    }
+
+    _setStatus(status) {
+        this._status = status;
+        this._myBridge.send('scan:status', this._status);
     }
 
 }

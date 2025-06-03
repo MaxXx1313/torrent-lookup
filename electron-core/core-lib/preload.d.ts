@@ -3,7 +3,7 @@ export interface IElectronAPI {
     stopScan: () => void,
     selectFolder: () => Promise<string | string[] | null>,
     onScanProgress: MyEventBinding<string>,
-    onScanStatus: MyEventBinding<boolean>,
+    onScanStatus: MyEventBinding<'idle'|'scan'|'analyze'|'export'>,
     onScanFound: MyEventBinding<string>,
     openDevTools: () => void,
 }

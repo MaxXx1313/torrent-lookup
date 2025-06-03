@@ -4,11 +4,24 @@ import { DATA_SERVICE_KEY, DataService } from '@/data/data.service';
 import { bindToComponent } from '@/components/async';
 
 
-const scanInProgress = ref<boolean>(false);
+const status = ref<string>('-');
 const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
 
-bindToComponent(dataService.isScanning$).subscribe(result => {
-  scanInProgress.value = !!result;
+bindToComponent(dataService.status$).subscribe(result => {
+  switch (result) {
+    case "idle":
+      status.value = 'Idle';
+      break;
+    case "scan":
+      status.value = 'Scanning...';
+      break;
+    case "analyze":
+      status.value = 'Analyzing...';
+      break;
+    case "export":
+      status.value = 'Exporting...';
+      break;
+  }
 });
 
 </script>
@@ -16,8 +29,7 @@ bindToComponent(dataService.isScanning$).subscribe(result => {
 <!-- -->
 <template>
   <div class="page-status">
-    <span v-if="scanInProgress">Scanning...</span>
-    <span v-if="!scanInProgress">Idle</span>
+    <span>{{ status }}</span>
   </div>
 </template>
 
@@ -27,6 +39,7 @@ bindToComponent(dataService.isScanning$).subscribe(result => {
   padding: 8px;
   font-size: 13px;
   background: var(--ion-color-light);
+  color: var(--ion-color-light-contrast);
   font-weight: 300;
 }
 </style>

@@ -49,8 +49,8 @@ const scanner = new Scanner(myBridge);
  * @param [data]
  */
 function triggerLifecycleEvent(target, event, data) {
-    if (typeof target['event'] === 'function') {
-        target['event'](data);
+    if (typeof target[event] === 'function') {
+        target[event](data);
     }
 }
 

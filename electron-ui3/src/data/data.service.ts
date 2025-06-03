@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, shareReplay } from 'rxjs';
+import { BehaviorSubject, map, Observable, shareReplay } from 'rxjs';
 
 
 export interface ScanOptions {
@@ -17,11 +17,15 @@ export class DataService {
         '~'
     ]);
 
-    readonly isScanning$ = new Observable(observer => {
+    readonly status$ = new Observable<'idle' | 'scan' | 'analyze' | 'export'>(observer => {
         return window.electronAPI.onScanStatus(isRunning => {
             observer.next(isRunning);
         });
     }).pipe(shareReplay(1));
+
+    readonly isScanning$ = this.status$.pipe(
+        map(s => s === 'scan'),
+    );
 
     readonly scanTarget$ = new Observable<string>((observer) => {
         return window.electronAPI.onScanProgress((filepath) => {
