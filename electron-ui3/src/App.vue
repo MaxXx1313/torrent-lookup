@@ -11,5 +11,6 @@ import { DataService, DATA_SERVICE_KEY } from '@/data/data.service';
 
 const dataService = new DataService();
 provide(DATA_SERVICE_KEY, dataService);
+dataService.appReady();
 
 </script>

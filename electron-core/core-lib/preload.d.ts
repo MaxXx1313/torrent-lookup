@@ -1,11 +1,13 @@
 export interface IElectronAPI {
+    openDevTools: () => void,
+    appReady: () => void,
+
     scan: (opts: { targets: string | string[] }) => Promise<void>,
     stopScan: () => void,
     selectFolder: () => Promise<string | string[] | null>,
     onScanProgress: MyEventBinding<string>,
     onScanStatus: MyEventBinding<'idle' | 'scan' | 'analyze' | 'export'>,
     onScanFound: MyEventBinding<string>,
-    openDevTools: () => void,
 
     onAnalyzeResults: MyEventBinding<TorrentMapping[]>,
 }

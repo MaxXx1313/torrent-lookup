@@ -32,6 +32,7 @@ function bindToEvent(eventName) {
 
 contextBridge.exposeInMainWorld('electronAPI', {
     openDevTools: (callback) => ipcRenderer.send('app:devtools'),
+    appReady: () => ipcRenderer.send('app:ready'),
 
     selectFolder: () => ipcRenderer.invoke('scan:select-folder'),
     scan: (targets) => ipcRenderer.send('scan:start', targets),

@@ -39,20 +39,6 @@ const myBridge = {
     },
 };
 
-const scanner = new Scanner(myBridge);
-
-
-/**
- *
- * @param target
- * @param {'windowCreated' | 'windowDestroyed'} event
- * @param [data]
- */
-function triggerLifecycleEvent(target, event, data) {
-    if (typeof target[event] === 'function') {
-        target[event](data);
-    }
-}
 
 /////////////////////////////
 
@@ -76,10 +62,8 @@ function createWindow() {
     // mainWindow.webContents.openDevTools();
 
     _mainWindow = mainWindow;
-    triggerLifecycleEvent(scanner, 'windowCreated', mainWindow);
 
     mainWindow.on('closed', function () {
-        triggerLifecycleEvent(scanner, 'windowDestroyed');
         _mainWindow = null;
     });
 }

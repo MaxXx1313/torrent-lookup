@@ -41,6 +41,10 @@ export class DataService {
         });
     }
 
+    appReady(){
+        window.electronAPI.appReady();
+    }
+
     getTargets(): Observable<ScanOptions['targets']> {
         return this._targets;
     }
