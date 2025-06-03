@@ -60,20 +60,20 @@ describe('Analyzer.spec', function () {
                 'file2.txt:14': [inputArr[1]],
                 'file3.txt:14': [inputArr[2]],
             };
-            analyzer.loadTorrentFile(torrentLocation);
+            analyzer.__loadTorrentFile(torrentLocation);
             assert.deepEqual(analyzer._hash, expected);
         });
 
 
         it('matchFile', function () {
-            analyzer.loadTorrentFile(torrentLocation);
+            analyzer.__loadTorrentFile(torrentLocation);
             const expected = {
                 ...inputArr[0],
                 match: ['/firstpath', '/secondpath'],
             };
 
             for (const fileInfo of filesToMatch) {
-                analyzer.matchFile(fileInfo.name, fileInfo.size);
+                analyzer.__matchFile(fileInfo.name, fileInfo.size);
             }
             assert.deepEqual(analyzer._hash['file1.txt:13'], [expected]);
 
@@ -82,9 +82,9 @@ describe('Analyzer.spec', function () {
 
         it('analyzeCacheData', function () {
 
-            analyzer.loadTorrentFile(torrentLocation);
+            analyzer.__loadTorrentFile(torrentLocation);
             for (const fileInfo of filesToMatch) {
-                analyzer.matchFile(fileInfo.name, fileInfo.size);
+                analyzer.__matchFile(fileInfo.name, fileInfo.size);
             }
 
             ///
@@ -95,7 +95,7 @@ describe('Analyzer.spec', function () {
                 },
             ];
 
-            analyzer.makeDecision();
+            analyzer._makeDecision();
             assert.deepEqual(analyzer._decision, expected);
         });
     });

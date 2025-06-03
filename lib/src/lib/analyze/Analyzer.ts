@@ -1,8 +1,7 @@
-import { DEFAULT_WORKDIR_LOCATION, FILE_DATA, FILEN_MAPS, FILE_TORRENTS } from "../const.js";
+import { DEFAULT_WORKDIR_LOCATION, FILE_DATA, FILE_TORRENTS, FILEN_MAPS } from "../const.js";
 
 import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
-import { Subject } from "rxjs";
 import { promiseByLine } from '../utils/line-by-line.js';
 import { bencodeReadSync } from '../utils/bencode/bencode.js';
 import { FileMatcher } from '../utils/FileMatcher.js';
@@ -71,13 +70,8 @@ export interface AnalyzerOptions {
  4. rehash by torrent location
  5. make a decision from matched results
  6. save result
-
- * @emit Analyzer#opStatus - when status changes
-
  */
 export class Analyzer {
-
-    public readonly opStatus: Subject<string> = new Subject();
 
     public options: AnalyzerOptions;
 
@@ -108,9 +102,9 @@ export class Analyzer {
      *
      */
     public stats = {
-        files: 0, // not a torrent file
-        torrents: 0,
-        maps: 0,
+        files: 0, // regular files amount
+        torrents: 0, // torrent files amount
+        maps: 0, // amount of found matches
     };
 
 
@@ -127,32 +121,33 @@ export class Analyzer {
     /**
      * Main flow
      */
-    async analyze(): Promise<any> {
+    async analyze(): Promise<TorrentMapping[]> {
         const torrentsFileName = path.join(this.options.workdir, FILE_TORRENTS);
         const dataFileName = path.join(this.options.workdir, FILE_DATA);
         const mapsFileName = path.join(this.options.workdir, FILEN_MAPS);
 
         await this._loadTorrentFilesFromFile(torrentsFileName);
         await this._matchFilesFromFile(dataFileName);
-        await this._analyzeCacheData();
+        await this._makeDecision();
         await this._saveDecisionTo(mapsFileName);
+        return this._decision;
     }
 
     /**
      *
      */
     protected _loadTorrentFilesFromFile(dataFileLocation: string): Promise<void> {
-        this.opStatus.next('Loading files');
+        console.log('[Analyzer] Loading files');
 
         return promiseByLine(dataFileLocation, (line: string) => {
-            return this.loadTorrentFile(line)
+            return this.__loadTorrentFile(line)
                 .catch(e => {
-                    console.error('Unable to load torrent file:', line);
+                    console.error('[Analyzer] Unable to load torrent file:', line);
                     console.error(e);
                 });
         }).then(() => {
             this.stats.torrents = Object.keys(this._hash).length;
-            this.opStatus.next('Loaded ' + this.stats.torrents + ' torrent files');
+            console.log(`[Analyzer] Loaded ${this.stats.torrents} torrent files`);
         });
 
     }
@@ -161,7 +156,7 @@ export class Analyzer {
      * @return {TorrentFileInfo}
      * https://nodejs.org/dist/latest-v7.x/docs/api/path.html#path_path_parse_path
      */
-    public async loadTorrentFile(filepath: string): Promise<void> {
+    public async __loadTorrentFile(filepath: string): Promise<void> {
         const data = bencodeReadSync(filepath);
 
         // console.log(data.info.files);
@@ -197,9 +192,13 @@ export class Analyzer {
             });
         }
 
-        //
+        // add to hash
         for (const file of files) {
-            this._addToHash(file);
+            const key = _hashId(file.base, file.length);
+            if (!this._hash[key]) {
+                this._hash[key] = [];
+            }
+            this._hash[key].push(file);
         }
     }
 
@@ -208,22 +207,22 @@ export class Analyzer {
      *
      */
     protected _matchFilesFromFile(dataFile: string): Promise<void> {
-        this.opStatus.next('Matching files');
+        console.log('[Analyzer] Matching files');
 
         return promiseByLine(dataFile, (fileInfoString) => {
 
             const fileInfo = FileMatcher.explodeFileInfo(fileInfoString)
             if (!fileInfo) {
-                console.warn('Internal error: unable to parse info:', fileInfoString);
+                console.log('[Analyzer] Internal error: unable to parse info:', fileInfoString);
                 return null;
             }
 
             //
-            this.matchFile(fileInfo.location, fileInfo.size);
+            this.__matchFile(fileInfo.location, fileInfo.size);
 
             this.stats.files++;
         }).then(() => {
-            this.opStatus.next('Loaded ' + this.stats.files + ' regular files');
+            console.log(`[Analyzer] Loaded ${this.stats.files} regular files`);
         });
     }
 
@@ -235,9 +234,9 @@ export class Analyzer {
      * Matching is quite challenged task.
      * So far we do simple step:
      *  1. try to match exact file + size
-     *  TODO: 2. try to match exact filename
+     *  TODO: 2. try to match exact filename with no size
      */
-    public matchFile(location: string, size: number) {
+    public __matchFile(location: string, size: number) {
 
         const pathInfo = path.parse(location);
 
@@ -246,26 +245,18 @@ export class Analyzer {
         if (this._hash[key]) {
             const matchTorrentInfo = this._hash[key];
 
-            for (const item of matchTorrentInfo) {
+            for (const tInfo of matchTorrentInfo) {
                 // TODO: 'no-relocate-inside-torrent' option
                 // 2. match path
-                const savedTo = extractBasePath(pathInfo.dir, item.dir);
+                const savedTo = extractBasePath(pathInfo.dir, tInfo.dir);
                 // console.log(' matched', pathInfo.dir, item.dir, savedTo);
                 if (savedTo) {
                     // location found
-                    item.match = item.match || [];
-                    item.match.push(savedTo);
+                    tInfo.match = tInfo.match || [];
+                    tInfo.match.push(savedTo);
                 }
             }
         }
-    }
-
-    /**
-     * analyze everything that is loaded and matched.
-     * This calculates the decision where to keep torrent file data
-     */
-    protected _analyzeCacheData(): void {
-        this.makeDecision();
     }
 
     /**
@@ -275,21 +266,17 @@ export class Analyzer {
         return this._decision;
     }
 
-    /**
-     */
-    protected _saveDecisionTo(mappingFileLocation: string): Promise<any> {
-        this.opStatus.next('Saving');
-
-        const data = this._decision;
-        return fs.writeFile(mappingFileLocation, JSON.stringify(data));
-    }
 
     /**
-     * group by torrent location
+     * Analyze everything that is loaded and matched.
+     * This calculates the decision where to keep torrent file data based on score value.
+     * Score is calculated as an amount of files within same folder,
+     * i.e. detect the folder where the most of the files downloaded (TBD: take into account filesize)
      */
-    public makeDecision(): void {
-        this.opStatus.next('Analyzing');
+    public _makeDecision(): void {
+        console.log('[Analyzer] Analyzing');
 
+        // group by torrent location
         this._mapping = {};
         for (const key in this._hash) {
             for (const torrentInfo of this._hash[key]) {
@@ -348,20 +335,18 @@ export class Analyzer {
         this._decision = mapping;
 
         this.stats.maps = this._decision.length;
-        this.opStatus.next('Found ' + this.stats.maps + ' matches');
+        console.log(`[Analyzer] Found ${this.stats.maps} matches`);
     }
-
 
     /**
      */
-    private _addToHash(torrentInfo: TorrentFileInfo) {
-        const key = _hashId(torrentInfo.base, torrentInfo.length);
-        if (!this._hash[key]) {
-            this._hash[key] = [];
-        }
-        this._hash[key].push(torrentInfo);
-    }
+    protected async _saveDecisionTo(mappingFileLocation: string): Promise<any> {
+        console.log('[Analyzer] Saving result');
 
+        const data = this._decision;
+        await fs.writeFile(mappingFileLocation, JSON.stringify(data));
+        console.log('[Analyzer] Result is saved:', mappingFileLocation);
+    }
 }
 
 

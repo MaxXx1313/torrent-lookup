@@ -76,8 +76,7 @@ export function request(opts, postData: any = null) {
 
 /**
  * Get basepath from {@param filepath} to {@param dir}, if it's a child
- * Otherwise return false
- * @private
+ * Otherwise return null
  */
 export function extractBasePath(filepath: string, dir: string): string {
     if (dir == '') {
