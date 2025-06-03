@@ -35,9 +35,16 @@
   </ion-list>
   <ion-list v-if="analyzeResults!==null">
     <ion-item v-for="r in analyzeResults" :key="r.torrent">
-      <ion-img class="torrent__icon" src="torrent-icon.svg"></ion-img>
-      <ion-label class="torrent__name">{{ r.torrent }}</ion-label>
-      <ion-label class="torrent__name">{{ r.saveTo }}</ion-label>
+      <div class="result">
+        <div class="row">
+          <ion-img class="torrent__icon" src="torrent-icon.svg"></ion-img>
+          <ion-label class="torrent__name">{{ r.torrent }}</ion-label>
+        </div>
+        <div class="row row--green">
+          <ion-icon class="torrent__icon" name="arrow-down-circle-outline"></ion-icon>
+          <ion-label class="torrent__location">{{ r.saveTo }}</ion-label>
+        </div>
+      </div>
     </ion-item>
   </ion-list>
 
@@ -52,6 +59,15 @@
   grid-template-columns: 1fr 1fr;
   height: 100%;
   */
+}
+
+.row {
+  display: flex;
+  gap: .5ch;
+}
+
+.row--green {
+  color: var(--ion-color-success);
 }
 
 .progress {
@@ -74,6 +90,10 @@
   text-overflow: ellipsis;
 }
 
+.result {
+  padding: 4px 0;
+}
+
 .torrent__icon {
   margin-right: 8px;
   height: 18px;
@@ -83,6 +103,10 @@
 
 .torrent__name {
   font-weight: 300;
+}
+
+.torrent__location {
+  font-weight: 400;
 }
 
 </style>
