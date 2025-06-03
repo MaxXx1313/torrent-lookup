@@ -3,9 +3,11 @@ export interface IElectronAPI {
     stopScan: () => void,
     selectFolder: () => Promise<string | string[] | null>,
     onScanProgress: MyEventBinding<string>,
-    onScanStatus: MyEventBinding<'idle'|'scan'|'analyze'|'export'>,
+    onScanStatus: MyEventBinding<'idle' | 'scan' | 'analyze' | 'export'>,
     onScanFound: MyEventBinding<string>,
     openDevTools: () => void,
+
+    onAnalyzeResults: MyEventBinding<TorrentMapping[]>,
 }
 
 declare global {
@@ -19,3 +21,9 @@ declare global {
  * return unsubscribe function
  */
 type MyEventBinding<T> = (callback: (arg: T) => void) => () => void;
+
+
+interface TorrentMapping {
+    torrent: string; // torrent location
+    saveTo: string; // absolute file location
+}

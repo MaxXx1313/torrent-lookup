@@ -39,4 +39,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onScanStatus: bindToEvent('scan:status'),
     onScanProgress: bindToEvent('scan:progress'),
     onScanFound: bindToEvent('scan:found'),
+
+    onAnalyzeResults: bindToEvent('analyze:decision'),
 });

@@ -1,4 +1,4 @@
-import {TorrentScanner} from 'tlookup';
+import {Analyzer, TorrentScanner} from 'tlookup';
 import {dialog} from 'electron';
 
 const reportDebounceTime = 300;
@@ -98,6 +98,14 @@ export class Scanner {
         this._setStatus('scan');
         return this.scanner.run().then(() => {
             console.log('Scanned %s files, found %s torrent files', this.scanner.stats.files, this.scanner.stats.torrents);
+        }).then(()=>{
+            this._setStatus('analyze');
+            const analyzer = new Analyzer();
+            return analyzer.analyze().then(()=>{
+                const decision = analyzer.getDecision();
+                this._myBridge.send('analyze:decision', decision);
+                return decision;
+            });
         }).catch((e) => {
             throw e;
         }).finally(() => {
