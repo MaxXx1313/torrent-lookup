@@ -1,4 +1,4 @@
-import { BehaviorSubject, map, Observable, shareReplay } from 'rxjs';
+import { BehaviorSubject, Observable, shareReplay } from 'rxjs';
 
 
 export interface ScanOptions {
@@ -9,6 +9,7 @@ export interface ScanOptions {
 export const DATA_SERVICE_KEY = Symbol();
 
 export type ScanStatus = 'idle' | 'scan' | 'analyze' | 'export';
+
 /**
  *
  */
@@ -19,14 +20,20 @@ export class DataService {
     ]);
 
     readonly status$ = new Observable<ScanStatus>(observer => {
-        return window.electronAPI.onScanStatus(isRunning => {
-            observer.next(isRunning);
+        return window.electronAPI.onStatus(status => {
+            observer.next(status);
         });
     }).pipe(shareReplay(1));
 
     readonly scanTarget$ = new Observable<string>((observer) => {
         return window.electronAPI.onScanProgress((filepath) => {
             observer.next(filepath);
+        });
+    }).pipe(shareReplay(1));
+
+    readonly analyzeResults$ = new Observable<TorrentMapping[]>((observer) => {
+        return window.electronAPI.onAnalyzeResults((data) => {
+            observer.next(data);
         });
     }).pipe(shareReplay(1));
 
@@ -41,7 +48,7 @@ export class DataService {
         });
     }
 
-    appReady(){
+    appReady() {
         window.electronAPI.appReady();
     }
 
@@ -86,4 +93,9 @@ export class DataService {
         return window.electronAPI.stopScan();
     }
 
+}
+
+export interface TorrentMapping {
+    torrent: string; // torrent location
+    saveTo: string; // absolute file location
 }

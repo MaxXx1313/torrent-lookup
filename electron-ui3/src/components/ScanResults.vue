@@ -27,10 +27,17 @@
     </div>
 
   </div>
-  <ion-list>
+  <ion-list v-if="analyzeResults===null">
     <ion-item v-for="r in scanFound" :key="r">
       <ion-img class="torrent__icon" src="torrent-icon.svg"></ion-img>
       <ion-label class="torrent__name">{{ r }}</ion-label>
+    </ion-item>
+  </ion-list>
+  <ion-list v-if="analyzeResults!==null">
+    <ion-item v-for="r in analyzeResults" :key="r.torrent">
+      <ion-img class="torrent__icon" src="torrent-icon.svg"></ion-img>
+      <ion-label class="torrent__name">{{ r.torrent }}</ion-label>
+      <ion-label class="torrent__name">{{ r.saveTo }}</ion-label>
     </ion-item>
   </ion-list>
 
@@ -84,17 +91,19 @@
 <script setup lang="ts">
 import { inject, ref } from 'vue';
 import { IonButton, IonIcon, IonImg, IonItem, IonLabel, IonList, IonSpinner } from '@ionic/vue';
-import { DATA_SERVICE_KEY, DataService, ScanStatus } from '@/data/data.service';
+import { DATA_SERVICE_KEY, DataService, ScanStatus, TorrentMapping } from '@/data/data.service';
 import { bindToComponent } from '@/components/async';
 
 const status = ref<ScanStatus>('idle');
 
 let currentTarget = ref('...');
 let scanFound = ref<string[]>([]);
+let analyzeResults = ref<TorrentMapping[] | null>(null);
 
 const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
 
 function startScan() {
+  analyzeResults.value = null;
   dataService.startScan();
 }
 
@@ -109,9 +118,9 @@ bindToComponent(dataService.scanTarget$).subscribe(data => {
 bindToComponent(dataService.status$).subscribe(result => {
   status.value = result;
 });
-bindToComponent(dataService.scanFound$).subscribe(result => {
-  scanFound.value.splice(0);
-  scanFound.value.push(...result);
+bindToComponent(dataService.analyzeResults$).subscribe(result => {
+  analyzeResults.value = [];
+  analyzeResults.value.push(...result);
 });
 
 </script>

@@ -1,25 +1,9 @@
 // preload.js
-
-// All the Node.js APIs are available in the preload process.
-// It has the same sandbox as a Chrome extension.
-window.addEventListener('DOMContentLoaded', () => {
-    const replaceText = (selector, text) => {
-        const element = document.getElementById(selector);
-        if (element) {
-            element.innerText = text;
-        }
-    }
-
-    for (const dependency of ['chrome', 'node', 'electron']) {
-        replaceText(`${dependency}-version`, process.versions[dependency]);
-    }
-});
-
-///
 const {contextBridge, ipcRenderer} = require('electron/renderer');
 
 /**
- * return unsubscribe function
+ * return unsubscribe function.
+ * This is
  */
 function bindToEvent(eventName) {
     return (callback) => {
@@ -37,7 +21,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     selectFolder: () => ipcRenderer.invoke('scan:select-folder'),
     scan: (targets) => ipcRenderer.send('scan:start', targets),
     stopScan: () => ipcRenderer.send('scan:stop'),
-    onScanStatus: bindToEvent('scan:status'),
+    onStatus: bindToEvent('scan:status'),
     onScanProgress: bindToEvent('scan:progress'),
     onScanFound: bindToEvent('scan:found'),
 

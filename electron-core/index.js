@@ -39,6 +39,9 @@ const myBridge = {
     },
 };
 
+// attach scanner logic
+const scanner = new Scanner(myBridge);
+
 
 /////////////////////////////
 
