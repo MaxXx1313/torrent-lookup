@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { inject, ref } from 'vue';
 import { DATA_SERVICE_KEY, DataService } from '@/data/data.service';
-import { bindToComponent } from '@/components/async';
+import { bindToComponent } from '@/tools/async';
 
 
 const status = ref<string>('-');

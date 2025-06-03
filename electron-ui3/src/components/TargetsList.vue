@@ -79,7 +79,7 @@ ion-item:last-child {
 import { IonButton, IonFabButton, IonIcon, IonImg, IonItem, IonLabel, IonList, IonSpinner } from '@ionic/vue';
 import { inject, ref } from 'vue';
 import { DATA_SERVICE_KEY, DataService, ScanOptions } from '@/data/data.service';
-import { bindToComponent } from '@/components/async';
+import { bindToComponent } from '@/tools/async';
 
 const targets = ref<ScanOptions['targets']>([]);
 const addInProgress = ref<boolean>(false);

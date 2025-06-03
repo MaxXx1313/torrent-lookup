@@ -115,7 +115,7 @@
 import { inject, ref } from 'vue';
 import { IonButton, IonIcon, IonImg, IonItem, IonLabel, IonList, IonSpinner } from '@ionic/vue';
 import { DATA_SERVICE_KEY, DataService, ScanStatus, TorrentMapping } from '@/data/data.service';
-import { bindToComponent } from '@/components/async';
+import { bindToComponent } from '@/tools/async';
 
 const status = ref<ScanStatus>('idle');
 
