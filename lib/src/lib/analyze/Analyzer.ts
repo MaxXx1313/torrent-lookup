@@ -122,6 +122,7 @@ export class Analyzer {
      * Main flow
      */
     async analyze(): Promise<TorrentMapping[]> {
+        console.log('[Analyzer] use workdir:', this.options.workdir);
         const torrentsFileName = path.join(this.options.workdir, FILE_TORRENTS);
         const dataFileName = path.join(this.options.workdir, FILE_DATA);
         const mapsFileName = path.join(this.options.workdir, FILEN_MAPS);

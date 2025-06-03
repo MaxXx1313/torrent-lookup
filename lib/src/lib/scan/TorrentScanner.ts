@@ -139,6 +139,7 @@ export class TorrentScanner {
      */
     protected _beforeScan(): void {
         fs.mkdirSync(this.options.workdir, {recursive: true});
+        console.log('[Scanner] use workdir:', this.options.workdir);
 
         const dataFileName = path.join(this.options.workdir, FILE_DATA);
         const torrFileName = path.join(this.options.workdir, FILE_TORRENTS);

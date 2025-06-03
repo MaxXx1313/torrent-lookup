@@ -88,6 +88,7 @@ export class PushManager {
      * @private
      */
     protected loadMapping(): TorrentMapping[] {
+        console.log('[Push] use workdir:', this.options.workdir);
         const mapsFileName = path.join(this.options.workdir, FILEN_MAPS);
         return JSON.parse(fs.readFileSync(mapsFileName, {encoding: 'utf-8'}).toString());
     }
