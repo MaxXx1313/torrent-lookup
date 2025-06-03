@@ -4,7 +4,7 @@
 
     <div class="progress" v-if="status=='idle'">
       <ion-icon class="progress__spinner" name="stop"></ion-icon>
-      <span>Scanning is not started</span>
+      <span>Stopped</span>
       <div class="progress__target"></div>
       <ion-button size="small" color="medium" @click="startScan">
         scan
@@ -27,13 +27,7 @@
     </div>
 
   </div>
-  <ion-list v-if="analyzeResults===null">
-    <ion-item v-for="r in scanFound" :key="r">
-      <ion-img class="torrent__icon" src="torrent-icon.svg"></ion-img>
-      <ion-label class="torrent__name">{{ r }}</ion-label>
-    </ion-item>
-  </ion-list>
-  <ion-list v-if="analyzeResults!==null">
+  <ion-list v-if="status=='idle'">
     <ion-item v-for="r in analyzeResults" :key="r.torrent">
       <div class="result">
         <div class="row">
@@ -45,6 +39,10 @@
           <ion-label class="torrent__location">{{ r.saveTo }}</ion-label>
         </div>
       </div>
+    </ion-item>
+
+    <ion-item v-if="!analyzeResults.length">
+      <ion-label class="no-data">empty</ion-label>
     </ion-item>
   </ion-list>
 
@@ -109,6 +107,7 @@
   font-weight: 400;
 }
 
+
 </style>
 
 <!-- -->
@@ -121,13 +120,12 @@ import { bindToComponent } from '@/components/async';
 const status = ref<ScanStatus>('idle');
 
 let currentTarget = ref('...');
-let scanFound = ref<string[]>([]);
-let analyzeResults = ref<TorrentMapping[] | null>(null);
+let analyzeResults = ref<TorrentMapping[]>([]);
 
 const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
 
 function startScan() {
-  analyzeResults.value = null;
+  analyzeResults.value = [];
   dataService.startScan();
 }
 

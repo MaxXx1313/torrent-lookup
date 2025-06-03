@@ -10,6 +10,10 @@
           </ion-button>
         </ion-item>
 
+        <ion-item v-if="!targets.length">
+          <ion-label class="no-data">no targets</ion-label>
+        </ion-item>
+
         <!--    <MessageListItem v-for="message in messages" :key="message.id" :message="message"/>-->
       </ion-list>
     </div>

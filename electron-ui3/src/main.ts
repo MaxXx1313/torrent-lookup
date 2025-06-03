@@ -34,6 +34,7 @@ import '@ionic/vue/css/display.css';
 import './theme/variables.css';
 import './theme/ionic-customisation.css';
 import './register-icons';
+import './theme/common.css';
 
 const app = createApp(App)
     .use(IonicVue)
