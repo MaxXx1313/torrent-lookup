@@ -1,26 +1,7 @@
 <template>
   <!-- Main Content Area -->
   <main class="flex-1 flex flex-col min-w-0 bg-background-light dark:bg-background-dark overflow-y-auto">
-    <!-- Top Header -->
-    <header
-        class="h-16 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 bg-white/50 dark:bg-background-dark/50 backdrop-blur-md sticky top-0 z-10">
-      <div class="flex items-center gap-2">
-        <span class="material-symbols-outlined text-slate-400">tune</span>
-        <h2 class="text-sm font-semibold text-slate-700 dark:text-slate-300">Scan Configuration</h2>
-      </div>
-      <div class="flex items-center gap-3">
-        <button
-            class="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors relative">
-          <span class="material-symbols-outlined">notifications</span>
-          <span
-              class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white dark:border-background-dark"></span>
-        </button>
-        <button
-            class="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors">
-          <span class="material-symbols-outlined">help</span>
-        </button>
-      </div>
-    </header>
+
     <div class="max-w-5xl w-full mx-auto p-8 flex flex-col gap-8">
       <!-- Page Title -->
       <div class="space-y-2">
