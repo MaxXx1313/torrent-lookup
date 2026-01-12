@@ -48,6 +48,7 @@ import { RouterView } from 'vue-router'
 </style>
 
 <style>
+@config "../tailwind.config.js";
 @import "tailwindcss";
 @import 'material-symbols';
 

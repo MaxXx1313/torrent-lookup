@@ -1,3 +1,5 @@
+<script setup lang="ts">
+</script>
 <template>
   <!-- Main Content Area -->
   <main class="flex-1 flex flex-col min-w-0 bg-background-light dark:bg-background-dark overflow-y-auto">
@@ -13,21 +15,21 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Left Column: Scan Folders -->
         <div class="lg:col-span-2 space-y-6">
-          <div
-              class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+          <div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
             <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-primary">folder_open</span>
                 <h3 class="font-bold text-lg">Add Scan Folders</h3>
               </div>
-              <button
-                  class="bg-primary hover:bg-primary/90 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-2">
+
+              <button class="bg-primary hover:bg-primary/90 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-2">
                 <span class="material-symbols-outlined text-sm">add</span>
                 Add Path
               </button>
             </div>
             <!-- Folders List -->
             <div class="divide-y divide-slate-100 dark:divide-slate-800">
+
               <div
                   class="p-4 flex items-center justify-between group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                 <div class="flex items-center gap-4">
@@ -42,10 +44,11 @@
                   </div>
                 </div>
                 <button
-                    class="p-2 text-slate-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
+                    class="p-2 text-slate-400 hover:text-red-500 transition-colors group-hover:opacity-100">
                   <span class="material-symbols-outlined">delete</span>
                 </button>
               </div>
+
               <div
                   class="p-4 flex items-center justify-between group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                 <div class="flex items-center gap-4">
@@ -59,10 +62,11 @@
                   </div>
                 </div>
                 <button
-                    class="p-2 text-slate-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
+                    class="p-2 text-slate-400 hover:text-red-500 transition-colors group-hover:opacity-100">
                   <span class="material-symbols-outlined">delete</span>
                 </button>
               </div>
+
               <div
                   class="p-4 flex items-center justify-between group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                 <div class="flex items-center gap-4">
@@ -76,91 +80,72 @@
                   </div>
                 </div>
                 <button
-                    class="p-2 text-slate-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
+                    class="p-2 text-slate-400 hover:text-red-500 transition-colors group-hover:opacity-100">
                   <span class="material-symbols-outlined">delete</span>
                 </button>
               </div>
-            </div>
-          </div>
-          <!-- Scan Options -->
-          <div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
-            <h3 class="font-bold text-lg mb-4 flex items-center gap-3">
-              <span class="material-symbols-outlined text-primary">settings_suggest</span>
-              Advanced Options
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <label
-                  class="flex items-center gap-3 p-3 rounded-lg border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer">
-                <input checked=""
-                       class="rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-primary bg-transparent"
-                       type="checkbox"/>
-                <div>
-                  <p class="text-sm font-medium">Recursive Scan</p>
-                  <p class="text-[10px] text-slate-500 uppercase tracking-tighter">Include all subfolders</p>
-                </div>
-              </label>
-              <label
-                  class="flex items-center gap-3 p-3 rounded-lg border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer">
-                <input
-                    class="rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-primary bg-transparent"
-                    type="checkbox"/>
-                <div>
-                  <p class="text-sm font-medium">Verify Checksums</p>
-                  <p class="text-[10px] text-slate-500 uppercase tracking-tighter">Slower, but 100% accurate</p>
-                </div>
-              </label>
+
             </div>
           </div>
         </div>
+
         <!-- Right Column: Exclusions -->
         <div class="space-y-6">
           <div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
             <div class="flex items-center gap-3 mb-4">
-              <span class="material-symbols-outlined text-primary">block</span>
+              <span class="material-symbols-outlined text-primary">do_not_disturb_on</span>
               <h3 class="font-bold text-lg">Exclusions</h3>
             </div>
-            <p class="text-xs text-slate-500 mb-4 leading-relaxed">Ignore files or folders that match these patterns.
+
+            <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+              Ignore files or folders that match these patterns.
               Useful for skipping metadata, samples, or temp files.</p>
+
             <div class="space-y-4">
               <div class="relative">
                 <input
                     class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:ring-primary focus:border-primary"
                     placeholder="e.g. *.nfo, sample/" type="text"/>
                 <button
-                    class="absolute right-2 top-2 p-1 text-primary hover:bg-primary/10 rounded-md transition-colors">
+                    class="absolute right-0 top-0 bottom-0 px-2 py-1 text-primary hover:bg-primary/10 rounded-md transition-colors flex items-center">
                   <span class="material-symbols-outlined text-sm">keyboard_return</span>
                 </button>
               </div>
+
               <div class="flex flex-wrap gap-2">
                 <div
                     class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full">
                   <span class="text-xs font-medium text-slate-600 dark:text-slate-300">*.txt</span>
-                  <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-100">
+                  <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-100 flex items-center">
                     <span class="material-symbols-outlined text-sm">close</span>
                   </button>
                 </div>
+
                 <div
                     class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full">
                   <span class="text-xs font-medium text-slate-600 dark:text-slate-300">sample/</span>
-                  <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-100">
+                  <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-100 flex items-center">
                     <span class="material-symbols-outlined text-sm">close</span>
                   </button>
                 </div>
+
                 <div
                     class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full">
                   <span class="text-xs font-medium text-slate-600 dark:text-slate-300">*.log</span>
-                  <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-100">
+                  <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-100 flex items-center">
                     <span class="material-symbols-outlined text-sm">close</span>
                   </button>
                 </div>
+
                 <div
                     class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full">
                   <span class="text-xs font-medium text-slate-600 dark:text-slate-300">@eaDir/</span>
-                  <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-100">
+                  <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-100 flex items-center">
                     <span class="material-symbols-outlined text-sm">close</span>
                   </button>
                 </div>
               </div>
+
             </div>
           </div>
           <!-- System Status -->
