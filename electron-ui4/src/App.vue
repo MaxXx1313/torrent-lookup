@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
+import TorrentIcon from "@/components/icons/TorrentIcon.vue";
 </script>
 
 <template>
   <!-- Top Header -->
   <header
-      class="h-16 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 backdrop-blur-md sticky top-0 z-10">
+      class="text-2xl h-16 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 backdrop-blur-md sticky top-0 z-10">
     <div class="flex items-center gap-2">
-      <span class="material-symbols-outlined text-slate-400">tune</span>
-      <h2 class="text-sm font-semibold text-slate-700 dark:text-slate-300">Scan Configuration</h2>
+      <TorrentIcon/>
+      <h2 class="font-semibold text-slate-700 dark:text-slate-300">Torrent lookup</h2>
     </div>
     <!--
     <div class="flex items-center gap-3">
@@ -58,11 +59,20 @@ import { RouterView } from 'vue-router'
 
 
 @keyframes slide {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(250%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(250%);
+  }
 }
+
 @keyframes rotateccw {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(-360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(-360deg);
+  }
 }
 </style>
