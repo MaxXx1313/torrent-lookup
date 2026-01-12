@@ -22,7 +22,7 @@
                 <h3 class="font-bold text-lg">Add Scan Folders</h3>
               </div>
 
-              <button class="bg-primary hover:bg-primary/90 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-2">
+              <button class="bg-primary hover:bg-primary/90 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-2 active:scale-[0.96]">
                 <span class="material-symbols-outlined text-sm">add</span>
                 Add Path
               </button>
@@ -169,7 +169,7 @@
           Save Configuration
         </button>
         <button
-            class="px-8 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-bold shadow-lg shadow-primary/20 flex items-center gap-2 transition-transform hover:scale-[1.02] active:scale-[0.98]">
+            class="px-8 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-bold shadow-lg shadow-primary/20 flex items-center gap-2 transition-transform active:scale-[0.98]">
           <span class="material-symbols-outlined">play_arrow</span>
           Start Scanning
         </button>
