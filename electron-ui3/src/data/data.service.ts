@@ -42,14 +42,14 @@ export class DataService {
 
 
     constructor() {
-        window.electronAPI.onScanFound(item => {
+        window.electronAPI?.onScanFound(item => {
             this._scanFound.push(item);
             this.scanFound$.next(this._scanFound);
         });
     }
 
     appReady() {
-        window.electronAPI.appReady();
+        window.electronAPI?.appReady();
     }
 
     getTargets(): Observable<ScanOptions['targets']> {

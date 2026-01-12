@@ -19,7 +19,7 @@ import ScanResults from '@/components/ScanResults.vue';
 import HomePageStatus from '@/views/HomePageStatus.vue';
 
 
-function devTools() {
+function openDevTools() {
   window.electronAPI.openDevTools();
 }
 </script>
@@ -32,7 +32,7 @@ function devTools() {
         <ion-title>Torrent lookup</ion-title>
 
         <ion-buttons slot="end">
-          <ion-button class="debug-btn" fill="clear" color="medium" @click="devTools">
+          <ion-button class="debug-btn" fill="clear" color="medium" @click="openDevTools">
             <ion-icon name="code-slash-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
@@ -41,10 +41,16 @@ function devTools() {
 
       <div class="segment-wrapper">
         <ion-segment value="scan">
-          <ion-segment-button value="scan" content-id="scan">
-            <ion-label>Scan targets</ion-label>
+          <ion-segment-button value="scan" content-id="scan" layout="icon-start">
+            <ion-icon name="cog-outline"></ion-icon>
+            <ion-label>Scan configuration</ion-label>
           </ion-segment-button>
-          <ion-segment-button value="results" content-id="results">
+          <ion-segment-button value="results" content-id="results" layout="icon-start">
+            <ion-icon name="search-circle-outline"></ion-icon>
+            <ion-label>Scan results</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="results" content-id="results" layout="icon-start">
+            <ion-icon name="save-outline"></ion-icon>
             <ion-label>Scan results</ion-label>
           </ion-segment-button>
         </ion-segment>
@@ -93,7 +99,7 @@ ion-header {
   z-index: 2;
   transform: translateY(-16px);
   margin: 0 auto;
-  max-width: 480px;
+  max-width: 640px;
   --background: var(--my-segment-background);
   --color: var(--my-segment-color);
 }
