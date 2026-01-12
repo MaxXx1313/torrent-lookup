@@ -2,7 +2,7 @@
   <!-- Main Content Area -->
   <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
 
-    <div class="max-w-5xl w-full mx-auto p-8 flex flex-col gap-8">
+    <div class="w-full mx-auto p-8 flex flex-col gap-8">
       <!-- Page Title -->
       <div class="space-y-2">
         <h1 class="text-4xl font-black tracking-tight text-slate-900 dark:text-white">New Scan Configuration</h1>

@@ -1,5 +1,5 @@
 <template>
-  <main class="flex-1 flex flex-col lg:flex-row max-w-[1440px] mx-auto w-full px-4 md:px-10 lg:px-20 py-8 gap-8">
+  <main class="flex-1 flex flex-col lg:flex-row mx-auto w-full p-8 gap-8">
     <!-- Left Content Area -->
     <div class="flex-1 flex flex-col gap-8">
       <!-- Page Heading -->
