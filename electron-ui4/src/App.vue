@@ -5,7 +5,7 @@ import { RouterView } from 'vue-router'
 <template>
   <!-- Top Header -->
   <header
-      class="h-16 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 dark:bg-background-dark/50 backdrop-blur-md sticky top-0 z-10">
+      class="h-16 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 backdrop-blur-md sticky top-0 z-10">
     <div class="flex items-center gap-2">
       <span class="material-symbols-outlined text-slate-400">tune</span>
       <h2 class="text-sm font-semibold text-slate-700 dark:text-slate-300">Scan Configuration</h2>
@@ -54,5 +54,11 @@ import { RouterView } from 'vue-router'
 
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+
+@keyframes slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
 }
 </style>

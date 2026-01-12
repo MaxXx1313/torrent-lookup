@@ -1,8 +1,6 @@
-<script setup lang="ts">
-</script>
 <template>
   <!-- Main Content Area -->
-  <main class="flex-1 flex flex-col min-w-0 bg-background-light dark:bg-background-dark overflow-y-auto">
+  <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
 
     <div class="max-w-5xl w-full mx-auto p-8 flex flex-col gap-8">
       <!-- Page Title -->
@@ -169,7 +167,8 @@
           Save Configuration
         </button>
         <button
-            class="px-8 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-bold shadow-lg shadow-primary/20 flex items-center gap-2 transition-transform active:scale-[0.98]">
+            class="px-8 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-bold shadow-lg shadow-primary/20 flex items-center gap-2 transition-transform active:scale-[0.98]"
+            @click="goToScanningPage">
           <span class="material-symbols-outlined">play_arrow</span>
           Start Scanning
         </button>
@@ -177,3 +176,14 @@
     </div>
   </main>
 </template>
+
+<script setup lang="ts">
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const goToScanningPage = () => {
+  // You can use a string path or a named route object
+  router.push('/progress');
+};
+</script>
