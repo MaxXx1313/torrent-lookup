@@ -26,6 +26,30 @@ const router = createRouter({
       component: () => import('../views/ScanProgress.vue'),
     },
     {
+      path: '/results',
+      name: 'results',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import('../views/ScanResults.vue'),
+    },
+    {
+      path: '/export',
+      name: 'export',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import('../views/ScanExport.vue'),
+    },
+    {
+      path: '/exportprogress',
+      name: 'exportprogress',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import('../views/ScanExportProgress.vue'),
+    },
+    {
       path: '/about',
       name: 'about',
       // route level code-splitting
