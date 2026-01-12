@@ -13,8 +13,10 @@
   "dependencies": {
     "@ionic/vue": "^8.0.0",
     "@ionic/vue-router": "^8.0.0",
+    "@tailwindcss/vite": "^4.1.18",
     "ionicons": "^7.0.0",
     "rxjs": "^7.8.2",
+    "tailwindcss": "^4.1.18",
     "vue": "^3.3.0",
     "vue-router": "^4.2.0"
   },

@@ -14,3 +14,10 @@ provide(DATA_SERVICE_KEY, dataService);
 dataService.appReady();
 
 </script>
+<style>
+  @import "tailwindcss";
+
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+</style>

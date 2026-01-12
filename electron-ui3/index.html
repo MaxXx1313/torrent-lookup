@@ -6,7 +6,7 @@
 
     <base href="/" />
 
-    <meta name="color-scheme" content="light dark" />
+    <meta name="color-scheme" content="light light" />
     <meta
       name="viewport"
       content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
@@ -19,13 +19,64 @@
     <!-- add to homescreen for ios -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Ionic App" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="light" />
   </head>
 
-  <body>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="flex h-screen overflow-hidden">
+    <!-- Sidebar Navigation -->
+    <!--
+    <aside class="w-64 border-r border-slate-200 dark:border-slate-800 flex flex-col bg-white dark:bg-background-dark shrink-0">
+        <div class="p-6 flex items-center gap-3">
+            <div class="size-10 bg-primary rounded-lg flex items-center justify-center text-white">
+                <span class="material-symbols-outlined text-2xl">lan</span>
+            </div>
+            <div class="flex flex-col">
+                <h1 class="text-base font-bold leading-none tracking-tight">TorrentMapper</h1>
+                <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Pro v1.0.4</p>
+            </div>
+        </div>
+        <nav class="flex-1 px-4 py-4 space-y-1">
+            <a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+               href="#">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="text-sm font-medium">Dashboard</span>
+            </a>
+            <a class="flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary rounded-lg transition-colors"
+               href="#">
+                <span class="material-symbols-outlined">radar</span>
+                <span class="text-sm font-medium">Scans</span>
+            </a>
+            <a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+               href="#">
+                <span class="material-symbols-outlined">history</span>
+                <span class="text-sm font-medium">History</span>
+            </a>
+            <a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+               href="#">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="text-sm font-medium">Settings</span>
+            </a>
+        </nav>
+        <div class="p-4 border-t border-slate-200 dark:border-slate-800">
+            <div class="flex items-center gap-3 p-2">
+                <div class="size-8 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                    <img alt="User Profile" data-alt="User profile avatar"
+                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCwzFVFVcdzmxAA0BqWOWO9L2tE68Eezd2QGUBh3bTOooZiIJ3-q6DD-45L8MKcjrGdLzsgXGaLwBnhPG2zZmnGcAj1lWxd8GYVZzLg5O6QzIlQThJKJnENPF_AVsV135w0_0Pu8QG8sGu92OUckemPF1QglQ5WcJsa8Yisp7gObQFDsPfp7Gh5D0ilbTzyHXkG5YpTOYyPLFSE-ByYDGpUGKaxmyQx8TrcweSoHuY4XzElohIBTvsOHYoa-9sqp3rI9ejYLFB7T4"/>
+                </div>
+                <div class="flex flex-col overflow-hidden">
+                    <p class="text-xs font-semibold truncate">Alex Rivera</p>
+                    <p class="text-[10px] text-slate-500 uppercase tracking-wider">Administrator</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+    -->
+
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
-  </body>
+</body>
 
 </html>
 
