@@ -61,4 +61,8 @@ import { RouterView } from 'vue-router'
   0% { transform: translateX(-100%); }
   100% { transform: translateX(250%); }
 }
+@keyframes rotateccw {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
 </style>

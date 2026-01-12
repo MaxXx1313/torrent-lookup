@@ -3,27 +3,17 @@
 <template>
   <!-- Main Content Area -->
   <main class="flex-1 flex flex-col overflow-y-auto">
-    <!-- Top Header -->
-    <header class="flex items-center justify-between border-b border-slate-200 dark:border-[#233648] px-8 py-4 sticky top-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md z-10">
-      <div class="flex items-center gap-2">
-        <span class="text-slate-500 dark:text-[#92adc9] text-sm">Export Session:</span>
-        <span class="text-sm font-bold">QBT-EXPORT-2023-11</span>
-      </div>
-      <div class="flex gap-3">
-        <button class="flex items-center justify-center rounded-lg h-10 w-10 bg-slate-100 dark:bg-[#233648] text-slate-700 dark:text-white hover:opacity-80 transition-opacity">
-          <span class="material-symbols-outlined">help</span>
-        </button>
-      </div>
-    </header>
+
     <div class="max-w-4xl mx-auto w-full px-8 py-10">
       <!-- Progress State -->
-      <div class="mb-10 text-center">
-        <div class="inline-flex items-center justify-center p-3 rounded-full bg-primary/10 dark:bg-primary/20 text-primary mb-4">
-          <span class="material-symbols-outlined text-3xl">sync</span>
+      <div class="mb-10 text-center relative">
+        <div class="inline-flex items-center justify-center p-3 rounded-full text-primary mb-4 border-2 border-primary/30 border-t-primary">
+          <span class="material-symbols-outlined text-3xl" style="animation: rotateccw 2s infinite linear">sync</span>
         </div>
         <h1 class="text-slate-900 dark:text-white text-3xl font-bold leading-tight mb-2">Exporting to qBittorrent...</h1>
         <p class="text-slate-500 dark:text-[#92adc9]">Moving matched metadata to your local torrent client instance.</p>
       </div>
+
       <!-- Progress Bar Component -->
       <div class="bg-white dark:bg-[#1a2632] rounded-xl p-8 border border-slate-200 dark:border-[#233648] shadow-sm mb-8">
         <div class="flex flex-col gap-4">
@@ -83,6 +73,8 @@
           </div>
         </div>
       </div>
+
+
       <!-- Post-Export Success View (Hidden initially or contextually shown) -->
       <!-- Note: This would typically replace the elements above or appear below -->
       <div class="mt-12 pt-12 border-t border-slate-200 dark:border-[#233648]">

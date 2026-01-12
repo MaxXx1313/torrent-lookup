@@ -1,15 +1,19 @@
-<script setup lang="ts">
-</script>
 <template>
   <main class="flex-1 flex flex-col lg:flex-row max-w-[1440px] mx-auto w-full px-4 md:px-10 lg:px-20 py-8 gap-8">
     <!-- Left Content Area -->
     <div class="flex-1 flex flex-col gap-8">
       <!-- Page Heading -->
-      <div class="flex flex-col gap-2">
-        <h1 class="text-4xl font-black leading-tight tracking-tight">Export Settings</h1>
-        <p class="text-slate-500 dark:text-[#92adc9] text-base">Select your target torrent client and configure the
-          connection mapping to begin the file association process.</p>
+      <div class="flex flex-wrap justify-between items-end gap-4 mb-8">
+        <div class="flex flex-col gap-2">
+          <h1 class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">
+            Export Settings
+          </h1>
+          <p class="text-slate-500 dark:text-[#92adc9] text-base font-normal">
+            Select your target torrent client and configure the
+            connection to begin the file association process</p>
+        </div>
       </div>
+
       <!-- Target Selection -->
       <section class="flex flex-col gap-4">
         <h3 class="text-xl font-bold flex items-center gap-2">
@@ -21,10 +25,11 @@
           <div
               class="group relative cursor-pointer flex flex-col items-center justify-center p-6 rounded-xl border-2 border-primary bg-primary/10 transition-all shadow-lg shadow-primary/5">
             <div class="size-12 mb-3 bg-slate-800 rounded-lg flex items-center justify-center overflow-hidden">
-              <img class="object-contain" data-alt="qBittorrent software logo blue square"
+              <img class="object-contain" alt="qBittorrent"
                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaQCW4LDHTWI1sfAqepT9DQt1MuI4mvt-XS_mYUZWPcUslR5uo2sOt4Evkrm8TN1khlanalUSA-t63lajBze-qxtpyJaalzgNwYhzh0sHJ4WByxabHb6WCS2idv7LUPryQK-eSp46InF1-EwRIiBJEqybPmGBHiLlcDVR1Wvhnwdx6tGGRR3YH9xKxGX-QFov2IXsDaHzR5_H4cj8zJIm_VnBzchndRMyrj_hG1opZCeDJ9oPgP4u0hYBXobVL4VaKLVfDkwYn0nI"/>
             </div>
             <p class="font-bold text-sm">qBittorrent</p>
+
             <div class="absolute top-2 right-2 text-primary">
               <span class="material-symbols-outlined text-lg">check_circle</span>
             </div>
@@ -33,7 +38,7 @@
           <div
               class="group cursor-pointer flex flex-col items-center justify-center p-6 rounded-xl border-2 border-slate-200 dark:border-[#233648] bg-white dark:bg-[#1a2632] hover:border-primary/50 transition-all">
             <div class="size-12 mb-3 bg-slate-800 rounded-lg flex items-center justify-center overflow-hidden">
-              <img class="object-contain" data-alt="Transmission software logo red circle"
+              <img class="object-contain" alt="Transmission"
                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCB7CxAjne4I-jAYw2E6tP1tg46_ISIeChMAd8RJEviMKwsKr8pQfEE7RiT1W7UN3LYn4HbscR8SCeqG1nPxLvhEbpO1H0JweQfCjJBPB-PvZsKxgc7AvEU6fdZhTXMCayZ1_nnzsEpm47M0czs9Cla0qklWtfWl7tuxBt2hozDM86RL2IOgVfoLlP_Frk8nd36Gv593fYEug3hpuSB7GmiAShGo1gIVV7Y8WjJaJLenIvp-0Y-Kif5YaQ1jTNp9joJxTTZATvP8sE"/>
             </div>
             <p class="font-bold text-sm text-slate-400">Transmission</p>
@@ -42,7 +47,7 @@
           <div
               class="group cursor-pointer flex flex-col items-center justify-center p-6 rounded-xl border-2 border-slate-200 dark:border-[#233648] bg-white dark:bg-[#1a2632] hover:border-primary/50 transition-all">
             <div class="size-12 mb-3 bg-slate-800 rounded-lg flex items-center justify-center overflow-hidden">
-              <img class="object-contain" data-alt="Deluge software logo green drop"
+              <img class="object-contain" alt="Deluge"
                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7UBc2VSE2kkhBTkqiSGUAevbmrIcObB_ZxuLaLSDYDSCBZbabzCLGDCz9TO8Ao5Z57in13eY8oAsv3wIYIErWxZUI1CQ25OtqP4N9OvD0rob_jgkFfLyL06jeuSJ7cWCP8oyZzSDMtLVaYKgX-IRf0Vnel2usT3Dy8zGzuCrN1A3ph6YT9fbbIKbBI-k4WicPCIoAwDU1TRzXsV9371airyLXjX-6oVxEU6wT3RxlKSAA9W45bW63-rMWZEm-aRFVqMoI7bG0DYU"/>
             </div>
             <p class="font-bold text-sm text-slate-400">Deluge</p>
@@ -57,6 +62,7 @@
           </div>
         </div>
       </section>
+
       <!-- Configuration Form -->
       <section
           class="flex flex-col gap-6 p-6 rounded-xl border border-slate-200 dark:border-[#233648] bg-white dark:bg-[#16222c]">
@@ -65,17 +71,11 @@
           qBittorrent Configuration
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="flex flex-col gap-2">
+          <div class="flex flex-col gap-2 col-span-2">
             <label class="text-sm font-semibold text-slate-500">API Host URL</label>
             <input
                 class="bg-background-light dark:bg-[#101922] border-slate-300 dark:border-[#233648] rounded-lg px-4 py-2 focus:ring-primary focus:border-primary"
                 type="text" value="http://localhost:8080"/>
-          </div>
-          <div class="flex flex-col gap-2">
-            <label class="text-sm font-semibold text-slate-500">Category (Optional)</label>
-            <input
-                class="bg-background-light dark:bg-[#101922] border-slate-300 dark:border-[#233648] rounded-lg px-4 py-2 focus:ring-primary focus:border-primary"
-                placeholder="e.g. MapperImports" type="text"/>
           </div>
           <div class="flex flex-col gap-2">
             <label class="text-sm font-semibold text-slate-500">Username</label>
@@ -115,20 +115,24 @@
             </label>
           </div>
         </div>
+
         <div class="flex items-center gap-3 mt-4">
           <button
-              class="flex-1 bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
-            <span class="material-symbols-outlined">rocket_launch</span>
-            Run Export Mapping
+              class="flex-1 bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+              @click="goToExportProgressPage">
+            <span class="material-symbols-outlined">publish</span>
+            Run Export
           </button>
           <button
               class="px-6 py-3 border border-slate-300 dark:border-[#233648] font-bold rounded-lg hover:bg-slate-100 dark:hover:bg-[#233648] transition-colors flex items-center gap-2">
-            <span class="material-symbols-outlined text-green-500">wifi</span>
+            <span class="material-symbols-outlined">network_check</span>
             Test
           </button>
         </div>
       </section>
     </div>
+
+
     <!-- Right Side Panel (Help & Guides) -->
     <aside class="w-full lg:w-80 flex flex-col gap-4">
       <div
@@ -191,3 +195,15 @@
 
 <style scoped>
 </style>
+
+
+<script setup lang="ts">
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const goToExportProgressPage = () => {
+  // You can use a string path or a named route object
+  router.push('/exportprogress');
+};
+</script>
