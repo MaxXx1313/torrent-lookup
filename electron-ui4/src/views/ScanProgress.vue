@@ -1,23 +1,29 @@
 <template>
   <!-- Main Content Area -->
-  <main class="flex-1 flex items-center justify-center px-4 md:px-40 py-12">
-    <div class="layout-content-container flex flex-col max-w-[720px] flex-1 items-center">
+  <main class="flex-1 flex items-center justify-center px-8 py-4 pt-8">
+    <div class="layout-content-container flex flex-col flex-1 items-center">
       <!-- Spinning Activity Indicator -->
-      <div class="mb-8 relative">
-        <div class="absolute inset-0 bg-primary/20 blur-xl rounded-full"></div>
-        <div class="relative flex items-center justify-center w-24 h-24 rounded-full border-2 border-primary/30 border-t-primary">
-          <span class="material-symbols-outlined text-4xl text-primary">search</span>
+      <div class="flex gap-8">
+        <div class="mb-8 relative">
+          <div class="absolute inset-0 bg-primary/20 blur-xl rounded-full"></div>
+          <div
+              class="relative flex items-center justify-center w-24 h-24 rounded-full border-2 border-primary/30 border-t-primary">
+            <span class="material-symbols-outlined text-4xl text-primary">search</span>
+          </div>
+        </div>
+        <!-- Headline Section -->
+        <div class="space-y-2 mb-8">
+          <h1 class="text-white tracking-tight text-[40px] font-bold leading-tight">
+            Scanning Filesystem...
+          </h1>
+          <p class="text-[#92adc9] text-base font-normal leading-normal max-w-lg mx-auto">
+            Matching local files with torrent metadata. This may take a while depending on your disk speed and volume
+            size.
+          </p>
         </div>
       </div>
-      <!-- Headline Section -->
-      <div class="text-center space-y-2 mb-8">
-        <h1 class="text-white tracking-tight text-[32px] md:text-[40px] font-bold leading-tight">Scanning Filesystem...</h1>
-        <p class="text-[#92adc9] text-base md:text-lg font-normal leading-normal max-w-lg mx-auto">
-          Matching local files with torrent metadata. This may take a while depending on your disk speed and library size.
-        </p>
-      </div>
       <!-- Progress & Path Display Card -->
-      <div class="w-full bg-[#1b2a38] rounded-xl p-6 md:p-8 border border-[#233648] shadow-2xl">
+      <div class="w-full max-w-[720px]  bg-[#1b2a38] rounded-xl p-6 md:p-8 border border-[#233648] shadow-2xl">
         <div class="flex flex-col gap-6">
           <!-- Current Activity Label -->
           <div class="flex justify-between items-end">
@@ -33,7 +39,8 @@
           <!-- Indeterminate Progress Bar -->
           <div class="relative w-full h-3 bg-[#324d67] rounded-full overflow-hidden">
             <div class="absolute inset-0 flex">
-              <div class="h-full bg-primary rounded-full" style="width: 40%; animation: slide 2s infinite linear;"></div>
+              <div class="h-full bg-primary rounded-full"
+                   style="width: 40%; animation: slide 2s infinite linear;"></div>
             </div>
           </div>
           <!-- Live Path Display -->
@@ -63,8 +70,9 @@
       </div>
       <!-- Actions -->
       <div class="mt-12 flex flex-col items-center gap-4">
-        <button class="flex items-center gap-2 px-8 py-3 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-all border border-white/10 hover:border-white/20"
-        @click="goToResultsPage">
+        <button
+            class="flex items-center gap-2 px-8 py-3 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-all border border-white/10 hover:border-white/20"
+            @click="goToResultsPage">
           <span class="material-symbols-outlined text-sm">close</span>
           <span class="font-semibold">Cancel Scan</span>
         </button>

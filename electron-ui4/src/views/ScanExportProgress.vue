@@ -106,13 +106,15 @@
       </div>
     </div>
     <!-- Footer Meta -->
+    <!--
     <footer class="mt-auto py-6 px-8 border-t border-slate-200 dark:border-[#233648] flex justify-between items-center text-xs text-slate-400 dark:text-[#4b6a8a]">
-      <p>© 2023 TorrentMatcher. All local data remained private during this scan.</p>
+      <p>© 2026 TorrentMatcher. All local data remained private during this scan.</p>
       <div class="flex gap-4">
         <a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
         <a class="hover:text-primary transition-colors" href="#">Documentation</a>
       </div>
     </footer>
+    -->
   </main>
 </template>
 

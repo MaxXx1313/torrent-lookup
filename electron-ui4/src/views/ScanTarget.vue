@@ -2,17 +2,17 @@
   <!-- Main Content Area -->
   <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
 
-    <div class="w-full mx-auto p-8 flex flex-col gap-8">
+    <div class="w-full mx-auto px-8 py-4 flex flex-col gap-8">
       <!-- Page Title -->
       <div class="space-y-2">
-        <h1 class="text-4xl font-black tracking-tight text-slate-900 dark:text-white">New Scan Configuration</h1>
-        <p class="text-slate-500 dark:text-slate-400 text-base max-w-2xl">Configure your filesystem paths and exclusion
+        <h1 class="text-4xl font-black tracking-tight text-slate-900 dark:text-white">Scan Configuration</h1>
+        <p class="text-slate-500 dark:text-slate-400 text-sm">Configure your filesystem paths and exclusion
           rules before starting the match process. TorrentMapper will index these locations to find matching data for
           your .torrent files.</p>
       </div>
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <!-- Left Column: Scan Folders -->
-        <div class="lg:col-span-2 space-y-6">
+        <div class="md:col-span-2 space-y-6">
           <div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
             <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
               <div class="flex items-center gap-3">
@@ -20,11 +20,14 @@
                 <h3 class="font-bold text-lg">Add Scan Folders</h3>
               </div>
 
-              <button class="bg-primary hover:bg-primary/90 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-2 active:scale-[0.96]">
+              <button
+                  class="bg-primary hover:bg-primary/90 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-2 active:scale-[0.96]">
                 <span class="material-symbols-outlined text-sm">add</span>
                 Add Path
               </button>
             </div>
+
+
             <!-- Folders List -->
             <div class="divide-y divide-slate-100 dark:divide-slate-800">
 
@@ -88,7 +91,7 @@
         </div>
 
         <!-- Right Column: Exclusions -->
-        <div class="space-y-6">
+        <div class="space-y-6 h-full">
           <div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
             <div class="flex items-center gap-3 mb-4">
               <span class="material-symbols-outlined text-primary">do_not_disturb_on</span>
@@ -146,7 +149,9 @@
 
             </div>
           </div>
+
           <!-- System Status -->
+          <!--
           <div class="p-6 bg-primary/5 rounded-xl border border-primary/20">
             <h4 class="text-sm font-bold text-primary mb-2 flex items-center gap-2">
               <span class="material-symbols-outlined text-base">info</span>
@@ -158,10 +163,11 @@
               <li class="flex justify-between"><span>Estimated Size:</span> <span class="font-bold">6.0 TB</span></li>
             </ul>
           </div>
+          -->
         </div>
       </div>
       <!-- Sticky Footer Action -->
-      <div class="flex items-center justify-end gap-4 pt-8 border-t border-slate-200 dark:border-slate-800">
+      <footer class="flex items-center justify-end gap-4 pt-8 border-t border-slate-200 dark:border-slate-800">
         <button
             class="px-6 py-2.5 rounded-lg text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
           Save Configuration
@@ -172,7 +178,7 @@
           <span class="material-symbols-outlined">play_arrow</span>
           Start Scanning
         </button>
-      </div>
+      </footer>
     </div>
   </main>
 </template>

@@ -6,7 +6,7 @@ import TorrentIcon from "@/components/icons/TorrentIcon.vue";
 <template>
   <!-- Top Header -->
   <header
-      class="text-2xl h-16 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 backdrop-blur-md sticky top-0 z-10">
+      class="text-2xl h-12 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 backdrop-blur-md sticky top-0 z-10">
     <div class="flex items-center gap-2">
       <TorrentIcon/>
       <h2 class="font-semibold text-slate-700 dark:text-slate-300">Torrent lookup</h2>
@@ -41,8 +41,9 @@ import TorrentIcon from "@/components/icons/TorrentIcon.vue";
     </div>
   </header>
   -->
-
-  <RouterView/>
+  <div class="h-full">
+    <RouterView/>
+  </div>
 </template>
 
 <style scoped>
@@ -74,5 +75,9 @@ import TorrentIcon from "@/components/icons/TorrentIcon.vue";
   100% {
     transform: rotate(-360deg);
   }
+}
+
+RouterView {
+  height: 100%;
 }
 </style>

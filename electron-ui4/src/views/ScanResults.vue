@@ -1,5 +1,5 @@
 <template>
-  <main class="flex-1 mx-auto w-full p-8">
+  <main class="flex-1 mx-auto w-full px-8 py-4">
     <!-- Page Heading -->
     <div class="flex flex-wrap justify-between items-end gap-4 mb-8">
       <div class="flex flex-col gap-2">
