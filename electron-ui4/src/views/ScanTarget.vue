@@ -198,7 +198,7 @@
   <!-- -->
   <el-dialog>
     <dialog id="dialog" aria-labelledby="dialog-title"
-            class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent">
+            class="fixed inset-0 size-auto max-w-none max-h-[80vh] overflow-y-auto bg-transparent backdrop:bg-transparent">
       <el-dialog-backdrop
           class="fixed inset-0 bg-gray-500/75 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in dark:bg-gray-900/50"/>
 
@@ -211,11 +211,10 @@
               <div class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full sm:mx-0 sm:size-10">
                 <span class="material-symbols-outlined">do_not_disturb_on</span>
               </div>
-              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <div class="mt-3 sm:mt-0 sm:ml-4 sm:text-left">
                 <h3 class="text-base font-semibold text-gray-900 dark:text-white">System exclusion</h3>
                 <div class="mt-2">
-                  <p class="text-sm text-gray-500 dark:text-gray-400" v-html="sysExcluded">
-                  </p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400" v-html="sysExcluded || 'Loading...'"></p>
                 </div>
               </div>
             </div>
@@ -243,7 +242,7 @@ import type { AppConfiguration } from "../../../electron-core/core-lib/types";
 
 const targets = ref<AppConfiguration['targets']>([]);
 const exclude = ref<AppConfiguration['exclude']>([]);
-const sysExcluded = ref<string>('Loading...');
+const sysExcluded = ref<string>('');
 const addInProgress = ref<boolean>(false);
 
 const exclusionAdd = ref('');
@@ -276,17 +275,31 @@ function addTarget() {
   addInProgress.value = true;
   dataService.selectFolder()
       .then((folders: string[]) => {
-        if (folders) {
-          targets.value.push(...folders);
-          _saveConfig();
-        }
+        _addTargets(folders);
+        _saveConfig();
       }).finally(() => {
     addInProgress.value = false;
   });
 }
 
-function addTargetsDefault() {
+const homeFolder = '~';
 
+function addTargetsDefault() {
+  _addTargets([homeFolder]);
+  _saveConfig();
+}
+
+function _addTargets(folders: string[]) {
+  if (!folders) {
+    return;
+  }
+  const currFolders = targets.value || [];
+  for (const f of folders) {
+    if (!currFolders.includes(f)) {
+      currFolders.push(f);
+    }
+  }
+  targets.value = currFolders;
 }
 
 function deleteTarget(target: string) {
@@ -306,6 +319,9 @@ function deleteExclusion(exclusion: string) {
 }
 
 async function loadSystemExcluded() {
+  if (sysExcluded.value) {
+    return;
+  }
   const excluded = await dataService.getSystemExcluded();
   sysExcluded.value = excluded.join('<br/>');
 }
