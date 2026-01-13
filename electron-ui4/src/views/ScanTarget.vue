@@ -7,7 +7,7 @@
       <div class="space-y-2">
         <h1 class="text-4xl font-black tracking-tight text-slate-900 dark:text-white">Scan Configuration</h1>
         <p class="text-slate-500 dark:text-slate-400 text-sm">Configure your filesystem paths and exclusion
-          rules before starting the match process. TorrentMapper will index these locations to find matching data for
+          rules before starting the match process. TorrentMapper will scan these locations to find matching data for
           your .torrent files.</p>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
