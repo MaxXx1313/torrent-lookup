@@ -1,8 +1,13 @@
 import {TorrentScanner} from "tlookup";
 
-export function scanLogic(ipcMain) {
+export function scanLogic(ipcMain, mainWindow) {
 
     const scanner = new TorrentScanner();
+
+    scanner.onEntry.subscribe((entry) => {
+        // ipcMain.emit('scan:entry', entry.location);
+        mainWindow.webContents.send('scan:entry', entry.location);
+    });
 
     /**
      * Start scanning process
@@ -20,6 +25,13 @@ export function scanLogic(ipcMain) {
         scanner.addExclusion(exclude);
 
         scanner.run();
+    });
+
+    /**
+     * Stop scanning process
+     */
+    ipcMain.handle('scan:stop', async () => {
+        await scanner.terminate();
     });
 
 }

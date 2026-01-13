@@ -50,9 +50,15 @@
             <div class="flex items-start gap-3">
               <span class="material-symbols-outlined text-[#92adc9] text-sm mt-1">folder_open</span>
               <div class="flex-1 overflow-hidden">
+                <!--
                 <p class="text-[#92adc9] text-sm font-mono leading-relaxed break-all">
                   /Volumes/HighSpeed_Storage/Media/Movies/Legal_Open_Source_Video_Collection_2024_4K/Scanning_In_Progress...
                 </p>
+                -->
+                <p class="text-[#92adc9] text-sm font-mono leading-relaxed break-all">
+                  {{currentTarget}}
+                </p>
+
               </div>
             </div>
           </div>
@@ -89,8 +95,20 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+import { inject, onMounted, ref } from "vue";
+import { DATA_SERVICE_KEY, DataService } from "@/data/data.service.ts";
+import { bindToComponent } from "../../tools/async.ts";
 
+const currentTarget = ref<string>('');
+
+const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
 const router = useRouter();
+
+onMounted(async () => {
+  bindToComponent<string>(dataService.scanEntry$).subscribe(entry => {
+    currentTarget.value = entry;
+  });
+});
 
 const goToResultsPage = () => {
   // You can use a string path or a named route object

@@ -28,14 +28,24 @@ function callable(name) {
     }
 }
 
+function event(eventName) {
+    return (callback) => {
+        const _cb = (_event, value) => {
+            console.log('[event] >\t', eventName, value);
+            callback(value);
+        }
+        ipcRenderer.on(eventName, _cb);
+
+        return () => ipcRenderer.off(eventName, _cb);
+    }
+}
+
 contextBridge.exposeInMainWorld('electronAPI', {
     openDevTools: (callback) => ipcRenderer.send('app:devtools'),
     appReady: () => ipcRenderer.send('app:ready'),
 
-    stopScan: () => ipcRenderer.send('scan:stop'),
     onStatus: bindToEvent('scan:status'),
     onScanProgress: bindToEvent('scan:progress'),
-    onScanFound: bindToEvent('scan:found'),
 
     onAnalyzeResults: bindToEvent('analyze:decision'),
 
@@ -46,5 +56,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
     selectFolder: callable('app:select-folder'),
 
-    scan: callable('scan:start'),
+    startScan: callable('scan:start'),
+    onScanEntry: event('scan:entry'),
+    stopScan: callable('scan:stop'),
 });

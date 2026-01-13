@@ -4,11 +4,8 @@ export interface IElectronAPI {
     openDevTools: () => void;
     appReady: () => void;
 
-    stopScan: () => void;
     onScanProgress: MyEventBinding<string>;
     onStatus: MyEventBinding<'idle' | 'scan' | 'analyze' | 'export'>;
-    onScanFound: MyEventBinding<string>;
-
     onAnalyzeResults: MyEventBinding<TorrentMapping[]>;
 
     // ui4
@@ -17,7 +14,10 @@ export interface IElectronAPI {
     getSystemExcluded: MyCallable<string[]>;
     selectFolder: () => Promise<string[] | null>;
 
-    scan: (opts: { targets: string[], exclude?: string }) => Promise<void>;
+    startScan: (opts: { targets: string[], exclude?: string }) => Promise<void>;
+    onScanEntry: MyEvent<string>;
+    stopScan: () => void;
+
 }
 
 declare global {
@@ -28,9 +28,14 @@ declare global {
 
 
 /**
+ * @deprecated
  * return unsubscribe function
  */
 type MyEventBinding<T> = (callback: (arg: T) => void) => () => void;
+/**
+ * return unsubscribe function
+ */
+type MyEvent<T> = (callback: (arg: T) => void) => () => void;
 
 interface MyCallable {
     <O>(): Promise<O>;
