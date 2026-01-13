@@ -16,7 +16,7 @@ export function matchCustom(filepath: string, pattern: string, opts?: { platform
 
     // put compare function to cache
     if (!_pattenCache[pattern]) {
-        _pattenCache[pattern] = createTestFunction(pattern, {platform});
+        _pattenCache[pattern] = _createPathTestFunction(pattern, {platform});
     }
     return _pattenCache[pattern](filepath);
 }
@@ -38,7 +38,7 @@ function isAbsolute(filepath: string, opts: { platform: string }) {
 }
 
 
-function createTestFunction(pattern: string, opts: { platform: string }) {
+function _createPathTestFunction(pattern: string, opts: { platform: string }) {
     const patternPrepared = path.normalize(pattern + path.sep)
         .replace(/\//g, '\/')
         .replace(/\*/g, '.+');

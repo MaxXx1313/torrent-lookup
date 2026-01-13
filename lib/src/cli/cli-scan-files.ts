@@ -5,7 +5,6 @@ import { TorrentScanner, TorrentScannerEntry } from '../lib/scan/TorrentScanner.
 import { ConsoleProgress } from './ConsoleProgress.js';
 
 
-
 /**
  *
  */
@@ -17,26 +16,22 @@ export function cliScanFiles(options: CliOptions): Promise<any> {
         logger.logLOP(str);
     }, 1000);
 
-    function _onProgress(entry: TorrentScannerEntry) {
-        if (entry.isTorrent) {
-            logger.log('Torrent file found:', entry.location);
-        } else {
-            logger.logLOP(entry.location);
-            // logDebounced(entry.location);
-        }
-    }
-
-
     //
     const scanner = new TorrentScanner({
         workdir: options.tmp,
         target: options.target,
         maxFps: options.fps,
+        onEntry: (entry: TorrentScannerEntry) => {
+            if (entry.isTorrent) {
+                logger.log('Torrent file found:', entry.location);
+            } else {
+                logger.logLOP(entry.location);
+                // logDebounced(entry.location);
+            }
+        },
     });
 
     // SCAN
-    scanner.onEntry.subscribe(_onProgress);
-
     logger.startLOP();
     return scanner.run().then(() => {
         logger.stopLOP();

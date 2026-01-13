@@ -37,6 +37,17 @@ export interface TorrentScannerOptions {
      * @default 0
      */
     maxFps?: number;
+
+    /**
+     * Not tested!
+     * @default false
+     */
+    followSymLinks?: boolean;
+
+    /**
+     *
+     */
+    onEntry?: (entry: TorrentScannerEntry) => void;
 }
 
 /**
@@ -94,6 +105,7 @@ export class TorrentScanner {
 
         this.options = {
             workdir: options?.workdir || DEFAULT_WORKDIR_LOCATION,
+            followSymLinks: !!options?.followSymLinks,
             target: [],
             exclude: SCAN_EXCLUDE_DEFAULT,
             maxFps: Math.max((options?.maxFps || 0), 0),
@@ -103,6 +115,9 @@ export class TorrentScanner {
         }
         if (options?.exclude) {
             this.addExclusion(options.exclude)
+        }
+        if (options?.onEntry) {
+            this.onEntry.subscribe(options.onEntry);
         }
     }
 
@@ -141,6 +156,7 @@ export class TorrentScanner {
         }
         // SCAN
         this.scanner = new FileScanner({
+            followSymLinks: !!this.options.followSymLinks,
             exclude: [
                 ...(this.options.exclude || []),
             ],

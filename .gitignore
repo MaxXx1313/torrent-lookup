@@ -3,3 +3,5 @@ tmp
 dist
 .idea
 test/analyzer/maps.json
+
+.tmp-tlookup
