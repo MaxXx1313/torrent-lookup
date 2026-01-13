@@ -43,6 +43,8 @@ export interface TorrentScannerStats {
      * Torrent files found
      */
     torrents: number;
+
+    filesPerSecond: number;
 }
 
 
@@ -73,7 +75,7 @@ export class TorrentScanner {
     private _dataFileStream: WriteStream;
     private _torrFileStream: WriteStream;
 
-    // private _lastFile: string;
+    private _lastFileFoundTs?: number | null;
 
 
     /**
@@ -140,7 +142,10 @@ export class TorrentScanner {
         this._resetStats();
         return Promise.resolve()
             .then(() => this._beforeScan())
-            .then(() => this.scanner.run())
+            .then(() => {
+                this._lastFileFoundTs = Date.now();
+                return this.scanner.run();
+            })
             .finally(() => {
                 this.scanner = null;
                 return this._afterScan()
@@ -207,6 +212,12 @@ export class TorrentScanner {
             filepath = path.resolve(filepath); // make path absolute;
             const isTorrent = this.isTorrentFile(filepath, stats);
 
+            // calculate stats
+            const now = Date.now();
+            const elapsed = now - this._lastFileFoundTs;
+            this._lastFileFoundTs = now;
+            this.stats.filesPerSecond = Math.round(1000 / elapsed);
+
             this.onEntry.next({
                 type: "file",
                 isTorrent,
@@ -230,12 +241,6 @@ export class TorrentScanner {
                     err ? reject(err) : resolve();
                 });
             }
-        }).then(d => {
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    resolve(d);
-                }, 100);
-            });
         });
     }
 
@@ -245,7 +250,8 @@ export class TorrentScanner {
     protected _resetStats() {
         this.stats = {
             files: 0, // without torrent files
-            torrents: 0
+            torrents: 0,
+            filesPerSecond: 0,
         };
     }
 
