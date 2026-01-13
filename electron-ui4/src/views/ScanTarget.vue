@@ -33,6 +33,7 @@
             <!-- Folders List -->
             <div class="divide-y divide-slate-100 dark:divide-slate-800">
 
+              <!--
               <div
                   class="p-4 flex items-center justify-between group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                 <div class="flex items-center gap-4">
@@ -69,6 +70,7 @@
                   <span class="material-symbols-outlined">delete</span>
                 </button>
               </div>
+-->
 
               <div v-for="t in targets"
                    class="p-4 flex items-center justify-between group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
@@ -89,6 +91,12 @@
                 </button>
               </div>
 
+              <div v-if="!targets?.length" class="p-4">
+                <div>
+                  <p class="text-xs text-center text-slate-500 italic">No targets</p>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -96,60 +104,40 @@
         <!-- Right Column: Exclusions -->
         <div class="space-y-6 h-full">
           <div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
-            <div class="flex items-center gap-3 mb-4">
+            <div class="flex items-center gap-3 mb-2">
               <span class="material-symbols-outlined text-primary">do_not_disturb_on</span>
               <h3 class="font-bold text-lg">Exclusions</h3>
             </div>
 
-            <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+            <p class="text-xs text-slate-500 mb-2 leading-relaxed">
               Ignore files or folders that match these patterns.
               Useful for skipping metadata, samples, or temp files.</p>
+            <p class="text-xs text-slate-500 mb-2 leading-relaxed">
+              Some system files are still ignored.</p>
 
             <div class="space-y-4">
               <div class="relative">
                 <input
                     class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:ring-primary focus:border-primary"
-                    placeholder="e.g. *.nfo, sample/" type="text"/>
+                    placeholder="e.g. *.nfo, sample/"
+                    type="text"
+                    @submit="addExclusion"
+                    v-model="exclusionAdd"
+                />
                 <button
-                    class="absolute right-0 top-0 bottom-0 px-2 py-1 text-primary hover:bg-primary/10 rounded-md transition-colors flex items-center">
+                    class="absolute right-0 top-0 bottom-0 px-2 py-1 text-primary hover:bg-primary/10 rounded-md transition-colors flex items-center"
+                    @click="addExclusion">
                   <span class="material-symbols-outlined text-sm">keyboard_return</span>
                 </button>
               </div>
 
               <div class="flex flex-wrap gap-2">
 
-                <div v-for="t in exclude">
-                  E: {{ t }}
-                </div>
-
-                <div
-                    class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full">
-                  <span class="text-xs font-medium text-slate-600 dark:text-slate-300">*.txt</span>
-                  <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-100 flex items-center">
-                    <span class="material-symbols-outlined text-sm">close</span>
-                  </button>
-                </div>
-
-                <div
-                    class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full">
-                  <span class="text-xs font-medium text-slate-600 dark:text-slate-300">sample/</span>
-                  <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-100 flex items-center">
-                    <span class="material-symbols-outlined text-sm">close</span>
-                  </button>
-                </div>
-
-                <div
-                    class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full">
-                  <span class="text-xs font-medium text-slate-600 dark:text-slate-300">*.log</span>
-                  <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-100 flex items-center">
-                    <span class="material-symbols-outlined text-sm">close</span>
-                  </button>
-                </div>
-
-                <div
-                    class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full">
-                  <span class="text-xs font-medium text-slate-600 dark:text-slate-300">@eaDir/</span>
-                  <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-100 flex items-center">
+                <div v-for="t in exclude"
+                     class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full">
+                  <span class="text-xs font-medium text-slate-600 dark:text-slate-300">{{ t }}</span>
+                  <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-100 flex items-center"
+                          @click="deleteExclusion(t)">
                     <span class="material-symbols-outlined text-sm">close</span>
                   </button>
                 </div>
@@ -181,8 +169,9 @@
           Save Configuration
         </button>
         <button
-            class="px-8 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-bold shadow-lg shadow-primary/20 flex items-center gap-2 transition-transform active:scale-[0.98]"
-            @click="goToScanningPage">
+            class="px-8 py-3 bg-primary hover:bg-primary/90 disabled:bg-primary/10 text-white rounded-lg text-sm font-bold enabled:shadow-lg enabled:shadow-primary/20 flex items-center gap-2 transition-transform active:enabled:scale-[0.98]"
+            @click="goToScanningPage"
+            :disabled="!targets?.length">
           <span class="material-symbols-outlined">play_arrow</span>
           Start Scanning
         </button>
@@ -203,6 +192,8 @@ import type { AppConfiguration } from "../../../electron-core/core-lib/types";
 const targets = ref<AppConfiguration['targets']>([]);
 const exclude = ref<AppConfiguration['exclude']>([]);
 const addInProgress = ref<boolean>(false);
+
+const exclusionAdd = ref('');
 
 const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
 
@@ -242,9 +233,18 @@ function addTarget() {
 }
 
 function deleteTarget(target: string) {
-  const targetsAll = (targets.value || []) as string[];
-  const targetRemoved = targetsAll.filter(t => t !== target);
-  targets.value = targetRemoved;
+  targets.value = (targets.value || []).filter(t => t !== target);
+  _saveConfig();
+}
+
+function addExclusion() {
+  (exclude.value as string[]).push(exclusionAdd.value);
+  exclusionAdd.value = '';
+  _saveConfig();
+}
+
+function deleteExclusion(exclusion: string) {
+  exclude.value = (exclude.value as string[]).filter(t => t !== exclusion);
   _saveConfig();
 }
 
