@@ -32,6 +32,18 @@ function event(eventName) {
     }
 }
 
+function eventOnce(eventName) {
+    return (callback) => {
+        const _cb = (_event, value) => {
+            console.log('[event] >\t', eventName, value);
+            callback(value);
+        }
+        ipcRenderer.once(eventName, _cb);
+
+        return () => ipcRenderer.off(eventName, _cb);
+    }
+}
+
 contextBridge.exposeInMainWorld('electronAPI', {
     openDevTools: (callback) => ipcRenderer.send('app:devtools'),
     appReady: () => ipcRenderer.send('app:ready'),
@@ -46,5 +58,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     startScan: callable('scan:start'),
     onScanEntry: event('scan:entry'),
     onScanStats: event('scan:stats'),
+    onScanFinished: eventOnce('scan:finished'),
     stopScan: callable('scan:stop'),
 });

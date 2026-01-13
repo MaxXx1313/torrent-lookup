@@ -25,7 +25,9 @@ export function scanLogic(ipcMain, mainWindow) {
         scanner.addTarget(targets);
         scanner.addExclusion(exclude);
 
-        scanner.run();
+        scanner.run().finally(() => {
+            mainWindow.webContents.send('scan:finished');
+        });
     });
 
     /**

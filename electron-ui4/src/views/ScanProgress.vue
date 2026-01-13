@@ -35,7 +35,7 @@
               <p class="text-white text-lg font-medium">Scanning directory contents</p>
             </div>
             <div class="text-right">
-              <p class="text-[#92adc9] text-base">{{formatNumber(filesPerSecond)}} files/sec</p>
+              <p class="text-[#92adc9] text-base">{{ formatNumber(filesPerSecond) }} files/sec</p>
             </div>
           </div>
           <!-- Indeterminate Progress Bar -->
@@ -83,7 +83,7 @@
       <div class="mt-12 flex flex-col items-center gap-4">
         <button
             class="flex items-center gap-2 px-8 py-3 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-all border border-white/10 hover:border-white/20"
-            @click="goToResultsPage">
+            @click="stopScan">
           <span class="material-symbols-outlined text-sm">close</span>
           <span class="font-semibold">Cancel Scan</span>
         </button>
@@ -119,9 +119,14 @@ onMounted(async () => {
     filesRegular.value = stats.files;
     filesPerSecond.value = stats.filesPerSecond;
   });
+
+  dataService.onScanFinished(() => {
+    router.push('/results');
+  });
 });
 
-const goToResultsPage = () => {
+function stopScan() {
+  dataService.stopScan();
   // You can use a string path or a named route object
   router.push('/results');
 };

@@ -47,6 +47,10 @@ export class DataService {
         return window.electronAPI.stopScan();
     }
 
+    onScanFinished(cb: () => void) {
+        return window.electronAPI.onScanFinished(cb);
+    }
+
 }
 
 ////

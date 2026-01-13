@@ -19,6 +19,7 @@ export interface IElectronAPI {
     startScan: (opts: { targets: string[], exclude?: string }) => Promise<void>;
     onScanEntry: MyEvent<string>;
     onScanStats: MyEvent<TorrentScannerStats>;
+    onScanFinished: MyEventOnce<void>;
     stopScan: () => void;
 
 }
@@ -28,6 +29,11 @@ export interface IElectronAPI {
  * return unsubscribe function
  */
 type MyEvent<T> = (callback: (arg: T) => void) => () => void;
+/**
+ * return unsubscribe function
+ * Event happens just once
+ */
+type MyEventOnce<T> = (callback: (arg: T) => void) => () => void;
 
 interface MyCallable {
     <O>(): Promise<O>;
