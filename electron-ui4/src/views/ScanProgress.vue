@@ -35,7 +35,7 @@
               <p class="text-white text-lg font-medium">Scanning directory contents</p>
             </div>
             <div class="text-right">
-              <p class="text-[#92adc9] text-base">420 files/sec</p>
+              <p class="text-[#92adc9] text-base">{{formatNumber(filesPerSecond)}} files/sec</p>
             </div>
           </div>
           <!-- Indeterminate Progress Bar -->
@@ -105,6 +105,7 @@ import { bindToComponent } from "../../tools/async.ts";
 const currentTarget = ref<string>('');
 const filesTorrent = ref<string>(0);
 const filesRegular = ref<string>(0);
+const filesPerSecond = ref<string>(0);
 
 const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
 const router = useRouter();
@@ -116,6 +117,7 @@ onMounted(async () => {
   bindToComponent(dataService.scanStats$).subscribe(stats => {
     filesTorrent.value = stats.torrents;
     filesRegular.value = stats.files;
+    filesPerSecond.value = stats.filesPerSecond;
   });
 });
 

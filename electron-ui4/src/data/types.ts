@@ -23,4 +23,6 @@ export interface TorrentScannerStats {
      * Torrent files found
      */
     torrents: number;
+
+    filesPerSecond: number;
 }
