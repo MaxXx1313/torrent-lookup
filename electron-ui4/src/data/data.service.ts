@@ -1,5 +1,5 @@
 import { Observable, shareReplay } from 'rxjs';
-import type { AppConfiguration } from "@/data/types.ts";
+import type { AppConfiguration, TorrentScannerStats } from "@/data/types.ts";
 
 
 export interface ScanOptions {
@@ -14,13 +14,8 @@ export const DATA_SERVICE_KEY = Symbol();
  */
 export class DataService {
 
-
-    readonly scanEntry$ = new Observable<string>(subject => {
-        const releaseFn = window.electronAPI.onScanEntry(entry => {
-            subject.next(entry);
-        });
-        return releaseFn;
-    }).pipe(shareReplay({refCount: true, bufferSize: 1}));
+    readonly scanEntry$ = _observableFromElectron<string>(window.electronAPI.onScanEntry);
+    readonly scanStats$ = _observableFromElectron<TorrentScannerStats>(window.electronAPI.onScanStats);
 
     constructor() {
 
@@ -54,7 +49,14 @@ export class DataService {
 
 }
 
-export interface TorrentMapping {
-    torrent: string; // torrent location
-    saveTo: string; // absolute file location
+////
+type MyEvent<T> = (callback: (arg: T) => void) => () => void;
+
+function _observableFromElectron<T>(electronMethod: MyEvent<T>): Observable<T> {
+    return new Observable<T>(subject => {
+        const releaseFn = electronMethod(entry => {
+            subject.next(entry);
+        });
+        return releaseFn;
+    }).pipe(shareReplay({refCount: true, bufferSize: 1}));
 }

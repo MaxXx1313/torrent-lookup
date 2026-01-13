@@ -1,18 +1,6 @@
 // preload.js
 const {contextBridge, ipcRenderer} = require('electron/renderer');
 
-/**
- * return unsubscribe function.
- * This is
- */
-function bindToEvent(eventName) {
-    return (callback) => {
-        const _cb = (_event, value) => callback(value)
-        ipcRenderer.on(eventName, _cb);
-
-        return () => ipcRenderer.off(eventName, _cb);
-    }
-}
 
 function callable(name) {
     return function () {
@@ -28,6 +16,10 @@ function callable(name) {
     }
 }
 
+/**
+ * return unsubscribe function.
+ * This is
+ */
 function event(eventName) {
     return (callback) => {
         const _cb = (_event, value) => {
@@ -44,11 +36,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     openDevTools: (callback) => ipcRenderer.send('app:devtools'),
     appReady: () => ipcRenderer.send('app:ready'),
 
-    onStatus: bindToEvent('scan:status'),
-    onScanProgress: bindToEvent('scan:progress'),
-
-    onAnalyzeResults: bindToEvent('analyze:decision'),
-
     // ui4
     getConfig: callable('app:get-config'),
     setConfig: callable('app:set-config'),
@@ -58,5 +45,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
     startScan: callable('scan:start'),
     onScanEntry: event('scan:entry'),
+    onScanStats: event('scan:stats'),
     stopScan: callable('scan:stop'),
 });

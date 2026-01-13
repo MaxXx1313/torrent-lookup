@@ -59,7 +59,7 @@
                 -->
 
                 <p class="text-[#92adc9] text-sm font-mono leading-relaxed break-all">
-                  {{currentTarget}}
+                  {{ currentTarget }}
                 </p>
 
               </div>
@@ -68,12 +68,12 @@
           <!-- Counter Metadata -->
           <div class="flex justify-center items-center gap-8 py-2">
             <div class="text-center">
-              <span class="block text-white text-xl font-bold">1,240</span>
+              <span class="block text-white text-xl font-bold">{{ formatNumber(filesTorrent) }}</span>
               <span class="text-[#92adc9] text-xs uppercase tracking-wide">Torrents Found</span>
             </div>
             <div class="w-px h-8 bg-[#233648]"></div>
             <div class="text-center">
-              <span class="block text-white text-xl font-bold">14,892</span>
+              <span class="block text-white text-xl font-bold">{{ formatNumber(filesRegular) }}</span>
               <span class="text-[#92adc9] text-xs uppercase tracking-wide">Files Found</span>
             </div>
           </div>
@@ -103,6 +103,8 @@ import { DATA_SERVICE_KEY, DataService } from "@/data/data.service.ts";
 import { bindToComponent } from "../../tools/async.ts";
 
 const currentTarget = ref<string>('');
+const filesTorrent = ref<string>(0);
+const filesRegular = ref<string>(0);
 
 const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
 const router = useRouter();
@@ -111,10 +113,20 @@ onMounted(async () => {
   bindToComponent<string>(dataService.scanEntry$).subscribe(entry => {
     currentTarget.value = entry;
   });
+  bindToComponent(dataService.scanStats$).subscribe(stats => {
+    filesTorrent.value = stats.torrents;
+    filesRegular.value = stats.files;
+  });
 });
 
 const goToResultsPage = () => {
   // You can use a string path or a named route object
   router.push('/results');
 };
+
+const intlNumberFormatter = new Intl.NumberFormat();
+
+function formatNumber(num: number) {
+  return intlNumberFormatter.format(num);
+}
 </script>

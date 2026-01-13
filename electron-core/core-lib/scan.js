@@ -7,6 +7,7 @@ export function scanLogic(ipcMain, mainWindow) {
     scanner.onEntry.subscribe((entry) => {
         // ipcMain.emit('scan:entry', entry.location);
         mainWindow.webContents.send('scan:entry', entry.location);
+        mainWindow.webContents.send('scan:stats', scanner.stats);
     });
 
     /**
