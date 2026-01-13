@@ -12,6 +12,7 @@ export interface CliOptions {
      */
     target: string[];
     tmp: string;
+    fps?: number;
 
     /**
      * for 'push' only

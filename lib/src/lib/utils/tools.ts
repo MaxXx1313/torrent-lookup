@@ -97,6 +97,14 @@ export function nexTickPromise() {
     });
 }
 
+/**
+ *
+ */
+export function timeoutPromise(delay: number = 0) {
+    return new Promise(resolve => {
+        setTimeout(resolve, delay);
+    });
+}
 
 //## tick
 let _tic_time = 0;
@@ -109,3 +117,4 @@ export function tick() {
     _tic_time = Date.now();
     return _tic_time - t;
 }
+

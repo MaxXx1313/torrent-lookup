@@ -4,7 +4,6 @@ import { debounce } from '../lib/utils/tools.js';
 import { TorrentScanner, TorrentScannerEntry } from '../lib/scan/TorrentScanner.js';
 import { LopConsole } from './LopConsole.js';
 
-const logger = new LopConsole();
 
 
 /**
@@ -13,6 +12,7 @@ const logger = new LopConsole();
 export function cliScanFiles(options: CliOptions): Promise<any> {
     assert.ok(options.target, 'target must be specified');
 
+    const logger = new LopConsole();
     const logDebounced = debounce(function (str) {
         logger.logLOP(str);
     }, 1000);
@@ -30,7 +30,8 @@ export function cliScanFiles(options: CliOptions): Promise<any> {
     //
     const scanner = new TorrentScanner({
         target: options.target,
-        workdir: options.tmp
+        workdir: options.tmp,
+        maxFps: options.fps,
     });
 
     // SCAN

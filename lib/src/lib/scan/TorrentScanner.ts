@@ -11,6 +11,7 @@ import {
 import { FileScanner } from "./FileScanner.js";
 import { Subject } from "rxjs";
 import { FileMatcher } from '../utils/FileMatcher.js';
+import { timeoutPromise } from "../utils/tools";
 
 
 export interface TorrentScannerOptions {
@@ -28,6 +29,14 @@ export interface TorrentScannerOptions {
      * @see FileScannerOption.exclude
      */
     exclude?: string[];
+
+    /**
+     * Maximum files per second.
+     * 0 - no limit
+     *
+     * @default 0
+     */
+    maxFps?: number;
 }
 
 /**
@@ -87,6 +96,7 @@ export class TorrentScanner {
             workdir: options?.workdir || DEFAULT_WORKDIR_LOCATION,
             target: [],
             exclude: SCAN_EXCLUDE_DEFAULT,
+            maxFps: Math.max((options?.maxFps || 0), 0),
         }
         if (options?.target) {
             this.addTarget(options.target)
@@ -212,12 +222,6 @@ export class TorrentScanner {
             filepath = path.resolve(filepath); // make path absolute;
             const isTorrent = this.isTorrentFile(filepath, stats);
 
-            // calculate stats
-            const now = Date.now();
-            const elapsed = now - this._lastFileFoundTs;
-            this._lastFileFoundTs = now;
-            this.stats.filesPerSecond = Math.round(1000 / elapsed);
-
             this.onEntry.next({
                 type: "file",
                 isTorrent,
@@ -241,6 +245,22 @@ export class TorrentScanner {
                     err ? reject(err) : resolve();
                 });
             }
+        }).then(() => {
+            // calculate stats
+            const now = Date.now();
+            const timePassedMs = now - this._lastFileFoundTs;
+            this._lastFileFoundTs = now;
+            this.stats.filesPerSecond = Math.round(1000 / timePassedMs);
+
+            // apply files-per-second limit
+            if (this.options.maxFps > 0) {
+                const expectedTimeMs = Math.round(1000 / this.options.maxFps);
+                const extraDelay = expectedTimeMs - timePassedMs;
+                if (extraDelay > 0) {
+                    return timeoutPromise(extraDelay);
+                }
+            }
+            return Promise.resolve();
         });
     }
 
