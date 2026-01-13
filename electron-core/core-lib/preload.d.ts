@@ -1,15 +1,21 @@
+import { AppConfiguration } from "./types";
+
 export interface IElectronAPI {
-    openDevTools: () => void,
-    appReady: () => void,
+    openDevTools: () => void;
+    appReady: () => void;
 
-    scan: (opts: { targets: string | string[] }) => Promise<void>,
-    stopScan: () => void,
-    selectFolder: () => Promise<string | string[] | null>,
-    onScanProgress: MyEventBinding<string>,
-    onStatus: MyEventBinding<'idle' | 'scan' | 'analyze' | 'export'>,
-    onScanFound: MyEventBinding<string>,
+    scan: (opts: { targets: string | string[] }) => Promise<void>;
+    stopScan: () => void;
+    onScanProgress: MyEventBinding<string>;
+    onStatus: MyEventBinding<'idle' | 'scan' | 'analyze' | 'export'>;
+    onScanFound: MyEventBinding<string>;
 
-    onAnalyzeResults: MyEventBinding<TorrentMapping[]>,
+    onAnalyzeResults: MyEventBinding<TorrentMapping[]>;
+
+    // ui4
+    getConfig: MyCallable<AppConfiguration>;
+    setConfig: MyCallable<AppConfiguration>;
+    selectFolder: () => Promise<string[] | null>;
 }
 
 declare global {
@@ -24,8 +30,15 @@ declare global {
  */
 type MyEventBinding<T> = (callback: (arg: T) => void) => () => void;
 
+interface MyCallable {
+    <O>(): Promise<O>;
+    <T1, O>(arg1: T1): Promise<O>;
+    <T1, T2, O>(arg1: T1, arg2: T2): Promise<O>;
+}
 
 interface TorrentMapping {
     torrent: string; // torrent location
     saveTo: string; // absolute file location
 }
+
+

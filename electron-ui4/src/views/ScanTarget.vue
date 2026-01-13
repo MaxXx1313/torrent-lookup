@@ -13,7 +13,8 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <!-- Left Column: Scan Folders -->
         <div class="md:col-span-2 space-y-6">
-          <div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+          <div
+              class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
             <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-primary">folder_open</span>
@@ -21,7 +22,8 @@
               </div>
 
               <button
-                  class="bg-primary hover:bg-primary/90 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-2 active:scale-[0.96]">
+                  class="bg-primary hover:bg-primary/90 disabled:bg-primary/10 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-2 active:enabled:scale-[0.96]"
+                  @click="addTarget" :disabled="addInProgress">
                 <span class="material-symbols-outlined text-sm">add</span>
                 Add Path
               </button>
@@ -68,20 +70,21 @@
                 </button>
               </div>
 
-              <div
-                  class="p-4 flex items-center justify-between group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+              <div v-for="t in targets"
+                   class="p-4 flex items-center justify-between group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                 <div class="flex items-center gap-4">
                   <div
                       class="size-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
                     <span class="material-symbols-outlined">folder</span>
                   </div>
                   <div>
-                    <p class="text-sm font-medium text-slate-900 dark:text-slate-200">/home/user/downloads/incoming</p>
+                    <p class="text-sm font-medium text-slate-900 dark:text-slate-200">{{ t }}</p>
                     <p class="text-xs text-slate-500">New directory added</p>
                   </div>
                 </div>
                 <button
-                    class="p-2 text-slate-400 hover:text-red-500 transition-colors group-hover:opacity-100">
+                    class="p-2 text-slate-400 hover:text-red-500 transition-colors group-hover:opacity-100"
+                    @click="deleteTarget(t)">
                   <span class="material-symbols-outlined">delete</span>
                 </button>
               </div>
@@ -114,6 +117,11 @@
               </div>
 
               <div class="flex flex-wrap gap-2">
+
+                <div v-for="t in exclude">
+                  E: {{ t }}
+                </div>
+
                 <div
                     class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full">
                   <span class="text-xs font-medium text-slate-600 dark:text-slate-300">*.txt</span>
@@ -183,13 +191,68 @@
   </main>
 </template>
 
+<!-- -->
 <script setup lang="ts">
+
+import { inject, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { DATA_SERVICE_KEY, DataService } from '@/data/data.service';
+import type { AppConfiguration } from "../../../electron-core/core-lib/types";
+
+
+const targets = ref<AppConfiguration['targets']>([]);
+const exclude = ref<AppConfiguration['exclude']>([]);
+const addInProgress = ref<boolean>(false);
+
+const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
 
 const router = useRouter();
+
+onMounted(async () => {
+  const config = await dataService.getConfig();
+  targets.value = config?.targets || [];
+  exclude.value = config?.exclude || [];
+});
 
 const goToScanningPage = () => {
   // You can use a string path or a named route object
   router.push('/progress');
 };
+
+// bindToComponent(dataService.getTargets()).subscribe(data => {
+//   // TODO: didn't found how to replace an array
+//   targets.value.splice(0);
+//   targets.value.push(...data);
+// });
+
+function addTarget() {
+  if (addInProgress.value) {
+    return;
+  }
+  addInProgress.value = true;
+  dataService.selectFolder()
+      .then((folders: string[]) => {
+        if (folders) {
+          targets.value.push(...folders);
+          _saveConfig();
+        }
+      }).finally(() => {
+    addInProgress.value = false;
+  });
+}
+
+function deleteTarget(target: string) {
+  const targetsAll = (targets.value || []) as string[];
+  const targetRemoved = targetsAll.filter(t => t !== target);
+  targets.value = targetRemoved;
+  _saveConfig();
+}
+
+function _saveConfig() {
+  dataService.setConfig({
+    targets: (targets.value || []).slice(),
+    exclude: (exclude.value || []).slice(),
+  });
+}
+
 </script>

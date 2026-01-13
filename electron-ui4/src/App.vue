@@ -1,8 +1,3 @@
-<script setup lang="ts">
-import { RouterView } from 'vue-router'
-import TorrentIcon from "@/components/icons/TorrentIcon.vue";
-</script>
-
 <template>
   <!-- Top Header -->
   <header
@@ -81,3 +76,14 @@ RouterView {
   height: 100%;
 }
 </style>
+
+<script setup lang="ts">
+import { provide } from 'vue';
+import { RouterView } from 'vue-router'
+import TorrentIcon from "@/components/icons/TorrentIcon.vue";
+
+import { DATA_SERVICE_KEY, DataService } from "@/data/data.service.ts";
+
+const dataService = new DataService();
+provide(DATA_SERVICE_KEY, dataService);
+</script>

@@ -15,31 +15,26 @@ export type ScanStatus = 'idle' | 'scan' | 'analyze' | 'export';
  */
 export class DataService {
 
-    private _targets = new BehaviorSubject<ScanOptions['targets']>([
-        '~'
-    ]);
-
     readonly status$ = new Observable<ScanStatus>(observer => {
         return window.electronAPI.onStatus(status => {
             observer.next(status);
         });
     }).pipe(shareReplay(1));
-
     readonly scanTarget$ = new Observable<string>((observer) => {
         return window.electronAPI.onScanProgress((filepath) => {
             observer.next(filepath);
         });
     }).pipe(shareReplay(1));
-
     readonly analyzeResults$ = new Observable<TorrentMapping[]>((observer) => {
         return window.electronAPI.onAnalyzeResults((data) => {
             observer.next(data);
         });
     }).pipe(shareReplay(1));
-
     readonly _scanFound: string[] = [];
     readonly scanFound$ = new BehaviorSubject<string[]>([]);
-
+    private _targets = new BehaviorSubject<ScanOptions['targets']>([
+        '~'
+    ]);
 
     constructor() {
         window.electronAPI?.onScanFound(item => {
@@ -55,6 +50,7 @@ export class DataService {
     getTargets(): Observable<ScanOptions['targets']> {
         return this._targets;
     }
+
 
     addTarget() {
         return window.electronAPI.selectFolder().then(folder => {
@@ -91,6 +87,20 @@ export class DataService {
 
     stopScan() {
         return window.electronAPI.stopScan();
+    }
+
+
+    // ui4
+    getConfig() {
+        return window.electronAPI.getConfig();
+    }
+
+    setConfig(config: any) {
+        return window.electronAPI.setConfig(config);
+    }
+
+    selectFolder() {
+        return window.electronAPI.selectFolder();
     }
 
 }

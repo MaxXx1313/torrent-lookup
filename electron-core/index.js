@@ -4,43 +4,46 @@
 const {app, BrowserWindow, ipcMain} = require('electron');
 const path = require('node:path');
 const {Scanner} = require('./core-lib/scan');
+const {appLogic} = require("./core-lib/app");
 
 
-const myBridge = {
-    /**
-     * Send message to UI
-     */
-    send: (topic, message) => {
-        console.log('[send]\t', topic, message);
-        if (_mainWindow) {
-            _mainWindow.webContents.send(topic, message);
-        } else {
-            // no active window
-            console.debug('[send]\t(no active window)', topic, message);
-        }
-    },
-    /**
-     * Receive message from UI
-     */
-    on: (topic, handler) => {
-        ipcMain.on(topic, (event, data) => {
-            console.log('[on]\t', topic);
-            return handler(data);
-        });
-    },
-    /**
-     * UI calls method and provide a result
-     */
-    handle: (topic, handler) => {
-        ipcMain.handle(topic, (event, data) => {
-            console.log('[handle]\t', topic);
-            return handler(data);
-        });
-    },
-};
+
+console.log('[Store]', app.getPath('userData'));
+// const myBridge = {
+//     /**
+//      * Send message to UI
+//      */
+//     send: (topic, message) => {
+//         console.log('[send]\t', topic, message);
+//         if (_mainWindow) {
+//             _mainWindow.webContents.send(topic, message);
+//         } else {
+//             // no active window
+//             console.debug('[send]\t(no active window)', topic, message);
+//         }
+//     },
+//     /**
+//      * Receive message from UI
+//      */
+//     on: (topic, handler) => {
+//         ipcMain.on(topic, (event, data) => {
+//             console.log('[on]\t', topic);
+//             return handler(data);
+//         });
+//     },
+//     /**
+//      * UI calls method and provide a result
+//      */
+//     handle: (topic, handler) => {
+//         ipcMain.handle(topic, (event, data) => {
+//             console.log('[handle]\t', topic);
+//             return handler(data);
+//         });
+//     },
+// };
 
 // attach scanner logic
-const scanner = new Scanner(myBridge);
+// const scanner = new Scanner(myBridge);
 
 
 /////////////////////////////
@@ -83,6 +86,9 @@ app.whenReady().then(() => {
             _mainWindow.webContents.openDevTools();
         }
     });
+
+    appLogic(ipcMain);
+
 
     app.on('activate', () => {
         // On macOS it's common to re-create a window in the app when the
