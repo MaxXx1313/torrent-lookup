@@ -7,8 +7,11 @@
         <div class="mb-8 relative">
           <div class="absolute inset-0 bg-primary/20 blur-xl rounded-full"></div>
           <div
-              class="relative flex items-center justify-center w-24 h-24 rounded-full border-2 border-primary/30 border-t-primary">
-            <span class="material-symbols-outlined text-4xl text-primary">search</span>
+              class="relative flex items-center justify-center w-24 h-24 rounded-full">
+
+            <div
+                class="absolute top-0 left-0 right-0 bottom-0 border-2 rounded-full border-primary/30 border-t-primary animate-rotate-cw"></div>
+            <span class="material-symbols-outlined text-4xl text-primary animate-search">search</span>
           </div>
         </div>
         <!-- Headline Section -->

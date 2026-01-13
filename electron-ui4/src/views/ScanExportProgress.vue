@@ -8,7 +8,7 @@
       <!-- Progress State -->
       <div class="mb-10 text-center relative">
         <div class="inline-flex items-center justify-center p-3 rounded-full text-primary mb-4 border-2 border-primary/30 border-t-primary">
-          <span class="material-symbols-outlined text-3xl" style="animation: rotateccw 2s infinite linear">sync</span>
+          <span class="material-symbols-outlined text-3xl animate-rotate-ccw">sync</span>
         </div>
         <h1 class="text-slate-900 dark:text-white text-3xl font-bold leading-tight mb-2">Exporting to qBittorrent...</h1>
         <p class="text-slate-500 dark:text-[#92adc9]">Moving matched metadata to your local torrent client instance.</p>
