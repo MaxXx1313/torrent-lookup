@@ -3,10 +3,11 @@
     <!-- Page Heading -->
     <div class="flex flex-wrap justify-between items-end gap-4 mb-8">
       <div class="flex flex-col gap-2">
-        <h1 class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Match Results
-          Review</h1>
-        <p class="text-slate-500 dark:text-[#92adc9] text-base font-normal">Verify the filesystem matches and resolve
-          any conflicts before final export.</p>
+        <h1 class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">
+          Match Results Review
+        </h1>
+        <p class="text-slate-500 dark:text-[#92adc9] text-sm font-normal">Verify the filesystem matches and resolve
+          any conflicts before the export</p>
       </div>
     </div>
     <!-- Stats Overview -->
@@ -217,7 +218,8 @@
       <div class="flex flex-col"></div>
       <div class="flex items-center gap-4 w-full md:w-auto">
         <button
-            class="flex-1 md:flex-none h-12 px-8 bg-white dark:bg-[#233648] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+            class="flex-1 md:flex-none h-12 px-8 bg-white dark:bg-[#233648] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+            @click="backToScan">
           Back to Scan
         </button>
 
@@ -240,5 +242,10 @@ const router = useRouter();
 const goToExportPage = () => {
   // You can use a string path or a named route object
   router.push('/export');
+};
+
+function backToScan() {
+  // You can use a string path or a named route object
+  router.push('/target');
 };
 </script>

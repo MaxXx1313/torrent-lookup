@@ -19,7 +19,7 @@
           <h1 class="text-white tracking-tight text-4xl font-bold leading-tight">
             Scanning Filesystem...
           </h1>
-          <p class="text-[#92adc9]text-sm font-normal leading-normal max-w-lg mx-auto">
+          <p class="text-[#92adc9] text-sm font-normal leading-normal max-w-lg mx-auto">
             Matching local files with torrent metadata. This may take a while depending on your disk speed and volume
             size.
           </p>
