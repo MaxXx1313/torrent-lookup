@@ -32,7 +32,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     openDevTools: (callback) => ipcRenderer.send('app:devtools'),
     appReady: () => ipcRenderer.send('app:ready'),
 
-    scan: (targets) => ipcRenderer.send('scan:start', targets),
     stopScan: () => ipcRenderer.send('scan:stop'),
     onStatus: bindToEvent('scan:status'),
     onScanProgress: bindToEvent('scan:progress'),
@@ -46,4 +45,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getSystemExcluded: callable('app:get-system-excluded'),
 
     selectFolder: callable('app:select-folder'),
+
+    scan: callable('scan:start'),
 });

@@ -1,4 +1,5 @@
 import { BehaviorSubject, Observable, shareReplay } from 'rxjs';
+import type { AppConfiguration } from "@/data/types.ts";
 
 
 export interface ScanOptions {
@@ -77,14 +78,6 @@ export class DataService {
         this._targets.next(targets);
     }
 
-    startScan() {
-        this._scanFound.length = 0;
-        this.scanFound$.next(this._scanFound);
-
-        const targets = this._targets.getValue();
-        window.electronAPI.scan({targets});
-    }
-
     stopScan() {
         return window.electronAPI.stopScan();
     }
@@ -95,7 +88,7 @@ export class DataService {
         return window.electronAPI.getConfig();
     }
 
-    setConfig(config: any) {
+    setConfig(config: AppConfiguration) {
         return window.electronAPI.setConfig(config);
     }
 
@@ -105,6 +98,14 @@ export class DataService {
 
     selectFolder() {
         return window.electronAPI.selectFolder();
+    }
+
+
+    startScan(config: AppConfiguration) {
+        this._scanFound.length = 0;
+        this.scanFound$.next(this._scanFound);
+
+        window.electronAPI.scan({targets: config.targets, exclude: config.exclude});
     }
 
 }

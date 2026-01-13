@@ -4,7 +4,6 @@ export interface IElectronAPI {
     openDevTools: () => void;
     appReady: () => void;
 
-    scan: (opts: { targets: string | string[] }) => Promise<void>;
     stopScan: () => void;
     onScanProgress: MyEventBinding<string>;
     onStatus: MyEventBinding<'idle' | 'scan' | 'analyze' | 'export'>;
@@ -17,6 +16,8 @@ export interface IElectronAPI {
     setConfig: MyCallable<AppConfiguration>;
     getSystemExcluded: MyCallable<string[]>;
     selectFolder: () => Promise<string[] | null>;
+
+    scan: (opts: { targets: string[], exclude?: string }) => Promise<void>;
 }
 
 declare global {
@@ -33,7 +34,9 @@ type MyEventBinding<T> = (callback: (arg: T) => void) => () => void;
 
 interface MyCallable {
     <O>(): Promise<O>;
+
     <T1, O>(arg1: T1): Promise<O>;
+
     <T1, T2, O>(arg1: T1, arg2: T2): Promise<O>;
 }
 

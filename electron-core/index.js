@@ -3,7 +3,7 @@
 // Modules to control application life and create native browser window
 const {app, BrowserWindow, ipcMain} = require('electron');
 const path = require('node:path');
-const {Scanner} = require('./core-lib/scan');
+const {Scanner, scanLogic} = require('./core-lib/scan');
 const {appLogic} = require("./core-lib/app");
 
 
@@ -88,6 +88,7 @@ app.whenReady().then(() => {
     });
 
     appLogic(ipcMain);
+    scanLogic(ipcMain);
 
 
     app.on('activate', () => {

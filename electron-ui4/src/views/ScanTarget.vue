@@ -186,7 +186,7 @@
         -->
         <button
             class="px-8 py-3 bg-primary hover:bg-primary/90 disabled:bg-zinc-800 text-white rounded-lg text-sm font-bold enabled:shadow-lg enabled:shadow-primary/20 flex items-center gap-2 transition-transform active:enabled:scale-[0.98]"
-            @click="goToScanningPage"
+            @click="startScanning"
             :disabled="!targets?.length">
           <span class="material-symbols-outlined">play_arrow</span>
           Start Scanning
@@ -257,8 +257,15 @@ onMounted(async () => {
   exclude.value = config?.exclude || [];
 });
 
-const goToScanningPage = () => {
+const startScanning = () => {
   // You can use a string path or a named route object
+  _saveConfig();
+
+  const config = {
+    targets: (targets.value || []).slice(),
+    exclude: (exclude.value || []).slice(),
+  }
+  dataService.startScan(config);
   router.push('/progress');
 };
 
