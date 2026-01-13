@@ -99,6 +99,10 @@ export class DataService {
         return window.electronAPI.setConfig(config);
     }
 
+    getSystemExcluded() {
+        return window.electronAPI.getSystemExcluded();
+    }
+
     selectFolder() {
         return window.electronAPI.selectFolder();
     }

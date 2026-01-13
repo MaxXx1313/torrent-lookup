@@ -43,6 +43,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // ui4
     getConfig: callable('app:get-config'),
     setConfig: callable('app:set-config'),
+    getSystemExcluded: callable('app:get-system-excluded'),
 
     selectFolder: callable('app:select-folder'),
 });

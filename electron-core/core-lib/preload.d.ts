@@ -15,6 +15,7 @@ export interface IElectronAPI {
     // ui4
     getConfig: MyCallable<AppConfiguration>;
     setConfig: MyCallable<AppConfiguration>;
+    getSystemExcluded: MyCallable<string[]>;
     selectFolder: () => Promise<string[] | null>;
 }
 

@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
+    "element-plus": "^2.13.1",
     "material-symbols": "^0.40.2",
     "rxjs": "^7.8.2",
     "sass": "^1.97.2",

@@ -1,6 +1,6 @@
 import Store from 'electron-store';
 import {dialog} from "electron";
-
+import {SCAN_EXCLUDE_DEFAULT} from "tlookup";
 
 export function appLogic(ipcMain) {
 
@@ -19,12 +19,16 @@ export function appLogic(ipcMain) {
         }
     });
 
+    ipcMain.handle('app:get-system-excluded', async () => {
+        return SCAN_EXCLUDE_DEFAULT;
+    });
+
     /**
      * Write app config
      */
     ipcMain.handle('app:set-config', async (event, config) => {
         const targets = config?.targets || [];
-        const exclude = exclude.value || [];
+        const exclude = config?.exclude || [];
         return store.set('config', {targets, exclude});
     });
 
