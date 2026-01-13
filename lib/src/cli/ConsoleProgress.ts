@@ -2,23 +2,20 @@ import { stdout } from 'single-line-log';
 import * as util from 'util';
 
 
-
 const ANIMATION_DELAY = 100;
 
-const STATE_ANIMATION = ['-', '\\', '/'];
+const STATE_ANIMATION = '|/-\\';
 
 /**
  * Console long operation mode
  */
-export class LopConsole {
+export class ConsoleProgress {
 
     private _status = 'Please wait...';
 
     private _stateIdx = 0;
     private _stateLength = STATE_ANIMATION.length;
 
-    private startTime: number | null;
-    private endTime: number | null;
     private _animationTimer;
 
 
@@ -35,13 +32,11 @@ export class LopConsole {
      * Start Long Operation
      */
     startLOP() {
-        this.startTime = Date.now();
-        this.endTime = null;
-        this._animationTimer = setInterval(function () {
+        this._animationTimer = setInterval(() => {
             this._stateIdx = (this._stateIdx + 1) % this._stateLength;
             this._print();
             // this._animationTimer.unref();
-        }.bind(this), ANIMATION_DELAY);
+        }, ANIMATION_DELAY);
     }
 
     /**
@@ -49,17 +44,7 @@ export class LopConsole {
      */
     stopLOP() {
         clearInterval(this._animationTimer);
-        this.endTime = Date.now();
-
         this.clear();
-    }
-
-    /**
-     * Get elapsed milliseconds
-     * @return {number}
-     */
-    elapsedLOP() {
-        return (this.endTime || Date.now()) - this.startTime;
     }
 
     /**
@@ -67,13 +52,14 @@ export class LopConsole {
      */
     logLOP(...args) {
         this._status = util.format.apply(util, args);
+        this._print();
     }
 
     _print() {
         stdout(util.format('[%s] %s', STATE_ANIMATION[this._stateIdx], this._status)); // write text
     }
 
-    clear = function () {
+    clear() {
         stdout('');
     }
 
