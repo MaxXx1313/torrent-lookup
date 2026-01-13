@@ -31,7 +31,7 @@ function callable(name) {
 function event(eventName) {
     return (callback) => {
         const _cb = (_event, value) => {
-            console.log('[event] >\t', eventName, value);
+            // console.log('[event] >\t', eventName, value);
             callback(value);
         }
         ipcRenderer.on(eventName, _cb);

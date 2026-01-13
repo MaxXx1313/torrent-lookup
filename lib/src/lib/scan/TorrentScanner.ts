@@ -230,6 +230,12 @@ export class TorrentScanner {
                     err ? reject(err) : resolve();
                 });
             }
+        }).then(d => {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    resolve(d);
+                }, 100);
+            });
         });
     }
 

@@ -49,12 +49,15 @@
           <div class="bg-[#111a22] rounded-lg p-4 border border-[#233648]">
             <div class="flex items-start gap-3">
               <span class="material-symbols-outlined text-[#92adc9] text-sm mt-1">folder_open</span>
-              <div class="flex-1 overflow-hidden">
+              <div class="flex-1 overflow-hidden h-[42px]">
                 <!--
                 <p class="text-[#92adc9] text-sm font-mono leading-relaxed break-all">
                   /Volumes/HighSpeed_Storage/Media/Movies/Legal_Open_Source_Video_Collection_2024_4K/Scanning_In_Progress...
+
+                  /Volumes/HighSpeed_Storage/Media/Movies/Legal_Open_Source_Video_Collection_2024_4K/Scanning_In_Progress...
                 </p>
                 -->
+
                 <p class="text-[#92adc9] text-sm font-mono leading-relaxed break-all">
                   {{currentTarget}}
                 </p>
@@ -66,7 +69,7 @@
           <div class="flex justify-center items-center gap-8 py-2">
             <div class="text-center">
               <span class="block text-white text-xl font-bold">1,240</span>
-              <span class="text-[#92adc9] text-xs uppercase tracking-wide">Files Matched</span>
+              <span class="text-[#92adc9] text-xs uppercase tracking-wide">Torrents Found</span>
             </div>
             <div class="w-px h-8 bg-[#233648]"></div>
             <div class="text-center">

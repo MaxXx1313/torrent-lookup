@@ -71,7 +71,8 @@ function createWindow() {
     mainWindow.on('closed', function () {
         _mainWindow = null;
     });
-}
+}// attach scanner logic
+// const scanner = new Scanner(myBridge);
 
 
 // This method will be called when Electron has finished
@@ -103,9 +104,9 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-        app.quit();
-    }
+    // if (process.platform !== 'darwin') {
+    app.quit();
+    // }
 })
 
 // In this file you can include the rest of your app's specific main process
