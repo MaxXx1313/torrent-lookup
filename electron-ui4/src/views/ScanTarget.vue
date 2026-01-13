@@ -125,7 +125,7 @@
                       command="show-modal"
                       commandfor="dialog"
                       @click="loadSystemExcluded">
-                See system files
+                See the system files
               </button>
             </p>
 
@@ -135,7 +135,7 @@
                     class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:ring-primary focus:border-primary"
                     placeholder="e.g. *.nfo, sample/"
                     type="text"
-                    @submit="addExclusion"
+                    @keydown.enter="addExclusion"
                     v-model="exclusionAdd"
                 />
                 <button
@@ -195,6 +195,7 @@
     </div>
   </main>
 
+  <!-- -->
   <el-dialog>
     <dialog id="dialog" aria-labelledby="dialog-title"
             class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent">
