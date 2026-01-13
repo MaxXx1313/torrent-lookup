@@ -25,18 +25,17 @@
           </p>
         </div>
       </div>
+
       <!-- Progress & Path Display Card -->
       <div class="w-full max-w-[720px]  bg-[#1b2a38] rounded-xl p-6 md:p-8 border border-[#233648] shadow-2xl">
         <div class="flex flex-col gap-6">
           <!-- Current Activity Label -->
           <div class="flex justify-between items-end">
             <div class="space-y-1">
-              <p class="text-primary text-xs font-bold uppercase tracking-widest">Active Process</p>
               <p class="text-white text-lg font-medium">Scanning directory contents</p>
             </div>
             <div class="text-right">
-              <p class="text-[#92adc9] text-xs font-medium uppercase tracking-widest">Speed</p>
-              <p class="text-white text-base">420 files/sec</p>
+              <p class="text-[#92adc9] text-base">420 files/sec</p>
             </div>
           </div>
           <!-- Indeterminate Progress Bar -->
