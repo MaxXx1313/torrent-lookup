@@ -40,15 +40,6 @@ const optionDefinitions: OptionDefinition[] = [
         type: Boolean,
         description: 'print help',
     },
-
-    // for scanner:
-    {
-        name: 'target',
-        alias: 't',
-        type: String,
-        multiple: true,
-        description: 'scan folder(s)',
-    },
     {
         name: 'tmp',
         type: String,
@@ -56,18 +47,33 @@ const optionDefinitions: OptionDefinition[] = [
         description: 'folder to save data'
     },
 
+    // for scanner:
+    {
+        name: 'target',
+        alias: 't',
+        type: String,
+        multiple: true,
+        description: '(scan) target folder(s)',
+    },
+    {
+        name: 'fps',
+        type: Number,
+        defaultValue: 0,
+        description: '(scan) files-per-second limit'
+    },
+
     {
         name: 'client',
         alias: 'c',
         type: String,
-        description: 'client app to push torrents (operation=push)'
+        description: '(push) client app to push torrents'
     },
     {
         name: 'option',
         alias: 'o',
         type: String,
         multiple: true,
-        description: 'client app options (for ex.: "-o endpoint=localhost:8080"). Look into documentation for the client app for details '
+        description: '(push) client app options (for ex.: "-o endpoint=localhost:8080"). Look into documentation for the client app for details '
     },
 ];
 
@@ -143,7 +149,7 @@ function usage() {
     const sections: commandLineUsage.Section[] = [
         {
             header: 'Usage',
-            content: '$ tlookup {bold operation} {bold target}'
+            content: '$ tlookup [{bold options}] {bold operation} {bold target}'
         },
         {
             header: 'Description',
