@@ -15,6 +15,7 @@
       </div>
 
       <!-- Progress Bar Component -->
+      <!--
       <div
           class="bg-white dark:bg-[#1a2632] rounded-xl p-8 border border-slate-200 dark:border-[#233648] shadow-sm mb-8">
         <div class="flex flex-col gap-4">
@@ -33,7 +34,9 @@
           </div>
         </div>
       </div>
+      -->
       <!-- Live Log / Summary -->
+      <!--
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="bg-white dark:bg-[#1a2632] border border-slate-200 dark:border-[#233648] p-5 rounded-xl">
           <p class="text-slate-500 dark:text-[#92adc9] text-xs font-bold uppercase tracking-wider mb-1">Status</p>
@@ -48,11 +51,12 @@
           <p class="text-slate-900 dark:text-white text-xl font-bold">0</p>
         </div>
       </div>
+      -->
       <!-- Export Log List -->
       <div class="bg-white dark:bg-[#1a2632] border border-slate-200 dark:border-[#233648] rounded-xl overflow-hidden">
         <div
             class="px-6 py-4 border-b border-slate-200 dark:border-[#233648] flex justify-between items-center bg-slate-50 dark:bg-[#1c2a38]">
-          <h3 class="text-slate-900 dark:text-white font-bold text-sm uppercase tracking-wide">Export Activity Log</h3>
+          <h3 class="text-slate-900 dark:text-white font-bold text-sm uppercase tracking-wide">Export Log</h3>
           <span
               class="text-xs px-2 py-1 rounded bg-slate-200 dark:bg-[#233648] text-slate-600 dark:text-[#92adc9]">Live</span>
         </div>
@@ -157,7 +161,7 @@ onMounted(async () => {
       })
       .then(() => timeoutPromise(1000))
       .then(() => {
-        // exportIsActive.value = false;
+        exportIsActive.value = false;
       })
       .catch((e: any) => {
         _pushLog(e.message || e, true)
