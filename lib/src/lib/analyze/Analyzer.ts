@@ -4,8 +4,8 @@ import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
 import { promiseByLine } from '../utils/line-by-line.js';
 import { bencodeReadSync } from '../utils/bencode/bencode.js';
-import { FileMatcher } from '../utils/FileMatcher';
-import { extractBasePath } from '../utils/path-utils';
+import { FileMatcher } from '../utils/FileMatcher.js';
+import { extractBasePath } from '../utils/path-utils.js';
 
 
 /**

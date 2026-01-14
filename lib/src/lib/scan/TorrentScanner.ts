@@ -11,7 +11,7 @@ import {
 import { FileScanner } from "./FileScanner.js";
 import { Subject } from "rxjs";
 import { FileMatcher } from '../utils/FileMatcher.js';
-import { timeoutPromise } from "../utils/tools";
+import { timeoutPromise } from "../utils/tools.js";
 
 
 export interface TorrentScannerOptions {

@@ -3,9 +3,8 @@ import { Stats } from 'node:fs';
 import * as path from 'node:path';
 import { QueueWorker } from "./QueueWorker.js";
 import { matchCustom } from "../utils/myglob.js";
-import * as os from 'node:os';
 import ErrnoException = NodeJS.ErrnoException;
-import { normalizePath } from "../utils/path-utils";
+import { normalizePath } from "../utils/path-utils.js";
 
 
 /**
