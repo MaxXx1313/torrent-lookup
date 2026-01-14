@@ -40,14 +40,14 @@ export class PushManager {
     /**
      *
      */
-    constructor(options: PusherOptions) {
+    constructor(options?: PusherOptions) {
 
         this.options = {
             workdir: DEFAULT_WORKDIR_LOCATION,
             ...options,
         };
 
-        if (options.client) {
+        if (options?.client) {
             this.setClient(options.client, options.clientOptions);
         }
     }
