@@ -8,7 +8,7 @@
           <h1 class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">
             Export Settings
           </h1>
-          <p class="text-slate-500 dark:text-[#92adc9] text-base font-normal">
+          <p class="text-slate-500 dark:text-[#92adc9] text-sm font-normal">
             Select your target torrent client and configure the
             connection to begin the file association process</p>
         </div>
@@ -25,16 +25,16 @@
           <div
               class="group relative cursor-pointer flex flex-col items-center justify-center p-6 rounded-xl border-2 border-primary bg-primary/10 transition-all shadow-lg shadow-primary/5">
             <div class="size-12 mb-3 bg-slate-800 rounded-lg flex items-center justify-center overflow-hidden">
-              <img class="object-contain" alt="qBittorrent"
-                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaQCW4LDHTWI1sfAqepT9DQt1MuI4mvt-XS_mYUZWPcUslR5uo2sOt4Evkrm8TN1khlanalUSA-t63lajBze-qxtpyJaalzgNwYhzh0sHJ4WByxabHb6WCS2idv7LUPryQK-eSp46InF1-EwRIiBJEqybPmGBHiLlcDVR1Wvhnwdx6tGGRR3YH9xKxGX-QFov2IXsDaHzR5_H4cj8zJIm_VnBzchndRMyrj_hG1opZCeDJ9oPgP4u0hYBXobVL4VaKLVfDkwYn0nI"/>
+              <IconTransmission />
             </div>
-            <p class="font-bold text-sm">qBittorrent</p>
+            <p class="font-bold text-sm">Transmission</p>
 
             <div class="absolute top-2 right-2 text-primary">
               <span class="material-symbols-outlined text-lg">check_circle</span>
             </div>
           </div>
           <!-- Client Option 2 -->
+          <!--
           <div
               class="group cursor-pointer flex flex-col items-center justify-center p-6 rounded-xl border-2 border-slate-200 dark:border-[#233648] bg-white dark:bg-[#1a2632] hover:border-primary/50 transition-all">
             <div class="size-12 mb-3 bg-slate-800 rounded-lg flex items-center justify-center overflow-hidden">
@@ -43,7 +43,10 @@
             </div>
             <p class="font-bold text-sm text-slate-400">Transmission</p>
           </div>
+          -->
+
           <!-- Client Option 3 -->
+          <!--
           <div
               class="group cursor-pointer flex flex-col items-center justify-center p-6 rounded-xl border-2 border-slate-200 dark:border-[#233648] bg-white dark:bg-[#1a2632] hover:border-primary/50 transition-all">
             <div class="size-12 mb-3 bg-slate-800 rounded-lg flex items-center justify-center overflow-hidden">
@@ -52,7 +55,10 @@
             </div>
             <p class="font-bold text-sm text-slate-400">Deluge</p>
           </div>
+          -->
+
           <!-- Client Option 4 -->
+          <!--
           <div
               class="group cursor-pointer flex flex-col items-center justify-center p-6 rounded-xl border-2 border-slate-200 dark:border-[#233648] bg-white dark:bg-[#1a2632] hover:border-primary/50 transition-all">
             <div class="size-12 mb-3 bg-slate-800 rounded-lg flex items-center justify-center overflow-hidden">
@@ -60,6 +66,7 @@
             </div>
             <p class="font-bold text-sm text-slate-400">JSON Export</p>
           </div>
+          -->
         </div>
       </section>
 
@@ -199,6 +206,7 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+import IconTransmission from "@/components/icons/IconTransmission.vue";
 
 const router = useRouter();
 
