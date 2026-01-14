@@ -8,42 +8,11 @@ const {appLogic} = require("./core-lib/app");
 
 
 console.log('[Store]', app.getPath('userData'));
-// const myBridge = {
-//     /**
-//      * Send message to UI
-//      */
-//     send: (topic, message) => {
-//         console.log('[send]\t', topic, message);
-//         if (_mainWindow) {
-//             _mainWindow.webContents.send(topic, message);
-//         } else {
-//             // no active window
-//             console.debug('[send]\t(no active window)', topic, message);
-//         }
-//     },
-//     /**
-//      * Receive message from UI
-//      */
-//     on: (topic, handler) => {
-//         ipcMain.on(topic, (event, data) => {
-//             console.log('[on]\t', topic);
-//             return handler(data);
-//         });
-//     },
-//     /**
-//      * UI calls method and provide a result
-//      */
-//     handle: (topic, handler) => {
-//         ipcMain.handle(topic, (event, data) => {
-//             console.log('[handle]\t', topic);
-//             return handler(data);
-//         });
-//     },
-// };
 
-// attach scanner logic
-// const scanner = new Scanner(myBridge);
-
+const isDevMode = process.argv.includes('--dev');
+if (isDevMode) {
+    console.log('[App] Starting in develop mode');
+}
 
 /////////////////////////////
 
@@ -60,8 +29,12 @@ function createWindow() {
     });
 
     // and load the index.html of the app.
-    // mainWindow.loadFile('app/index.html');
-    mainWindow.loadURL('http://localhost:5173');
+    if (isDevMode) {
+        mainWindow.loadURL('http://localhost:5173');
+    } else {
+        mainWindow.setMenu(null);
+        mainWindow.loadFile('app/index.html');
+    }
 
     // Open the DevTools.
     // mainWindow.webContents.openDevTools();
