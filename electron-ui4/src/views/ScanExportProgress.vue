@@ -126,7 +126,7 @@
         </div>
         -->
 
-        <div class="flex flex-col sm:flex-row gap-3 w-full justify-center">
+        <div class="flex flex-col sm:flex-row gap-3 w-full justify-center" v-if="hasError">
           <!--
           <button
               class="bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-lg transition-all flex items-center justify-center gap-2">
@@ -153,6 +153,7 @@ const router = useRouter();
 
 const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
 const exportIsActive = ref<boolean>(false);
+const hasError = ref<boolean>(false);
 const logs = ref<LogData[]>([]);
 
 bindToComponent(dataService.exportLogs$).subscribe(log => {
@@ -163,6 +164,7 @@ bindToComponent(dataService.exportLogs$).subscribe(log => {
 onMounted(async () => {
 
   exportIsActive.value = true;
+  hasError.value = false;
   _pushLog('Initializing...');
   timeoutPromise(1000)
       .then(() => dataService.exportStart())
@@ -174,6 +176,7 @@ onMounted(async () => {
         exportIsActive.value = false;
       })
       .catch((e: any) => {
+        hasError.value = true;
         _pushLog(e.message || e, true)
       });
 
