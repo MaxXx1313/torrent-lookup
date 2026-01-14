@@ -25,7 +25,9 @@ export interface IElectronAPI {
     setUserMappings: MyCallable<TorrentMapping[], void>;
     getUserMappings: MyCallable<TorrentMapping[]>;
 
-    exportStart: MyCallable<TransmissionOptions, void>;
+    exportGetParameters: MyCallable<TransmissionOptions>;
+    exportSetParameters: MyCallable<TransmissionOptions, void>;
+    exportStart: MyCallable<void>;
     onExportLog: MyEvent<string>;
 }
 

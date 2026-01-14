@@ -64,6 +64,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     setUserMappings: callable('export:set-user-decision'),
     getUserMappings: callable('export:get-user-decision'),
 
+    exportGetParameters: callable('export:get-parameters'),
+    exportSetParameters: callable('export:set-parameters'),
     exportStart: callable('export:push'),
     onExportLog: event('export:log'),
 });

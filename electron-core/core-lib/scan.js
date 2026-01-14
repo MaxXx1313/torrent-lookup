@@ -9,6 +9,12 @@ export function scanLogic(ipcMain, mainWindow) {
     const info = new Info();
     const pushManager = new PushManager();
 
+    let _exportParameters = {
+        username: 'admin',
+        password: 'admin',
+        port: 9091,
+    }
+
     // load mappings
     info.getMapping().then(m => {
         _mappings = m || [];
@@ -70,19 +76,32 @@ export function scanLogic(ipcMain, mainWindow) {
         return _mappings || [];
     });
 
+
     /**
      *
      */
-    ipcMain.handle('export:push', async (event, options) => {
-        const mappingsActive = (_mappings || []).filter(m => !m.isDisabled);
-        if (!mappingsActive?.length) {
-            return Promise.reject('Nothing to push');
-        }
+    ipcMain.handle('export:get-parameters', async () => {
+        return _exportParameters;
+    });
 
+    /**
+     *
+     */
+    ipcMain.handle('export:set-parameters', async (event, options) => {
+        _exportParameters = options;
         const transmissionOptions = {
             endpoint: `http://${options.username}:${options.password}@localhost:${options.port}`,
         }
         pushManager.setClient('transmission', transmissionOptions);
+    });
+    /**
+     *
+     */
+    ipcMain.handle('export:push', async () => {
+        const mappingsActive = (_mappings || []).filter(m => !m.isDisabled);
+        if (!mappingsActive?.length) {
+            return Promise.reject('Nothing to push');
+        }
         await pushManager.pushCustomMatch(mappingsActive);
     });
 

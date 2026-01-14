@@ -1,5 +1,5 @@
 import { Observable, shareReplay } from 'rxjs';
-import type { AppConfiguration, TorrentMapping, TorrentScannerStats } from "@/data/types.ts";
+import type { AppConfiguration, TorrentMapping, TorrentScannerStats, TransmissionOptions } from "@/data/types.ts";
 
 
 export interface ScanOptions {
@@ -16,8 +16,7 @@ export class DataService {
 
     readonly scanEntry$ = _observableFromElectron<string>(window.electronAPI.onScanEntry);
     readonly scanStats$ = _observableFromElectron<TorrentScannerStats>(window.electronAPI.onScanStats);
-
-    private _mappingsSelected: TorrentMapping[] = [];
+    readonly exportLogs$ = _observableFromElectron<string>(window.electronAPI.onExportLog);
 
     constructor() {
 
@@ -59,6 +58,17 @@ export class DataService {
 
     getUserMappings(): Promise<TorrentMapping[]> {
         return window.electronAPI.getUserMappings();
+    }
+
+    exportGetParameters(): Promise<TransmissionOptions> {
+        return window.electronAPI.exportGetParameters();
+    }
+    exportSetParameters(options: TransmissionOptions): Promise<void> {
+        return window.electronAPI.exportSetParameters(options);
+    }
+
+    exportStart(): Promise<void> {
+        return window.electronAPI.exportStart();
     }
 
 }
