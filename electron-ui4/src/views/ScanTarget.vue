@@ -190,7 +190,7 @@
           </button>
 
           <button
-              class="px-8 py-3 bg-primary hover:bg-primary/90 disabled:bg-zinc-800 text-white rounded-lg text-sm font-bold enabled:shadow-lg enabled:shadow-primary/20 flex items-center gap-2 transition-transform active:enabled:scale-[0.98]"
+              class="px-8 py-3 bg-primary hover:bg-primary/90 disabled:bg-zinc-800 text-white disabled:text-white/60 rounded-lg text-sm font-bold enabled:shadow-lg enabled:shadow-primary/20 flex items-center gap-2 transition-transform active:enabled:scale-[0.98]"
               @click="startScanning"
               :disabled="!targets?.length">
             <span class="material-symbols-outlined">play_arrow</span>

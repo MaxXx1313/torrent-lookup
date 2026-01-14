@@ -72,8 +72,8 @@
         class="bg-white dark:bg-background-dark rounded-xl border border-slate-200 dark:border-[#324d67] shadow-sm">
       <table class="w-full text-left border-collapse">
         <thead>
-        <tr class="bg-slate-50 dark:bg-[#192633] border-b border-slate-200 dark:border-[#324d67]">
-          <th class="px-6 py-4 text-slate-500 dark:text-white text-xs font-bold uppercase tracking-wider">
+        <tr class="border-b border-slate-200 dark:border-[#324d67] bg-slate-50 dark:bg-[#192633] ">
+          <th class="px-6 py-4 text-slate-500 dark:text-white text-xs font-bold uppercase tracking-wider rounded-tl-xl">
             Mapping
           </th>
           <!--
@@ -87,17 +87,27 @@
             Selection
           </th>
           -->
-          <th class="px-6 py-4 text-slate-500 dark:text-white text-xs font-bold uppercase tracking-wider w-48">
+          <th class="px-6 py-4 text-slate-500 dark:text-white text-xs font-bold uppercase tracking-wider w-48 rounded-tr-xl">
             Export
           </th>
         </tr>
         </thead>
         <tbody class="divide-y divide-slate-200 dark:divide-[#324d67]">
 
+        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors group"
+            v-if="mappings.length === 0">
+          <td class="px-6 py-5 text-center" colspan="2">
+            <p class="text-slate-500 dark:text-[#92adc9] text-sm font-normal italic">
+              Nothing found
+            </p>
+          </td>
+        </tr>
+
         <!-- Row 1: Confirmed -->
         <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors group"
             v-for="r of mappings">
-          <td class="px-6 py-5">
+          <td class="px-6 py-5"
+              :class="[r.isDisabled ? 'opacity-30' : '']">
             <div class="flex flex-col">
               <span
                   class="text-slate-900 dark:text-white text-base font-semibold group-hover:text-primary transition-colors">
@@ -133,10 +143,11 @@
                       class="absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-gray-800 outline-1 -outline-offset-1 outline-white/10">
                     <div class="py-1">
                       <MenuItem v-for="opt of r.saveToOptions" v-slot="{ active }">
-                        <a href="#"
-                           :class="[active ? 'bg-white/5 text-white outline-hidden' : 'text-gray-300', 'block px-4 py-2 text-sm']">
-                        {{ opt}}
-                        </a>
+                        <button class="text-left w-full block px-4 py-2 text-sm"
+                                @click="selectOption(r, opt)"
+                                :class="[active ? 'bg-white/5 text-white outline-hidden' : 'text-gray-300']">
+                          {{ opt }}
+                        </button>
                       </MenuItem>
                     </div>
                   </MenuItems>
@@ -163,10 +174,13 @@
 
           <td class="px-6 py-5">
             <label class="relative inline-flex items-center cursor-pointer">
-              <input checked="" class="sr-only peer" type="checkbox"/>
+              <input checked="" class="sr-only peer" type="checkbox" :checked="!r.isDisabled"
+                     @change="toggleEnabled(r, $event)"/>
               <div
                   class="w-11 h-6 bg-slate-300 border border-[#324d67] dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary peer-checked:dark:bg-primary/60"></div>
-              <span class="select-none ml-3 text-sm font-medium text-heading">Export / Skip</span>
+              <span class="select-none ml-3 text-sm font-medium text-heading">
+                {{ r.isDisabled ? 'Skip' : 'Export' }}
+              </span>
             </label>
           </td>
         </tr>
@@ -307,7 +321,8 @@
         </button>
 
         <button
-            class="flex-1 md:flex-none h-12 px-10 bg-primary text-white rounded-lg font-bold text-base shadow-lg shadow-primary/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+            class="flex-1 md:flex-none h-12 px-10 bg-primary text-white disabled:text-white/60 disabled rounded-lg font-bold text-base enabled:shadow-lg enabled:shadow-primary/30 active:enabled:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:bg-zinc-800"
+            :disabled="mappings.length===0"
             @click="goToExportPage">
           Continue to Export
           <span class="material-symbols-outlined">chevron_right</span>
@@ -335,8 +350,16 @@ onMounted(async () => {
   mappings.value = await dataService.scanGetResults();
 });
 
+function selectOption(map: TorrentMapping, option: string) {
+  map.saveTo = option;
+}
 
-const goToExportPage = () => {
+function toggleEnabled(map: TorrentMapping, event: any) {
+  map.isDisabled = !event.target.checked;
+}
+
+
+function goToExportPage() {
   // You can use a string path or a named route object
   router.push('/export');
 };
