@@ -12,6 +12,7 @@
       </div>
     </div>
     <!-- Stats Overview -->
+    <!--
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
       <div
           class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-background-dark border border-slate-200 dark:border-[#324d67] shadow-sm">
@@ -47,6 +48,7 @@
         </div>
       </div>
     </div>
+    -->
 
     <!-- Filter Tabs -->
     <!--
@@ -103,9 +105,43 @@
           </td>
           <td class="px-6 py-5">
             <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-slate-400 text-sm">folder</span>
-              <span class="text-slate-500 dark:text-[#92adc9] text-sm font-medium italic">/downloads/isos/linux/ubuntu-22.04.iso</span>
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-slate-400 text-sm">folder</span>
+                <span class="text-slate-500 dark:text-[#92adc9] text-sm font-medium italic">
+                  /downloads/isos/linux/ubuntu-22.04.iso/downloads/isos/linux/ubuntu-22.04.iso
+                </span>
+              </div>
+
+
+              <Menu as="div" class="relative inline-block">
+                <MenuButton class="inline-flex w-full justify-center rounded-md bg-background/10 dark:bg-[#233648] px-2 py-1 text-sm text-white inset-ring-1 inset-ring-white/5 hover:bg-white/20">
+                  <span class="material-symbols-outlined">expand_more</span>
+                </MenuButton>
+
+                <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform scale-100" leave-to-class="transform opacity-0 scale-95">
+                  <MenuItems class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-gray-800 outline-1 -outline-offset-1 outline-white/10">
+                    <div class="py-1">
+                      <MenuItem v-slot="{ active }">
+                        <a href="#" :class="[active ? 'bg-white/5 text-white outline-hidden' : 'text-gray-300', 'block px-4 py-2 text-sm']">Account settings</a>
+                      </MenuItem>
+                      <MenuItem v-slot="{ active }">
+                        <a href="#" :class="[active ? 'bg-white/5 text-white outline-hidden' : 'text-gray-300', 'block px-4 py-2 text-sm']">Support</a>
+                      </MenuItem>
+                      <MenuItem v-slot="{ active }">
+                        <a href="#" :class="[active ? 'bg-white/5 text-white outline-hidden' : 'text-gray-300', 'block px-4 py-2 text-sm']">License</a>
+                      </MenuItem>
+                      <form method="POST" action="#">
+                        <MenuItem v-slot="{ active }">
+                          <button type="submit" :class="[active ? 'bg-white/5 text-white outline-hidden' : 'text-gray-300', 'block w-full px-4 py-2 text-left text-sm']">Sign out</button>
+                        </MenuItem>
+                      </form>
+                    </div>
+                  </MenuItems>
+                </transition>
+              </Menu>
+
             </div>
+
           </td>
           <!--
           <td class="px-6 py-5 text-center">
@@ -126,8 +162,9 @@
 
           <td class="px-6 py-5">
             <label class="inline-flex items-center cursor-pointer">
-              <input type="checkbox" value="" class="sr-only peer" />
-              <div class="relative w-9 h-5 border border-[#324d67] peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-[#324d67] dark:peer-focus:ring-[#324d67] rounded-full peer peer-checked:after:translate-x-full  after:content-[''] after:absolute after:top-[0px] after:left-[0px] after:bottom-[0px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+              <input type="checkbox" value="" class="sr-only peer"/>
+              <div
+                  class="relative w-9 h-5 border border-[#324d67] peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-[#324d67] dark:peer-focus:ring-[#324d67] rounded-full peer peer-checked:after:translate-x-full  after:content-[''] after:absolute after:top-[0px] after:left-[0px] after:bottom-[0px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
               <span class="select-none ml-3 text-sm font-medium text-heading">Export / Skip</span>
             </label>
           </td>
@@ -279,9 +316,13 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useRouter } from 'vue-router';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
 
 const router = useRouter();
+
+
 
 const goToExportPage = () => {
   // You can use a string path or a named route object
