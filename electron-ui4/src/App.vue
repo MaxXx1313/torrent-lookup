@@ -3,7 +3,7 @@
   <header
       class="text-2xl h-12 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 backdrop-blur-md sticky top-0 z-10">
     <div class="flex items-center gap-2">
-      <TorrentIcon/>
+      <IconTorrent/>
       <h2 class="font-semibold text-slate-700 dark:text-slate-300">Torrent lookup</h2>
     </div>
     <!--
@@ -63,7 +63,7 @@ RouterView {
 <script setup lang="ts">
 import { provide } from 'vue';
 import { RouterView } from 'vue-router'
-import TorrentIcon from "@/components/icons/TorrentIcon.vue";
+import IconTorrent from "@/components/icons/IconTorrent.vue";
 
 import { DATA_SERVICE_KEY, DataService } from "@/data/data.service.ts";
 

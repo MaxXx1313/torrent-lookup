@@ -117,7 +117,7 @@
             </div>
 
             <div class="flex items-center gap-2">
-              <TorrentIcon class="text-sm text-[18px] basis-[24px] flex-0 shrink-0"/>
+              <IconTorrent class="text-sm text-[18px] basis-[24px] flex-0 shrink-0"/>
               <div class="text-slate-500 dark:text-[#92adc9] text-sm font-medium italic break-all">
                 {{ r.torrent }}
               </div>
@@ -340,7 +340,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
 import { DATA_SERVICE_KEY, DataService } from "@/data/data.service.ts";
 import { getBaseName } from "../../tools/path-util.ts";
 import type { TorrentMapping } from "@/data/types.ts";
-import TorrentIcon from "@/components/icons/TorrentIcon.vue";
+import IconTorrent from "@/components/icons/IconTorrent.vue";
 
 const router = useRouter();
 
