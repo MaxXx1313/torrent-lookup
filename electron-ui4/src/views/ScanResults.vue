@@ -306,6 +306,7 @@
       </table>
 
     </div>
+
     <!-- Bottom Action Bar (Fixed/Sticky behavior simulated with margin) -->
     <div
         class="mt-10 p-6 rounded-xl bg-primary/5 border border-primary/20 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl shadow-primary/5">
