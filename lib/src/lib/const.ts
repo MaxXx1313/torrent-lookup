@@ -3,7 +3,7 @@ import * as os from 'node:os';
 
 export const FILE_DATA = 'files.txt';
 export const FILE_TORRENTS = 'torrents.txt';
-export const FILEN_MAPS = 'maps.json';
+export const FILES_MAPS = 'maps.json';
 
 export const DEFAULT_WORKDIR_LOCATION = path.join(os.tmpdir(), 'tlookup'); // '~/tmp'
 export const TORRENT_EXTENSION = '.torrent';

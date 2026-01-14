@@ -1,4 +1,4 @@
-import { DEFAULT_WORKDIR_LOCATION, FILE_DATA, FILE_TORRENTS, FILEN_MAPS } from "../const.js";
+import { DEFAULT_WORKDIR_LOCATION, FILE_DATA, FILE_TORRENTS, FILES_MAPS } from "../const.js";
 
 import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
@@ -123,7 +123,7 @@ export class Analyzer {
         console.log('[Analyzer] use workdir:', this.options.workdir);
         const torrentsFileName = path.join(this.options.workdir, FILE_TORRENTS);
         const dataFileName = path.join(this.options.workdir, FILE_DATA);
-        const mapsFileName = path.join(this.options.workdir, FILEN_MAPS);
+        const mapsFileName = path.join(this.options.workdir, FILES_MAPS);
 
         await this._loadTorrentFilesFromFile(torrentsFileName);
         await this._matchFilesFromFile(dataFileName);

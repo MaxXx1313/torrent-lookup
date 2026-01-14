@@ -1,12 +1,19 @@
-import { DEFAULT_WORKDIR_LOCATION, FILEN_MAPS } from "../const.js";
+import { DEFAULT_WORKDIR_LOCATION, FILES_MAPS } from "../const.js";
 import { Subject } from "rxjs";
-import { TorrentMapping } from "../analyze/Analyzer.js";
 
 import * as fs from 'node:fs';
-import * as  path from 'node:path';
+import * as path from 'node:path';
 import { ITorrentClient } from "./ITorrentClient.js";
 import { TlookupTransmission } from "../../plugins/tlookup-transmission.js";
 
+
+/**
+ *
+ */
+export interface TorrentMap {
+    torrent: string; // torrent location
+    saveTo: string; // absolute file location
+}
 
 /**
  *
@@ -78,7 +85,7 @@ export class PushManager {
     /**
      * @private
      */
-    public async _pushAll(matchArr: TorrentMapping[]): Promise<any> {
+    public async _pushAll(matchArr: TorrentMap[]): Promise<any> {
         for (const torrentMapping of matchArr) {
             await this.push(torrentMapping.torrent, torrentMapping.saveTo);
         }
@@ -87,9 +94,9 @@ export class PushManager {
     /**
      * @private
      */
-    protected loadMapping(): TorrentMapping[] {
+    protected loadMapping(): TorrentMap[] {
         console.log('[Push] use workdir:', this.options.workdir);
-        const mapsFileName = path.join(this.options.workdir, FILEN_MAPS);
+        const mapsFileName = path.join(this.options.workdir, FILES_MAPS);
         return JSON.parse(fs.readFileSync(mapsFileName, {encoding: 'utf-8'}).toString());
     }
 
