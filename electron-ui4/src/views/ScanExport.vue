@@ -6,7 +6,7 @@
       <div class="flex flex-wrap justify-between items-end gap-4 mb-8">
         <div class="flex flex-col gap-2">
           <h1 class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">
-            Export {{mappings.length}}
+            Export
           </h1>
           <p class="text-slate-500 dark:text-[#92adc9] text-sm font-normal">
             Select your target torrent client and configure the
@@ -75,7 +75,7 @@
           class="flex flex-col gap-6 p-6 rounded-xl border border-slate-200 dark:border-[#233648] bg-white dark:bg-[#16222c]">
         <h3 class="text-xl font-bold flex items-center gap-2">
           <span class="flex items-center justify-center bg-primary text-white size-6 rounded-full text-xs">2</span>
-          qBittorrent Configuration
+          Transmission Configuration
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="flex flex-col gap-2 col-span-2">
@@ -139,7 +139,6 @@
       </section>
     </div>
 
-
     <!-- Right Side Panel (Help & Guides) -->
     <aside class="w-full lg:w-80 flex flex-col gap-4">
       <div
@@ -149,51 +148,7 @@
           <p class="text-sm text-slate-500 dark:text-[#92adc9]">Setting up API access for your client</p>
         </div>
         <div class="flex-1 overflow-y-auto p-5 custom-scrollbar space-y-6">
-          <div class="space-y-3">
-            <div class="flex items-center gap-3 text-primary">
-              <span class="material-symbols-outlined text-lg">settings_suggest</span>
-              <h4 class="font-bold text-sm uppercase tracking-wider">qBittorrent Setup</h4>
-            </div>
-            <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-              1. Open qBittorrent and go to <b>Tools &gt; Options</b>.<br/><br/>
-              2. Select the <b>Web UI</b> tab on the left sidebar.<br/><br/>
-              3. Check <b>"Web User Interface (Remote control)"</b>.<br/><br/>
-              4. Note the port (default is 8080) and set a secure username and password.
-            </p>
-          </div>
-          <div class="rounded-lg overflow-hidden border border-slate-200 dark:border-[#233648]">
-            <div class="aspect-video relative">
-              <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3">
-                <span class="text-xs text-white font-medium">Web UI Settings Dialog</span>
-              </div>
-              <img class="w-full h-full object-cover" data-alt="Screenshot of qBittorrent web ui settings panel"
-                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmOV3iitdBFhEr5A16dGP2lKC-Pl9NWOCMAm1gmJbs2PmDwzdQlXpfXRNVuzKuth8xwRi8jPdqQu6qhVjyNSFR8aVgkEcrYnEWcWrvB-mWRAW6Oc45uQHlHVutn0heHXb564l5xwnDDIVrw68RVE37Edn7VaXz6WpqH8_jFQ_a8q1OIhLx6lr5C-4_d7du5kgb8M0NUWdwWaS-1ef9emuv8NBcT2O2C9AibfrE3HKv6aLDPA-XFumKyROwlLu-ZubqOmbJ_G9Bj5o"/>
-            </div>
-          </div>
-          <hr class="border-slate-200 dark:border-[#233648]"/>
-          <nav class="space-y-1">
-            <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-[#233648] transition-colors group"
-               href="#">
-              <span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">description</span>
-              <span class="text-sm font-medium">Full Documentation</span>
-            </a>
-            <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-[#233648] transition-colors group"
-               href="#">
-              <span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">troubleshoot</span>
-              <span class="text-sm font-medium">API Troubleshooting</span>
-            </a>
-            <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-[#233648] transition-colors group"
-               href="#">
-              <span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">live_help</span>
-              <span class="text-sm font-medium">Common Issues</span>
-            </a>
-          </nav>
-          <div class="p-4 rounded-lg bg-primary/10 border border-primary/20">
-            <p class="text-xs text-primary leading-tight">
-              <b>Pro Tip:</b> Use "localhost" if the client is on this machine, otherwise use the static IP address of
-              your server.
-            </p>
-          </div>
+          <ExportHelp />
         </div>
       </div>
     </aside>
@@ -210,6 +165,7 @@ import IconTransmission from "@/components/icons/IconTransmission.vue";
 import { inject, onMounted, ref } from "vue";
 import type { TorrentMapping } from "@/data/types.ts";
 import { DATA_SERVICE_KEY, DataService } from "@/data/data.service.ts";
+import ExportHelp from "@/views/ExportHelp.vue";
 
 const router = useRouter();
 
