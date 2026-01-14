@@ -79,24 +79,27 @@
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="flex flex-col gap-2 col-span-2">
-            <label class="text-sm font-semibold text-slate-500">API Host URL</label>
+            <label class="text-sm font-semibold text-slate-500">API Port</label>
             <input
                 class="bg-background-light dark:bg-[#101922] border-slate-300 dark:border-[#233648] rounded-lg px-4 py-2 focus:ring-primary focus:border-primary"
-                type="text" value="http://localhost:8080"/>
+                type="number" min="0"
+                v-model="port"/>
           </div>
           <div class="flex flex-col gap-2">
             <label class="text-sm font-semibold text-slate-500">Username</label>
             <input
                 class="bg-background-light dark:bg-[#101922] border-slate-300 dark:border-[#233648] rounded-lg px-4 py-2 focus:ring-primary focus:border-primary"
-                type="text" value="admin"/>
+                type="text" v-model="username"/>
           </div>
           <div class="flex flex-col gap-2">
             <label class="text-sm font-semibold text-slate-500">Password</label>
             <input
                 class="bg-background-light dark:bg-[#101922] border-slate-300 dark:border-[#233648] rounded-lg px-4 py-2 focus:ring-primary focus:border-primary"
-                type="password" value="••••••••"/>
+                type="text" v-model="password"/>
           </div>
         </div>
+
+        <!--
         <hr class="border-slate-200 dark:border-[#233648] my-2"/>
         <div class="space-y-4">
           <div class="flex items-center justify-between p-3 rounded-lg bg-background-light dark:bg-[#101922]/50">
@@ -122,6 +125,7 @@
             </label>
           </div>
         </div>
+        -->
 
       </section>
 
@@ -175,27 +179,40 @@
 import { useRouter } from 'vue-router';
 import IconTransmission from "@/components/icons/IconTransmission.vue";
 import { inject, onMounted, ref } from "vue";
-import type { TorrentMapping } from "@/data/types.ts";
 import { DATA_SERVICE_KEY, DataService } from "@/data/data.service.ts";
 import ExportHelp from "@/views/ExportHelp.vue";
 
 const router = useRouter();
 
-const mappings = ref<TorrentMapping[]>([]);
+const port = ref<number>(0);
+const username = ref<string>('');
+const password = ref<string>('');
 const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
 
 
 onMounted(async () => {
-
+  const params = await dataService.exportGetParameters();
+  port.value = params.port;
+  username.value = params.username;
+  password.value = params.password;
 });
 
-function backToResults() {
-  // You can use a string path or a named route object
+async function backToResults() {
+  await _saveParameters();
   router.push('/results');
 }
 
-function runExport() {
+async function runExport() {
   // You can use a string path or a named route object
+  await _saveParameters();
   router.push('/exportprogress');
+}
+
+function _saveParameters() {
+  return dataService.exportSetParameters({
+    port: port.value * 1,
+    username: username.value,
+    password: password.value,
+  });
 }
 </script>
