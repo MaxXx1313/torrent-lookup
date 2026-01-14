@@ -161,10 +161,9 @@
           -->
 
           <td class="px-6 py-5">
-            <label class="inline-flex items-center cursor-pointer">
-              <input type="checkbox" value="" class="sr-only peer"/>
-              <div
-                  class="relative w-9 h-5 border border-[#324d67] peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-[#324d67] dark:peer-focus:ring-[#324d67] rounded-full peer peer-checked:after:translate-x-full  after:content-[''] after:absolute after:top-[0px] after:left-[0px] after:bottom-[0px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input checked="" class="sr-only peer" type="checkbox"/>
+              <div class="w-11 h-6 bg-slate-300 border border-[#324d67] dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary peer-checked:dark:bg-primary/60"></div>
               <span class="select-none ml-3 text-sm font-medium text-heading">Export / Skip</span>
             </label>
           </td>
