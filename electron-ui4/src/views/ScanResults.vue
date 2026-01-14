@@ -69,17 +69,17 @@
 
     <!-- Results Table -->
     <div
-        class="bg-white dark:bg-background-dark rounded-xl border border-slate-200 dark:border-[#324d67] overflow-hidden shadow-sm">
+        class="bg-white dark:bg-background-dark rounded-xl border border-slate-200 dark:border-[#324d67] shadow-sm">
       <table class="w-full text-left border-collapse">
         <thead>
         <tr class="bg-slate-50 dark:bg-[#192633] border-b border-slate-200 dark:border-[#324d67]">
-          <th class="px-6 py-4 text-slate-500 dark:text-white text-xs font-bold uppercase tracking-wider w-[350px]">
-            Torrent File
+          <th class="px-6 py-4 text-slate-500 dark:text-white text-xs font-bold uppercase tracking-wider">
+            Mapping
           </th>
+          <!--
           <th class="px-6 py-4 text-slate-500 dark:text-white text-xs font-bold uppercase tracking-wider">Matched Local
             Path
           </th>
-          <!--
           <th class="px-6 py-4 text-slate-500 dark:text-white text-xs font-bold uppercase tracking-wider w-40 text-center">
             Status
           </th>
@@ -100,21 +100,26 @@
           <td class="px-6 py-5">
             <div class="flex flex-col">
               <span
-                  class="text-slate-900 dark:text-white text-sm font-semibold group-hover:text-primary transition-colors">ubuntu-22.04-desktop-amd64.iso.torrent</span>
-              <span class="text-slate-400 text-xs mt-1">3.4 GB • Added 2h ago</span>
+                  class="text-slate-900 dark:text-white text-base font-semibold group-hover:text-primary transition-colors">
+                {{ getBaseName(r.torrent) }}
+              </span>
+              <!--              <span class="text-slate-400 text-xs mt-1">3.4 GB • Added 2h ago</span>-->
             </div>
-          </td>
-          <td class="px-6 py-5">
+
             <div class="flex items-center gap-2">
-              <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-slate-400 text-sm">folder</span>
-                <span class="text-slate-500 dark:text-[#92adc9] text-sm font-medium italic">
-                  /downloads/isos/linux/ubuntu-22.04.iso/downloads/isos/linux/ubuntu-22.04.iso
-                </span>
+              <TorrentIcon class="text-sm text-[18px] basis-[24px] flex-0 shrink-0"/>
+              <div class="text-slate-500 dark:text-[#92adc9] text-sm font-medium italic break-all">
+                {{ r.torrent }}
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-slate-400 text-sm">folder</span>
+              <div class="text-slate-500 dark:text-[#92adc9] text-sm font-medium italic break-all">
+                {{ r.saveTo }}
               </div>
 
-
-              <Menu as="div" class="relative inline-block">
+              <Menu as="div" class="relative inline-block" v-if="r.saveToOptions?.length > 1">
                 <MenuButton
                     class="inline-flex w-full justify-center rounded-md bg-background/10 dark:bg-[#233648] px-2 py-1 text-sm text-white inset-ring-1 inset-ring-white/5 hover:bg-white/20">
                   <span class="material-symbols-outlined">expand_more</span>
@@ -125,36 +130,19 @@
                             leave-active-class="transition ease-in duration-75" leave-from-class="transform scale-100"
                             leave-to-class="transform opacity-0 scale-95">
                   <MenuItems
-                      class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-gray-800 outline-1 -outline-offset-1 outline-white/10">
+                      class="absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-gray-800 outline-1 -outline-offset-1 outline-white/10">
                     <div class="py-1">
-                      <MenuItem v-slot="{ active }">
+                      <MenuItem v-for="opt of r.saveToOptions" v-slot="{ active }">
                         <a href="#"
-                           :class="[active ? 'bg-white/5 text-white outline-hidden' : 'text-gray-300', 'block px-4 py-2 text-sm']">Account
-                          settings</a>
+                           :class="[active ? 'bg-white/5 text-white outline-hidden' : 'text-gray-300', 'block px-4 py-2 text-sm']">
+                        {{ opt}}
+                        </a>
                       </MenuItem>
-                      <MenuItem v-slot="{ active }">
-                        <a href="#"
-                           :class="[active ? 'bg-white/5 text-white outline-hidden' : 'text-gray-300', 'block px-4 py-2 text-sm']">Support</a>
-                      </MenuItem>
-                      <MenuItem v-slot="{ active }">
-                        <a href="#"
-                           :class="[active ? 'bg-white/5 text-white outline-hidden' : 'text-gray-300', 'block px-4 py-2 text-sm']">License</a>
-                      </MenuItem>
-                      <form method="POST" action="#">
-                        <MenuItem v-slot="{ active }">
-                          <button type="submit"
-                                  :class="[active ? 'bg-white/5 text-white outline-hidden' : 'text-gray-300', 'block w-full px-4 py-2 text-left text-sm']">
-                            Sign out
-                          </button>
-                        </MenuItem>
-                      </form>
                     </div>
                   </MenuItems>
                 </transition>
               </Menu>
-
             </div>
-
           </td>
           <!--
           <td class="px-6 py-5 text-center">
@@ -184,6 +172,7 @@
         </tr>
 
         <!-- Row 2: Conflict/Action Needed -->
+        <!--
         <tr class="bg-orange-50/20 dark:bg-orange-950/5 hover:bg-orange-50/30 dark:hover:bg-orange-950/10 transition-colors group border-l-4 border-l-orange-500">
           <td class="px-6 py-5">
             <div class="flex flex-col">
@@ -199,7 +188,6 @@
                   class="text-orange-600 dark:text-orange-400 text-sm font-bold">Conflict: Multiple paths detected</span>
             </div>
           </td>
-          <!--
           <td class="px-6 py-5 text-center">
             <div
                 class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-100 dark:bg-orange-500/10 text-orange-700 dark:text-orange-400 text-xs font-bold">
@@ -216,7 +204,6 @@
               </button>
             </div>
           </td>
-          -->
 
           <td class="px-6 py-5">
             <div class="relative">
@@ -228,8 +215,10 @@
             </div>
           </td>
         </tr>
+        -->
 
         <!-- Row 3: Confirmed -->
+        <!--
         <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors group">
           <td class="px-6 py-5">
             <div class="flex flex-col">
@@ -244,7 +233,6 @@
               <span class="text-slate-500 dark:text-[#92adc9] text-sm font-medium italic">/media/storage/temp/debian-11.iso</span>
             </div>
           </td>
-          <!--
           <td class="px-6 py-5 text-center">
             <div
                 class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold">
@@ -259,7 +247,6 @@
               <span class="material-symbols-outlined text-[16px]">expand_more</span>
             </button>
           </td>
-          -->
 
           <td class="px-6 py-5">
             <button
@@ -269,6 +256,7 @@
             </button>
           </td>
         </tr>
+        -->
 
         <!-- Row 4: Missing -->
         <!--
@@ -334,6 +322,9 @@ import { inject, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
 import { DATA_SERVICE_KEY, DataService } from "@/data/data.service.ts";
+import { getBaseName } from "../../tools/path-util.ts";
+import type { TorrentMapping } from "@/data/types.ts";
+import TorrentIcon from "@/components/icons/TorrentIcon.vue";
 
 const router = useRouter();
 
