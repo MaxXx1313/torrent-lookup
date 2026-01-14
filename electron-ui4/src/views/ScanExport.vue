@@ -1,9 +1,9 @@
 <template>
   <main class="flex-1 flex flex-col lg:flex-row mx-auto w-full px-8 py-4 gap-8">
     <!-- Left Content Area -->
-    <div class="flex-1 flex flex-col gap-8">
+    <div class="flex-1 flex flex-col gap-4">
       <!-- Page Heading -->
-      <div class="flex flex-wrap justify-between items-end gap-4 mb-8">
+      <div class="flex flex-wrap justify-between items-end gap-4 mb-1">
         <div class="flex flex-col gap-2">
           <h1 class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">
             Export
@@ -127,8 +127,8 @@
 
 
       <!-- Bottom Action Bar (Fixed/Sticky behavior simulated with margin) -->
-      <footer
-          class="mt-10 p-6 rounded-xl bg-primary/5 border border-primary/20 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl shadow-primary/5">
+      <section
+          class="mt-1 p-6 rounded-xl bg-primary/5 border border-primary/20 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl shadow-primary/5">
         <div class="flex flex-col"></div>
         <div class="flex items-center gap-4 w-full md:w-auto">
           <button
@@ -152,7 +152,7 @@
             Run Export
           </button>
         </div>
-      </footer>
+      </section>
     </div>
 
     <!-- Right Side Panel (Help & Guides) -->
