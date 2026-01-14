@@ -123,20 +123,36 @@
           </div>
         </div>
 
-        <div class="flex items-center gap-3 mt-4">
+      </section>
+
+
+      <!-- Bottom Action Bar (Fixed/Sticky behavior simulated with margin) -->
+      <footer
+          class="mt-10 p-6 rounded-xl bg-primary/5 border border-primary/20 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl shadow-primary/5">
+        <div class="flex flex-col"></div>
+        <div class="flex items-center gap-4 w-full md:w-auto">
           <button
-              class="flex-1 bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
-              @click="goToExportProgressPage">
-            <span class="material-symbols-outlined">publish</span>
-            Run Export
+              class="flex-1 md:flex-none h-12 px-8 bg-white dark:bg-[#233648] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+              @click="backToResults">
+            Back to Results
           </button>
+
+          <!--
           <button
               class="px-6 py-3 border border-slate-300 dark:border-[#233648] font-bold rounded-lg hover:bg-slate-100 dark:hover:bg-[#233648] transition-colors flex items-center gap-2">
             <span class="material-symbols-outlined">network_check</span>
             Test
           </button>
+          -->
+
+          <button
+              class="flex-1 md:flex-none h-12 px-10 bg-primary text-white disabled:text-white/60 disabled rounded-lg font-bold text-base enabled:shadow-lg enabled:shadow-primary/30 active:enabled:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:bg-zinc-800"
+              @click="runExport">
+            <span class="material-symbols-outlined">publish</span>
+            Run Export
+          </button>
         </div>
-      </section>
+      </footer>
     </div>
 
     <!-- Right Side Panel (Help & Guides) -->
@@ -148,16 +164,12 @@
           <p class="text-sm text-slate-500 dark:text-[#92adc9]">Setting up API access for your client</p>
         </div>
         <div class="flex-1 overflow-y-auto p-5 custom-scrollbar space-y-6">
-          <ExportHelp />
+          <ExportHelp/>
         </div>
       </div>
     </aside>
   </main>
 </template>
-
-<style scoped>
-</style>
-
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
@@ -174,11 +186,16 @@ const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
 
 
 onMounted(async () => {
-  mappings.value = await dataService.getUserMappings();
+
 });
 
-const goToExportProgressPage = () => {
+function backToResults() {
+  // You can use a string path or a named route object
+  router.push('/results');
+}
+
+function runExport() {
   // You can use a string path or a named route object
   router.push('/exportprogress');
-};
+}
 </script>
