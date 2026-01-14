@@ -52,17 +52,19 @@ export class DataService {
         return window.electronAPI.onScanFinished(cb);
     }
 
-    saveUserMappings(m: TorrentMapping[]) {
-        return window.electronAPI.setUserMappings(m);
-    }
-
     getUserMappings(): Promise<TorrentMapping[]> {
         return window.electronAPI.getUserMappings();
     }
 
+    saveUserMappings(m: TorrentMapping[]) {
+        return window.electronAPI.setUserMappings(m);
+    }
+
+
     exportGetParameters(): Promise<TransmissionOptions> {
         return window.electronAPI.exportGetParameters();
     }
+
     exportSetParameters(options: TransmissionOptions): Promise<void> {
         return window.electronAPI.exportSetParameters(options);
     }

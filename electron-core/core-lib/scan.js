@@ -62,18 +62,18 @@ export function scanLogic(ipcMain, mainWindow) {
         await scanner.terminate();
     });
 
+    /**
+     *
+     */
+    ipcMain.handle('export:get-user-decision', async () => {
+        return _mappings || [];
+    });
 
     /**
      *
      */
     ipcMain.handle('export:set-user-decision', async (event, mappings) => {
         _mappings = mappings || [];
-    });
-    /**
-     *
-     */
-    ipcMain.handle('export:get-user-decision', async () => {
-        return _mappings || [];
     });
 
 
