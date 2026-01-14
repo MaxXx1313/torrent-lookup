@@ -21,15 +21,18 @@ export interface TorrentMap {
 export interface PusherOptions {
     client: string;
     workdir?: string;
-    option?: object;
+    clientOptions?: ClientOptions;
 }
+
+// TODO: not finished yet
+export type ClientOptions = { [key: string]: string | number | boolean }
 
 /**
  *
  */
 export class PushManager {
 
-    public readonly opStatus: Subject<string> = new Subject();
+    public readonly opStatus$: Subject<string> = new Subject();
 
     public options: PusherOptions;
     public client: ITorrentClient;
@@ -44,25 +47,31 @@ export class PushManager {
             ...options,
         };
 
-        this.client = PushManager.getClient(options);
+        if (options.client) {
+            this.setClient(options.client, options.clientOptions);
+        }
     }
 
     /**
      * Client must implement IPushProvider
      */
-    static getClient(options: PusherOptions): ITorrentClient {
+    static getClient(clientAlias: string, clientOptions?: ClientOptions): ITorrentClient {
         // TODO: autodetect client
-        if (!options.client) {
+        if (!clientAlias) {
             throw new Error('Client not set');
         }
-        switch (options.client) {
+        switch (clientAlias) {
             case 't':
             case 'transmission':
-                return new TlookupTransmission(options.option);
+                return new TlookupTransmission(clientOptions);
 
             default:
-                throw new Error('Unknown client: ' + options.client);
+                throw new Error('Unknown client: ' + clientAlias);
         }
+    }
+
+    setClient(clientAlias: string, clientOptions?: ClientOptions) {
+        this.client = PushManager.getClient(clientAlias, clientOptions);
     }
 
     /**
@@ -78,8 +87,16 @@ export class PushManager {
     push(location: string, saveTo: string): Promise<void> {
         return this.client.push(location, saveTo)
             .then(result => {
-                this.opStatus.next('Torrent ' + (result.isNew ? 'added' : 'exists') + ': ' + result.id + ':\t' + location);
+                this.opStatus$.next('Torrent ' + (result.isNew ? 'added' : 'exists') + ': ' + result.id + ':\t' + location);
             });
+    }
+
+    /**
+     */
+    async pushCustomMatch(matchArr: TorrentMap[]): Promise<any> {
+        for (const torrentMapping of matchArr) {
+            await this.push(torrentMapping.torrent, torrentMapping.saveTo);
+        }
     }
 
     /**
@@ -90,6 +107,7 @@ export class PushManager {
             await this.push(torrentMapping.torrent, torrentMapping.saveTo);
         }
     }
+
 
     /**
      * @private

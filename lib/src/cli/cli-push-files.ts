@@ -12,9 +12,9 @@ export function cliPushFiles(options: CliOptions): Promise<any> {
     const pusher = new PushManager({
         workdir: options.tmp,
         client: options.client,
-        option: options.option,
+        clientOptions: options.clientOptions,
     });
-    pusher.opStatus.subscribe(status => {
+    pusher.opStatus$.subscribe(status => {
         console.log(status);
     });
     return pusher.pushAll();

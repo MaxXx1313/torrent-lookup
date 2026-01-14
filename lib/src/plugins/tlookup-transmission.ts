@@ -4,7 +4,7 @@ import { UrlWithStringQuery } from 'url';
 
 
 import * as assert from 'node:assert';
-import * as url from 'node:url';
+import * as URL from 'node:url';
 
 
 const CSRF_HEADER = 'x-transmission-session-id';
@@ -49,7 +49,7 @@ export class TlookupTransmission implements ITorrentClient {
         };
 
         //
-        this._endpointParsed = url.parse(this._config.endpoint);
+        this._endpointParsed = URL.parse(this._config.endpoint);
     }
 
     // "content-type":"application/json; charset=UTF-8"

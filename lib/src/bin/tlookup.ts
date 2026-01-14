@@ -82,7 +82,7 @@ const optionDefinitions: OptionDefinition[] = [
     tick();
 
     const parsed = commandLineArgs(optionDefinitions, {stopAtFirstUnknown: true, partial: true, argv: process.argv});
-    parsed.option = parseOptions(parsed.option || []);
+    parsed.clientOptions = parseOptions(parsed.option || []);
     const argv = parsed._unknown || []; // rest options are here
     const options = parsed as CliOptions;
 

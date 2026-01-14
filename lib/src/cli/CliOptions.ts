@@ -22,5 +22,5 @@ export interface CliOptions {
      * client options
      * for 'push' only
      */
-    option: OptionsParsed;
+    clientOptions: OptionsParsed;
 }
