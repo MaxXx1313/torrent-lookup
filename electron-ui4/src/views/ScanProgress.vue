@@ -103,9 +103,9 @@ import { DATA_SERVICE_KEY, DataService } from "@/data/data.service.ts";
 import { bindToComponent } from "../../tools/async.ts";
 
 const currentTarget = ref<string>('');
-const filesTorrent = ref<string>(0);
-const filesRegular = ref<string>(0);
-const filesPerSecond = ref<string>(0);
+const filesTorrent = ref<number>(0);
+const filesRegular = ref<number>(0);
+const filesPerSecond = ref<number>(0);
 
 const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
 const router = useRouter();

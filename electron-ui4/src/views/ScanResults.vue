@@ -129,7 +129,7 @@
                 {{ r.saveTo }}
               </div>
 
-              <Menu as="div" class="relative inline-block" v-if="r.saveToOptions?.length > 1">
+              <Menu as="div" class="relative inline-block" v-if="(r.saveToOptions?.length || 0) > 1">
                 <MenuButton
                     class="inline-flex w-full justify-center rounded-md bg-background/10 dark:bg-[#233648] px-2 py-1 text-sm text-white inset-ring-1 inset-ring-white/5 hover:bg-white/20">
                   <span class="material-symbols-outlined">expand_more</span>

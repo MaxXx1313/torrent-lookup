@@ -295,9 +295,11 @@ function addTarget() {
   }
   addInProgress.value = true;
   dataService.selectFolder()
-      .then((folders: string[]) => {
-        _addTargets(folders);
-        _saveConfig();
+      .then((folders: string[] | null) => {
+        if (folders) {
+          _addTargets(folders);
+          _saveConfig();
+        }
       }).finally(() => {
     addInProgress.value = false;
   });

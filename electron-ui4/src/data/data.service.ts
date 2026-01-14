@@ -41,7 +41,7 @@ export class DataService {
     }
 
     startScan(config: AppConfiguration) {
-        window.electronAPI.scanStart({targets: config.targets, exclude: config.exclude});
+        window.electronAPI.scanStart({targets: config.targets || [], exclude: config.exclude});
     }
 
     stopScan() {
