@@ -87,6 +87,16 @@
         </div>
       </div>
     </div>
+
+    <!-- Actions -->
+    <div class="mt-2 flex flex-col items-center gap-4">
+      <button
+          class="flex items-center gap-2 px-8 py-3 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-all border border-white/10 hover:border-white/20"
+          @click="gotoSettings">
+        <span class="material-symbols-outlined text-sm">arrow_back_ios</span>
+        <span class="font-semibold">Back to settings</span>
+      </button>
+    </div>
   </main>
 
   <!-- Post-Export Success View (Hidden initially or contextually shown) -->
@@ -169,11 +179,15 @@ onMounted(async () => {
 
 });
 
-function goToStart() {
-  router.push('/target');
+function gotoSettings() {
+  router.replace('/export');
 }
 
-const timeFormatter = new Intl.DateTimeFormat('en-Gb', {
+function goToStart() {
+  router.replace('/target');
+}
+
+const timeFormatter = new Intl.DateTimeFormat('en-GB', {
   hour: 'numeric',
   minute: 'numeric',
   second: 'numeric',

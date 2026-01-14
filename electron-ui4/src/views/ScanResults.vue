@@ -363,11 +363,11 @@ function toggleEnabled(map: TorrentMapping, event: any) {
 
 
 async function goToExportPage() {
-  router.push('/export');
+  router.replace('/export');
 };
 
 function backToScan() {
   // You can use a string path or a named route object
-  router.push('/target');
+  router.replace('/target');
 };
 </script>

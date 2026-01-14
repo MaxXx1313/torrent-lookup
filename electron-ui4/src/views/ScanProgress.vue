@@ -121,15 +121,15 @@ onMounted(async () => {
   });
 
   dataService.onScanFinished(() => {
-    router.push('/results');
+    router.replace('/results');
   });
 });
 
 function stopScan() {
   dataService.stopScan();
   // You can use a string path or a named route object
-  router.push('/results');
-};
+  router.replace('/results');
+}
 
 const intlNumberFormatter = new Intl.NumberFormat();
 

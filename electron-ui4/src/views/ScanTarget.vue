@@ -276,11 +276,11 @@ function startScanning() {
     exclude: (exclude.value || []).slice(),
   }
   dataService.startScan(config);
-  router.push('/progress');
+  router.replace('/progress');
 };
 
 function goToResults() {
-  router.push('/results');
+  router.replace('/results');
 }
 
 // bindToComponent(dataService.getTargets()).subscribe(data => {
