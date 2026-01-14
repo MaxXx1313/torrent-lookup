@@ -1,5 +1,5 @@
 import { Observable, shareReplay } from 'rxjs';
-import type { AppConfiguration, TorrentScannerStats } from "@/data/types.ts";
+import type { AppConfiguration, TorrentMapping, TorrentScannerStats } from "@/data/types.ts";
 
 
 export interface ScanOptions {
@@ -49,6 +49,10 @@ export class DataService {
 
     onScanFinished(cb: () => void) {
         return window.electronAPI.onScanFinished(cb);
+    }
+
+    scanGetResults(): Promise<TorrentMapping[]> {
+        return window.electronAPI.scanGetResults();
     }
 
 }

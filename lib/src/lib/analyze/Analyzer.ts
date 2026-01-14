@@ -125,6 +125,7 @@ export class Analyzer {
         const dataFileName = path.join(this.options.workdir, FILE_DATA);
         const mapsFileName = path.join(this.options.workdir, FILES_MAPS);
 
+        this._hash = {};
         await this._loadTorrentFilesFromFile(torrentsFileName);
         await this._matchFilesFromFile(dataFileName);
         await this._makeDecision();
