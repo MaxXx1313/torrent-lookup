@@ -267,12 +267,18 @@ export class TlookupTransmission implements ITorrentClient {
 
         return _makeRequest()
             .catch((res) => {
+                if (typeof res !== 'object' || typeof res.statusCode === 'undefined') {
+                    throw res;
+                }
+
                 // CSRF Protection
                 if (res.statusCode === 409) {
                     self._collectCsrf(res);
                     return _makeRequest();
+                } else if (res.statusCode === 401) {
+                    throw new Error(res.statusMessage);
                 } else {
-                    throw res;
+                    throw new Error(`[status: ${res.statusCode}] ${res.statusMessage}`);
                 }
             }).then(res => {
                 return res;

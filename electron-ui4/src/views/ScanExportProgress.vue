@@ -89,7 +89,7 @@
     </div>
 
     <!-- Actions -->
-    <div class="mt-2 flex flex-col items-center gap-4">
+    <div class="mt-2 flex flex-col items-center gap-4" v-if="hasError">
       <button
           class="flex items-center gap-2 px-8 py-3 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-all border border-white/10 hover:border-white/20"
           @click="gotoSettings">
@@ -126,7 +126,7 @@
         </div>
         -->
 
-        <div class="flex flex-col sm:flex-row gap-3 w-full justify-center" v-if="hasError">
+        <div class="flex flex-col sm:flex-row gap-3 w-full justify-center">
           <!--
           <button
               class="bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-lg transition-all flex items-center justify-center gap-2">

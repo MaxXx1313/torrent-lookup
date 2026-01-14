@@ -12,6 +12,9 @@ function callable(name) {
                 console.log('[callable] >>\t', name, result);
 
                 return result;
+            }).catch(e => {
+                console.error(e);
+                throw e;
             });
     }
 }
