@@ -12,3 +12,8 @@ export function bindToComponent<T>(v: Observable<T>) {
     });
     return v.pipe(takeUntil(destroy$));
 }
+
+
+export function timeoutPromise(interval = 0) {
+    return new Promise(resolve => setTimeout(resolve, interval));
+}
