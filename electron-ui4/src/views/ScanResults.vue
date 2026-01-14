@@ -6,8 +6,9 @@
         <h1 class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">
           Match Results Review
         </h1>
-        <p class="text-slate-500 dark:text-[#92adc9] text-sm font-normal">Verify the filesystem matches and resolve
-          any conflicts before the export</p>
+        <p class="text-slate-500 dark:text-[#92adc9] text-sm font-normal">
+          Verify the filesystem matches before the export
+        </p>
       </div>
     </div>
     <!-- Stats Overview -->
@@ -46,7 +47,9 @@
         </div>
       </div>
     </div>
+
     <!-- Filter Tabs -->
+    <!--
     <div class="mb-6">
       <div class="flex border-b border-slate-200 dark:border-[#324d67] gap-8">
         <a class="flex items-center gap-2 border-b-[3px] border-b-primary text-slate-900 dark:text-white pb-3 pt-4 transition-all"
@@ -60,6 +63,8 @@
         </a>
       </div>
     </div>
+    -->
+
     <!-- Results Table -->
     <div
         class="bg-white dark:bg-background-dark rounded-xl border border-slate-200 dark:border-[#324d67] overflow-hidden shadow-sm">
@@ -72,11 +77,16 @@
           <th class="px-6 py-4 text-slate-500 dark:text-white text-xs font-bold uppercase tracking-wider">Matched Local
             Path
           </th>
+          <!--
           <th class="px-6 py-4 text-slate-500 dark:text-white text-xs font-bold uppercase tracking-wider w-40 text-center">
             Status
           </th>
           <th class="px-6 py-4 text-slate-500 dark:text-white text-xs font-bold uppercase tracking-wider w-48">
             Selection
+          </th>
+          -->
+          <th class="px-6 py-4 text-slate-500 dark:text-white text-xs font-bold uppercase tracking-wider w-48">
+            Export
           </th>
         </tr>
         </thead>
@@ -97,6 +107,7 @@
               <span class="text-slate-500 dark:text-[#92adc9] text-sm font-medium italic">/downloads/isos/linux/ubuntu-22.04.iso</span>
             </div>
           </td>
+          <!--
           <td class="px-6 py-5 text-center">
             <div
                 class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold">
@@ -110,6 +121,15 @@
               <span class="truncate">Auto-Matched</span>
               <span class="material-symbols-outlined text-[16px]">expand_more</span>
             </button>
+          </td>
+          -->
+
+          <td class="px-6 py-5">
+            <label class="inline-flex items-center cursor-pointer">
+              <input type="checkbox" value="" class="sr-only peer" />
+              <div class="relative w-9 h-5 border border-[#324d67] peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-[#324d67] dark:peer-focus:ring-[#324d67] rounded-full peer peer-checked:after:translate-x-full  after:content-[''] after:absolute after:top-[0px] after:left-[0px] after:bottom-[0px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+              <span class="select-none ml-3 text-sm font-medium text-heading">Export / Skip</span>
+            </label>
           </td>
         </tr>
 
@@ -129,6 +149,7 @@
                   class="text-orange-600 dark:text-orange-400 text-sm font-bold">Conflict: Multiple paths detected</span>
             </div>
           </td>
+          <!--
           <td class="px-6 py-5 text-center">
             <div
                 class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-100 dark:bg-orange-500/10 text-orange-700 dark:text-orange-400 text-xs font-bold">
@@ -136,6 +157,17 @@
               Needs Action
             </div>
           </td>
+          <td class="px-6 py-5">
+            <div class="relative">
+              <button
+                  class="flex items-center justify-between w-full px-3 h-9 bg-white dark:bg-[#233648] border-2 border-orange-500/50 rounded-lg text-xs font-bold text-slate-900 dark:text-white hover:border-orange-500 transition-all shadow-sm">
+                <span class="truncate">Select Path...</span>
+                <span class="material-symbols-outlined text-[16px]">unfold_more</span>
+              </button>
+            </div>
+          </td>
+          -->
+
           <td class="px-6 py-5">
             <div class="relative">
               <button
@@ -162,6 +194,7 @@
               <span class="text-slate-500 dark:text-[#92adc9] text-sm font-medium italic">/media/storage/temp/debian-11.iso</span>
             </div>
           </td>
+          <!--
           <td class="px-6 py-5 text-center">
             <div
                 class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold">
@@ -176,9 +209,19 @@
               <span class="material-symbols-outlined text-[16px]">expand_more</span>
             </button>
           </td>
+          -->
+
+          <td class="px-6 py-5">
+            <button
+                class="flex items-center justify-between w-full px-3 h-9 bg-slate-100 dark:bg-[#233648] rounded-lg text-xs font-medium text-slate-500 dark:text-white hover:border-primary border border-transparent transition-all">
+              <span class="truncate">Manual Fix</span>
+              <span class="material-symbols-outlined text-[16px]">expand_more</span>
+            </button>
+          </td>
         </tr>
 
         <!-- Row 4: Missing -->
+        <!--
         <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors group opacity-75">
           <td class="px-6 py-5">
             <div class="flex flex-col">
@@ -208,6 +251,7 @@
             </button>
           </td>
         </tr>
+        -->
         </tbody>
       </table>
 
