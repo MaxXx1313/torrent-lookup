@@ -1,4 +1,4 @@
-import {Analyzer, Info, TorrentScanner} from "tlookup";
+import {Analyzer, Info, PushManager, TorrentScanner} from "tlookup";
 
 export function scanLogic(ipcMain, mainWindow) {
 
@@ -7,6 +7,7 @@ export function scanLogic(ipcMain, mainWindow) {
     const scanner = new TorrentScanner();
     const analyzer = new Analyzer();
     const info = new Info();
+    const pushManager = new PushManager();
 
     // load mappings
     info.getMapping().then(m => {
@@ -17,6 +18,10 @@ export function scanLogic(ipcMain, mainWindow) {
         // ipcMain.emit('scan:entry', entry.location);
         mainWindow.webContents.send('scan:entry', entry.location);
         mainWindow.webContents.send('scan:stats', scanner.stats);
+    });
+
+    pushManager.opStatus$.subscribe((msg) => {
+        mainWindow.webContents.send('export:log', msg);
     });
 
     /**
@@ -63,6 +68,22 @@ export function scanLogic(ipcMain, mainWindow) {
      */
     ipcMain.handle('export:get-user-decision', async () => {
         return _mappings || [];
+    });
+
+    /**
+     *
+     */
+    ipcMain.handle('export:push', async (event, options) => {
+        const mappingsActive = (_mappings || []).filter(m => !m.isDisabled);
+        if (!mappingsActive?.length) {
+            return Promise.reject('Nothing to push');
+        }
+
+        const transmissionOptions = {
+            endpoint: `http://${options.username}:${options.password}@localhost:${options.port}`,
+        }
+        pushManager.setClient('transmission', transmissionOptions);
+        await pushManager.pushCustomMatch(mappingsActive);
     });
 
 }

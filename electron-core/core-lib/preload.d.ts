@@ -1,4 +1,4 @@
-import { AppConfiguration, TorrentMapping, TorrentScannerStats } from "./types";
+import { AppConfiguration, TorrentMapping, TorrentScannerStats, TransmissionOptions } from "./types";
 
 declare global {
     interface Window {
@@ -24,6 +24,9 @@ export interface IElectronAPI {
 
     setUserMappings: MyCallable<TorrentMapping[], void>;
     getUserMappings: MyCallable<TorrentMapping[]>;
+
+    exportStart: MyCallable<TransmissionOptions, void>;
+    onExportLog: MyEvent<string>;
 }
 
 

@@ -27,3 +27,9 @@ export interface TorrentMapping {
     saveTo: string; // absolute file location
     saveToOptions?: string[]; // another options (any path which has at least one file from the torrent)
 }
+
+export interface TransmissionOptions {
+    username: string;
+    password: string;
+    port: number;
+}
