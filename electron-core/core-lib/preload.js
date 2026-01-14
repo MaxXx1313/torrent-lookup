@@ -55,9 +55,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
     selectFolder: callable('app:select-folder'),
 
-    startScan: callable('scan:start'),
+    scanStart: callable('scan:start'),
     onScanEntry: event('scan:entry'),
     onScanStats: event('scan:stats'),
     onScanFinished: eventOnce('scan:finished'),
-    stopScan: callable('scan:stop'),
+    scanStop: callable('scan:stop'),
+    scanGetResults: callable('scan:get-results'),
 });

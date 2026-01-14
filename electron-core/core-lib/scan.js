@@ -1,8 +1,10 @@
-import {TorrentScanner} from "tlookup";
+import {Analyzer, Info, TorrentScanner} from "tlookup";
 
 export function scanLogic(ipcMain, mainWindow) {
 
     const scanner = new TorrentScanner();
+    const analyzer = new Analyzer();
+    const info = new Info();
 
     scanner.onEntry.subscribe((entry) => {
         // ipcMain.emit('scan:entry', entry.location);
@@ -25,9 +27,11 @@ export function scanLogic(ipcMain, mainWindow) {
         scanner.addTarget(targets);
         scanner.addExclusion(exclude);
 
-        scanner.run().finally(() => {
-            mainWindow.webContents.send('scan:finished');
-        });
+        scanner.run()
+            .then(() => analyzer.analyze())
+            .finally(() => {
+                mainWindow.webContents.send('scan:finished');
+            });
     });
 
     /**
@@ -35,6 +39,14 @@ export function scanLogic(ipcMain, mainWindow) {
      */
     ipcMain.handle('scan:stop', async () => {
         await scanner.terminate();
+    });
+
+
+    /**
+     * Get results
+     */
+    ipcMain.handle('scan:get-results', async () => {
+        return info.getMapping();
     });
 
 }

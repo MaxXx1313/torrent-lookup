@@ -1,4 +1,4 @@
-import { AppConfiguration, TorrentScannerStats } from "./types";
+import { AppConfiguration, TorrentMapping, TorrentScannerStats } from "./types";
 
 declare global {
     interface Window {
@@ -16,12 +16,12 @@ export interface IElectronAPI {
     getSystemExcluded: MyCallable<string[]>;
     selectFolder: () => Promise<string[] | null>;
 
-    startScan: (opts: { targets: string[], exclude?: string }) => Promise<void>;
+    scanStart: (opts: { targets: string[], exclude?: string }) => Promise<void>;
     onScanEntry: MyEvent<string>;
     onScanStats: MyEvent<TorrentScannerStats>;
     onScanFinished: MyEventOnce<void>;
-    stopScan: () => void;
-
+    scanStop: MyCallable<void>;
+    scanGetResults: MyCallable<TorrentMapping[]>;
 }
 
 
