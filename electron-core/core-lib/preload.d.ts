@@ -21,7 +21,9 @@ export interface IElectronAPI {
     onScanStats: MyEvent<TorrentScannerStats>;
     onScanFinished: MyEventOnce<void>;
     scanStop: MyCallable<void>;
-    scanGetResults: MyCallable<TorrentMapping[]>;
+
+    setUserMappings: MyCallable<TorrentMapping[], void>;
+    getUserMappings: MyCallable<TorrentMapping[]>;
 }
 
 

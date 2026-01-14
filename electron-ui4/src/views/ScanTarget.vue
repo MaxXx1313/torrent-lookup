@@ -264,7 +264,7 @@ onMounted(async () => {
   targets.value = config?.targets || [];
   exclude.value = config?.exclude || [];
 
-  hasPreviousResults.value = (await dataService.scanGetResults())?.length > 0;
+  hasPreviousResults.value = (await dataService.getUserMappings())?.length > 0;
 });
 
 function startScanning() {

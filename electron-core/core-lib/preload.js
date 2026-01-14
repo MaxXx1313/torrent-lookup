@@ -60,5 +60,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onScanStats: event('scan:stats'),
     onScanFinished: eventOnce('scan:finished'),
     scanStop: callable('scan:stop'),
-    scanGetResults: callable('scan:get-results'),
+
+    setUserMappings: callable('export:set-user-decision'),
+    getUserMappings: callable('export:get-user-decision'),
 });

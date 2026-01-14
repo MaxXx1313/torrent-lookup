@@ -174,7 +174,8 @@
 
           <td class="px-6 py-5">
             <label class="relative inline-flex items-center cursor-pointer">
-              <input checked="" class="sr-only peer" type="checkbox" :checked="!r.isDisabled"
+              <input class="sr-only peer" type="checkbox"
+                     :checked="!r.isDisabled"
                      @change="toggleEnabled(r, $event)"/>
               <div
                   class="w-11 h-6 bg-slate-300 border border-[#324d67] dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary peer-checked:dark:bg-primary/60"></div>
@@ -333,7 +334,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, onMounted, ref } from 'vue'
+import { inject, onMounted, ref, toRaw } from 'vue'
 import { useRouter } from 'vue-router';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
 import { DATA_SERVICE_KEY, DataService } from "@/data/data.service.ts";
@@ -347,20 +348,21 @@ const mappings = ref<TorrentMapping[]>([]);
 const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
 
 onMounted(async () => {
-  mappings.value = await dataService.scanGetResults();
+  mappings.value = await dataService.getUserMappings();
 });
 
 function selectOption(map: TorrentMapping, option: string) {
   map.saveTo = option;
+  dataService.saveUserMappings(toRaw(mappings.value) || []);
 }
 
 function toggleEnabled(map: TorrentMapping, event: any) {
   map.isDisabled = !event.target.checked;
+  dataService.saveUserMappings(toRaw(mappings.value) || []);
 }
 
 
-function goToExportPage() {
-  // You can use a string path or a named route object
+async function goToExportPage() {
   router.push('/export');
 };
 

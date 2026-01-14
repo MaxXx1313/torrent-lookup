@@ -6,7 +6,7 @@
       <div class="flex flex-wrap justify-between items-end gap-4 mb-8">
         <div class="flex flex-col gap-2">
           <h1 class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">
-            Export Settings
+            Export {{mappings.length}}
           </h1>
           <p class="text-slate-500 dark:text-[#92adc9] text-sm font-normal">
             Select your target torrent client and configure the
@@ -25,7 +25,7 @@
           <div
               class="group relative cursor-pointer flex flex-col items-center justify-center p-6 rounded-xl border-2 border-primary bg-primary/10 transition-all shadow-lg shadow-primary/5">
             <div class="size-12 mb-3 bg-slate-800 rounded-lg flex items-center justify-center overflow-hidden">
-              <IconTransmission />
+              <IconTransmission/>
             </div>
             <p class="font-bold text-sm">Transmission</p>
 
@@ -207,8 +207,19 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import IconTransmission from "@/components/icons/IconTransmission.vue";
+import { inject, onMounted, ref } from "vue";
+import type { TorrentMapping } from "@/data/types.ts";
+import { DATA_SERVICE_KEY, DataService } from "@/data/data.service.ts";
 
 const router = useRouter();
+
+const mappings = ref<TorrentMapping[]>([]);
+const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
+
+
+onMounted(async () => {
+  mappings.value = await dataService.getUserMappings();
+});
 
 const goToExportProgressPage = () => {
   // You can use a string path or a named route object

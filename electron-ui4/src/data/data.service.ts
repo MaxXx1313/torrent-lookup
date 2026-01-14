@@ -17,6 +17,8 @@ export class DataService {
     readonly scanEntry$ = _observableFromElectron<string>(window.electronAPI.onScanEntry);
     readonly scanStats$ = _observableFromElectron<TorrentScannerStats>(window.electronAPI.onScanStats);
 
+    private _mappingsSelected: TorrentMapping[] = [];
+
     constructor() {
 
     }
@@ -51,8 +53,12 @@ export class DataService {
         return window.electronAPI.onScanFinished(cb);
     }
 
-    scanGetResults(): Promise<TorrentMapping[]> {
-        return window.electronAPI.scanGetResults();
+    saveUserMappings(m: TorrentMapping[]) {
+        return window.electronAPI.setUserMappings(m);
+    }
+
+    getUserMappings(): Promise<TorrentMapping[]> {
+        return window.electronAPI.getUserMappings();
     }
 
 }

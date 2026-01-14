@@ -2,9 +2,16 @@ import {Analyzer, Info, TorrentScanner} from "tlookup";
 
 export function scanLogic(ipcMain, mainWindow) {
 
+    let _mappings = [];
+
     const scanner = new TorrentScanner();
     const analyzer = new Analyzer();
     const info = new Info();
+
+    // load mappings
+    info.getMapping().then(m => {
+        _mappings = m || [];
+    });
 
     scanner.onEntry.subscribe((entry) => {
         // ipcMain.emit('scan:entry', entry.location);
@@ -29,6 +36,9 @@ export function scanLogic(ipcMain, mainWindow) {
 
         scanner.run()
             .then(() => analyzer.analyze())
+            .then(mappings => {
+                _mappings = mappings;
+            })
             .finally(() => {
                 mainWindow.webContents.send('scan:finished');
             });
@@ -43,10 +53,16 @@ export function scanLogic(ipcMain, mainWindow) {
 
 
     /**
-     * Get results
+     *
      */
-    ipcMain.handle('scan:get-results', async () => {
-        return info.getMapping();
+    ipcMain.handle('export:set-user-decision', async (event, mappings) => {
+        _mappings = mappings || [];
+    });
+    /**
+     *
+     */
+    ipcMain.handle('export:get-user-decision', async () => {
+        return _mappings || [];
     });
 
 }
