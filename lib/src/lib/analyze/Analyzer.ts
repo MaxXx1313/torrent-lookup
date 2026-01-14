@@ -48,6 +48,7 @@ interface TorrentFileInfo {
 export interface TorrentMapping {
     torrent: string; // torrent location
     saveTo: string; // absolute file location
+    saveToOptions?: string[]; // another options (any path which has at least one file from the torrent)
     // TODO:
     // mapping: Array<>; // set of renamed/moved files
 }
@@ -282,11 +283,17 @@ export class Analyzer {
                 }
             }
 
+            // get all possible options
+            // It's any path which has at least one file from torrent
+            const options = Object.keys(scoreHash)
+                .sort((a, b) => scoreHash[b] - scoreHash[a]);
+
             //
             if (saveTo) {
                 mapping.push({
                     torrent: tPath,
                     saveTo: saveTo,
+                    saveToOptions: options,
                 });
             }
         }
