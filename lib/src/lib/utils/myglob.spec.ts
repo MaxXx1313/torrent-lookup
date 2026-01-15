@@ -45,4 +45,9 @@ describe('matchCustom.spec', () => {
     test('linux case', () => {
         assert.equal(matchCustom('/root/.NPM/project/lib/somefile.js', ".npm", {platform: 'posix'}), false);
     });
+
+
+    test('windows example', function () {
+        assert.equal(matchCustom('C:\\Windows\\system32\\myfile.js', '.swp', {platform: 'win32'}), false);
+    });
 });

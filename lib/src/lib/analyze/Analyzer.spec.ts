@@ -31,24 +31,24 @@ describe('Analyzer.spec', function () {
         const torrentLocation = assetsPath + '/t2/fixture2 - sourcefolder.torrent';
         const inputArr = [
             {
-                base: 'file1.txt',
+                name: 'file1.txt',
                 dir: 'sourcefolder',
                 length: 13,
-                torrent: torrentLocation,
+                torrentFileLocation: torrentLocation,
                 match: [],
             },
             {
-                base: 'file2.txt',
+                name: 'file2.txt',
                 dir: 'sourcefolder',
                 length: 14,
-                torrent: torrentLocation,
+                torrentFileLocation: torrentLocation,
                 match: [],
             },
             {
-                base: 'file3.txt',
+                name: 'file3.txt',
                 dir: 'sourcefolder',
                 length: 14,
-                torrent: torrentLocation,
+                torrentFileLocation: torrentLocation,
                 match: [],
             },
         ];
@@ -91,7 +91,11 @@ describe('Analyzer.spec', function () {
             const expected = [
                 {
                     torrent: torrentLocation,
-                    saveTo: '/firstpath'
+                    saveTo: '/firstpath',
+                    saveToOptions: [
+                        '/firstpath',
+                        '/secondpath'
+                    ],
                 },
             ];
 
