@@ -45,7 +45,7 @@ export function scanLogic(ipcMain, mainWindow) {
         scanner.addTarget(targets);
         scanner.addExclusion(exclude);
 
-        scanner.run()
+        return scanner.run()
             .then(() => analyzer.analyze())
             .then(mappings => {
                 _mappings = mappings;

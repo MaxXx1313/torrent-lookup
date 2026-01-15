@@ -38,7 +38,7 @@ function isAbsolute(filepath: string, opts: { platform: string }) {
 }
 
 
-function _createPathTestFunction(pattern: string, opts: { platform: string }) {
+export function _createPathTestFunction(pattern: string, opts?: { platform: string }) {
     const patternPrepared = path.normalize(pattern + path.posix.sep)
         .replace(/\*/g, '.+');
     const patternRegEx = new RegExp(_unifySlashes(patternPrepared));

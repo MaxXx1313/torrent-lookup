@@ -2,9 +2,9 @@ import * as fs from 'node:fs/promises';
 import { Stats } from 'node:fs';
 import * as path from 'node:path';
 import { QueueWorker } from "./QueueWorker.js";
-import { matchCustom } from "../utils/myglob.js";
-import ErrnoException = NodeJS.ErrnoException;
+import { _createPathTestFunction, matchCustom } from "../utils/myglob.js";
 import { normalizePath } from "../utils/path-utils.js";
+import ErrnoException = NodeJS.ErrnoException;
 
 
 /**
@@ -71,6 +71,27 @@ export class FileScanner {
         this._exclude = this._exclude.map(normalizePath);
     }
 
+    /**
+     *
+     */
+    static cbErrorDefault(err: ErrnoException): Promise<any> {
+        console.warn('FileScanner:', err.message);
+        return Promise.resolve();
+    }
+
+    /**
+     */
+    static cbNoOperation(file: string, stats: Stats): Promise<any> {
+        return Promise.resolve();
+    }
+
+    /**
+     */
+    static cbOtherFound(file: string, stats: Stats): Promise<any> {
+        console.log('FileScanner: Skip unknown entry type:', file);
+        console.debug(stats);
+        return Promise.resolve();
+    }
 
     /**
      * Add one or multiple targets
@@ -86,7 +107,22 @@ export class FileScanner {
      * start scanning process
      */
     run(): Promise<void> {
+        this._verifyExcludeTemplates();
         return this.jobWorker.run();
+    }
+
+    // quick solution to prevent errors on invalid file pattern
+    _verifyExcludeTemplates() {
+        const excludeToTest = this._exclude || [];
+        this._exclude = [];
+        for (const excludeElement of excludeToTest) {
+            try {
+                _createPathTestFunction(excludeElement);
+                this._exclude.push(excludeElement);
+            } catch (e) {
+                console.error(`Invalid file pattern: "${excludeElement}"`, e);
+            }
+        }
     }
 
     /**
@@ -103,7 +139,6 @@ export class FileScanner {
         return this.jobWorker.isRunning();
     }
 
-
     /**
      * @param filepath
      * @private
@@ -117,7 +152,6 @@ export class FileScanner {
         }
         return excluded;
     }
-
 
     /**
      * @description It a job=)
@@ -168,30 +202,6 @@ export class FileScanner {
             }
 
         }
-    }
-
-
-    /**
-     *
-     */
-    static cbErrorDefault(err: ErrnoException): Promise<any> {
-        console.warn('FileScanner:', err.message);
-        return Promise.resolve();
-    }
-
-    /**
-     */
-    static cbNoOperation(file: string, stats: Stats): Promise<any> {
-        return Promise.resolve();
-    }
-
-
-    /**
-     */
-    static cbOtherFound(file: string, stats: Stats): Promise<any> {
-        console.log('FileScanner: Skip unknown entry type:', file);
-        console.debug(stats);
-        return Promise.resolve();
     }
 
 
