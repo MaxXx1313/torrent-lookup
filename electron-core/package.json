@@ -1,5 +1,6 @@
 {
   "name": "electron-core",
+  "description": "Scan filesystem, find torrent file ans associate it with the downloaded files",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -9,7 +10,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "electron-store": "^11.0.2",
     "tlookup": "file:../lib"
