@@ -1,5 +1,5 @@
 // preload.js
-import {contextBridge, ipcRenderer} from 'electron/renderer';
+const {contextBridge, ipcRenderer} = require('electron/renderer');
 
 
 function callable(name) {
@@ -48,8 +48,7 @@ function eventOnce(eventName) {
 }
 
 contextBridge.exposeInMainWorld('electronAPI', {
-    openDevTools: (callback) => ipcRenderer.send('app:devtools'),
-    appReady: () => ipcRenderer.send('app:ready'),
+    openDevTools: callable('app:devtools'),
 
     // ui4
     getConfig: callable('app:get-config'),

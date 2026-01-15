@@ -8,7 +8,7 @@ declare global {
 
 export interface IElectronAPI {
     openDevTools: () => void;
-    appReady: () => void;
+    // appReady: () => void;
 
     // ui4
     getConfig: MyCallable<AppConfiguration>;

@@ -3,6 +3,7 @@
 // Modules to control application life and create native browser window
 import {app, BrowserWindow, ipcMain} from 'electron';
 import * as path from 'node:path';
+import * as URL from 'node:url';
 import {scanLogic} from './core-lib/scan.js';
 import {appLogic} from "./core-lib/app.js";
 
@@ -15,7 +16,9 @@ if (isDevMode) {
 }
 
 /////////////////////////////
-const __dirname = path.dirname(import.meta.url);
+const __filename = URL.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+console.log('__dirname',__dirname);
 
 let _mainWindow = null;
 
@@ -55,7 +58,7 @@ function createWindow() {
 app.whenReady().then(() => {
     createWindow();
 
-    ipcMain.on('app:devtools', () => {
+    ipcMain.handle('app:devtools', () => {
         if (_mainWindow) {
             _mainWindow.webContents.openDevTools();
         }
