@@ -91,7 +91,7 @@
     <!-- Actions -->
     <div class="mt-2 flex flex-col items-center gap-4" v-if="hasError">
       <button
-          class="flex items-center gap-2 px-8 py-3 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-all border border-white/10 hover:border-white/20"
+          class="flex items-center gap-2 px-8 py-3 text-slate-600 dark:text-white bg-slate-200/50 dark:bg-white/5 hover:bg-white/10 rounded-lg transition-all border border-slate-600 dark:border-white/10 hover:border-slate-600/20 dark:hover:border-white/20"
           @click="gotoSettings">
         <span class="material-symbols-outlined text-sm">arrow_back_ios</span>
         <span class="font-semibold">Back to settings</span>

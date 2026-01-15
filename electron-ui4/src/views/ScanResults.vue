@@ -131,7 +131,7 @@
 
               <Menu as="div" class="relative inline-block" v-if="(r.saveToOptions?.length || 0) > 1">
                 <MenuButton
-                    class="inline-flex w-full justify-center rounded-md bg-background/10 dark:bg-[#233648] px-2 py-1 text-sm text-white inset-ring-1 inset-ring-white/5 hover:bg-white/20">
+                    class="inline-flex w-full justify-center text-slate-500 dark:text-white rounded-md bg-slate-200 dark:bg-[#233648] px-2 py-1 text-sm inset-ring-1 inset-ring-white/5 hover:bg-slate-900/20 dark:hover:bg-white/20">
                   <span class="material-symbols-outlined">expand_more</span>
                 </MenuButton>
 
@@ -140,12 +140,12 @@
                             leave-active-class="transition ease-in duration-75" leave-from-class="transform scale-100"
                             leave-to-class="transform opacity-0 scale-95">
                   <MenuItems
-                      class="absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-gray-800 outline-1 -outline-offset-1 outline-white/10">
+                      class="absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-slate-50 dark:bg-gray-800 outline-1 -outline-offset-1 outline-slate-200 dark:outline-white/10">
                     <div class="py-1">
                       <MenuItem v-for="opt of r.saveToOptions" v-slot="{ active }">
                         <button class="text-left w-full block px-4 py-2 text-sm"
                                 @click="selectOption(r, opt)"
-                                :class="[active ? 'bg-white/5 text-white outline-hidden' : 'text-gray-300']">
+                                :class="[active ? 'bg-slate-200 dark:bg-white/5 dark:text-white outline-hidden' : 'dark:text-gray-300']">
                           {{ opt }}
                         </button>
                       </MenuItem>
@@ -178,7 +178,7 @@
                      :checked="!r.isDisabled"
                      @change="toggleEnabled(r, $event)"/>
               <div
-                  class="w-11 h-6 bg-slate-300 border border-[#324d67] dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary peer-checked:dark:bg-primary/60"></div>
+                  class="w-11 h-6 bg-slate-300 border border-slate-200 dark:border-[#324d67] dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary peer-checked:dark:bg-primary/60"></div>
               <span class="select-none ml-3 text-sm font-medium text-heading">
                 {{ r.isDisabled ? 'Skip' : 'Export' }}
               </span>

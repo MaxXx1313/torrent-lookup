@@ -5,7 +5,7 @@
     <div class="w-full mx-auto px-8 py-4 flex flex-col gap-8">
       <!-- Page Title -->
       <div class="space-y-2">
-        <h1 class="text-4xl font-black tracking-tight text-slate-900 dark:text-white">Scan Configuration</h1>
+        <h1 class="text-4xl text-black tracking-tight text-slate-900 dark:text-white">Scan Configuration</h1>
         <p class="text-slate-500 dark:text-slate-400 text-sm">Configure your filesystem paths and exclusion
           rules before starting the match process. TorrentMapper will scan these locations to find matching data for
           your .torrent files.</p>
@@ -22,7 +22,7 @@
               </div>
 
               <button
-                  class="bg-primary/10 hover:bg-slate/90 disabled:bg-primary/10 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-2 active:enabled:scale-[0.96]"
+                  class="bg-primary/80 hover:bg-slate/90 disabled:bg-primary/10 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-2 active:enabled:scale-[0.96]"
                   @click="addTargetsDefault" :disabled="addInProgress">
                 <span class="material-symbols-outlined text-sm">add</span>
                 Add Default folders
@@ -132,12 +132,13 @@
             <div class="space-y-4">
               <div class="relative">
                 <input
-                    class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:ring-primary focus:border-primary"
+                    class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:ring-primary focus:border-primary"
                     placeholder="e.g. *.nfo, sample/"
                     type="text"
                     @keydown.enter="addExclusion"
                     v-model="exclusionAdd"
                 />
+
                 <button
                     class="absolute right-0 top-0 bottom-0 px-2 py-1 text-primary hover:bg-primary/10 rounded-md transition-colors flex items-center"
                     @click="addExclusion">

@@ -16,9 +16,8 @@
         </div>
         <!-- Headline Section -->
         <div class="space-y-2 mb-8">
-          <h1 class="text-white tracking-tight text-4xl font-bold leading-tight">
-            Scanning Filesystem...
-          </h1>
+          <h1 class="text-4xl text-black tracking-tight text-slate-900 dark:text-white">
+            Scanning Filesystem...</h1>
           <p class="text-[#92adc9] text-sm font-normal leading-normal max-w-lg mx-auto">
             Matching local files with torrent metadata. This may take a while depending on your disk speed and volume
             size.
@@ -27,28 +26,28 @@
       </div>
 
       <!-- Progress & Path Display Card -->
-      <div class="w-full max-w-[720px]  bg-[#1b2a38] rounded-xl p-6 md:p-8 border border-[#233648] shadow-2xl">
+      <div class="w-full max-w-[720px]  bg-[#1b2a38] rounded-xl p-6 md:p-8 border border-slate-200 dark:border-[#233648] bg-white dark:bg-background-dark shadow-2xl">
         <div class="flex flex-col gap-6">
           <!-- Current Activity Label -->
           <div class="flex justify-between items-end">
             <div class="space-y-1">
-              <p class="text-white text-lg font-medium">Scanning directory contents</p>
+              <p class="text-black-900 dark:text-white text-lg font-medium">Scanning directory contents</p>
             </div>
             <div class="text-right">
               <p class="text-[#92adc9] text-base">{{ formatNumber(filesPerSecond) }} files/sec</p>
             </div>
           </div>
           <!-- Indeterminate Progress Bar -->
-          <div class="relative w-full h-3 bg-[#324d67] rounded-full overflow-hidden">
+          <div class="relative w-full h-3 bg-slate-100 dark:bg-[#324d67] rounded-full overflow-hidden">
             <div class="absolute inset-0 flex">
-              <div class="h-full bg-primary rounded-full"
-                   style="width: 40%; animation: slide 2s infinite linear;"></div>
+              <div class="h-full bg-primary rounded-full animate-slide"
+                   style="width: 40%"></div>
             </div>
           </div>
           <!-- Live Path Display -->
-          <div class="bg-[#111a22] rounded-lg p-4 border border-[#233648]">
-            <div class="flex items-start gap-3">
-              <span class="material-symbols-outlined text-[#92adc9] text-sm mt-1">folder_open</span>
+          <div class="bg-slate-100 dark:bg-[#111a22] rounded-lg p-4 border border-[#233648]">
+            <div class="flex items-start gap-3  text-[#233648] dark:text-[#92adc9]">
+              <span class="material-symbols-outlined text-sm mt-1">folder_open</span>
               <div class="flex-1 overflow-hidden h-[42px]">
                 <!--
                 <p class="text-[#92adc9] text-sm font-mono leading-relaxed break-all">
@@ -58,7 +57,7 @@
                 </p>
                 -->
 
-                <p class="text-[#92adc9] text-sm font-mono leading-relaxed break-all">
+                <p class=" text-sm font-mono leading-relaxed break-all">
                   {{ currentTarget }}
                 </p>
 
@@ -67,13 +66,13 @@
           </div>
           <!-- Counter Metadata -->
           <div class="flex justify-center items-center gap-8 py-2">
-            <div class="text-center">
-              <span class="block text-white text-xl font-bold">{{ formatNumber(filesTorrent) }}</span>
+            <div class="text-center text-black-900 ">
+              <span class="block text-black-900 dark:text-white text-xl font-bold">{{ formatNumber(filesTorrent) }}</span>
               <span class="text-[#92adc9] text-xs uppercase tracking-wide">Torrents Found</span>
             </div>
             <div class="w-px h-8 bg-[#233648]"></div>
             <div class="text-center">
-              <span class="block text-white text-xl font-bold">{{ formatNumber(filesRegular) }}</span>
+              <span class="block text-black-900 dark:text-white text-xl font-bold">{{ formatNumber(filesRegular) }}</span>
               <span class="text-[#92adc9] text-xs uppercase tracking-wide">Files Found</span>
             </div>
           </div>
@@ -82,7 +81,7 @@
       <!-- Actions -->
       <div class="mt-12 flex flex-col items-center gap-4">
         <button
-            class="flex items-center gap-2 px-8 py-3 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-all border border-white/10 hover:border-white/20"
+            class="flex items-center gap-2 px-8 py-3 text-slate-600 dark:text-white bg-slate-200/50 dark:bg-white/5 hover:bg-white/10 rounded-lg transition-all border border-slate-600 dark:border-white/10 hover:border-slate-600/20 dark:hover:border-white/20"
             @click="stopScan">
           <span class="material-symbols-outlined text-sm">close</span>
           <span class="font-semibold">Cancel Scan</span>

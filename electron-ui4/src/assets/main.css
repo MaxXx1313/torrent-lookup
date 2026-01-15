@@ -56,6 +56,10 @@
     animation: search 2s infinite linear
 }
 
+.animate-slide {
+    animation: slide 2s infinite linear;
+}
+
 .animate-rotate-ccw {
     animation: rotateccw 2s infinite linear
 }
