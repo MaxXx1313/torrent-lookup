@@ -1,10 +1,10 @@
 // main.js
 
 // Modules to control application life and create native browser window
-const {app, BrowserWindow, ipcMain} = require('electron');
-const path = require('node:path');
-const {scanLogic} = require('./core-lib/scan');
-const {appLogic} = require("./core-lib/app");
+import {app, BrowserWindow, ipcMain} from 'electron';
+import * as path from 'node:path';
+import {scanLogic} from './core-lib/scan.js';
+import {appLogic} from "./core-lib/app.js";
 
 
 console.log('[Store]', app.getPath('userData'));
@@ -15,6 +15,7 @@ if (isDevMode) {
 }
 
 /////////////////////////////
+const __dirname = path.dirname(import.meta.url);
 
 let _mainWindow = null;
 

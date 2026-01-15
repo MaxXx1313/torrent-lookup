@@ -1,5 +1,5 @@
 // preload.js
-const {contextBridge, ipcRenderer} = require('electron/renderer');
+import {contextBridge, ipcRenderer} from 'electron/renderer';
 
 
 function callable(name) {
