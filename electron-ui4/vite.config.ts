@@ -7,6 +7,7 @@ import tailwindcss from '@tailwindcss/vite'
 const CUSTOM_ELEMENTS = ['el-dialog', 'el-dialog-backdrop', 'el-dialog-panel'];
 // https://vite.dev/config/
 export default defineConfig({
+    base: './',
     plugins: [
         vue({
             template: {
