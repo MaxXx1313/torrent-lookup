@@ -1,0 +1,23 @@
+appId: com.example.myapp
+productName: TLookup
+copyright: Copyright © 2024 Your Name
+directories:
+  output: out
+
+files:
+  - index.js
+  - app/**/*
+  - core-lib/**/*
+  - package.json
+
+linux:
+  target: AppImage
+  icon: resources/torrent-icon-1024.png
+  category: Utils
+  maintainer: your-email@example.com
+  description: Scan filesystem, find torrent file ans associate it with the downloaded files
+  synopsis: Electron AppImage Example
+
+appImage:
+  license: LICENSE
+  artifactName: ${productName}-${version}-${arch}.AppImage
