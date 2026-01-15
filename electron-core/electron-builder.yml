@@ -3,6 +3,7 @@ productName: TLookup
 copyright: Copyright © 2024 Your Name
 directories:
   output: out
+  buildResources: resources
 
 files:
   - index.js
@@ -12,7 +13,7 @@ files:
 
 linux:
   target: AppImage
-  icon: resources/torrent-icon-1024.png
+  icon: resources/torrent-icon-256.png
   category: Utils
   maintainer: your-email@example.com
   description: Scan filesystem, find torrent file ans associate it with the downloaded files
