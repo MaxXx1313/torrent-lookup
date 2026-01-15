@@ -3,10 +3,14 @@ import type { ForgeConfig } from '@electron-forge/shared-types';
 import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
+import AutoUnpackNativesPlugin from "@electron-forge/plugin-auto-unpack-natives";
 
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    // This tells the packager to copy the actual files
+    // instead of just the symlink reference.
+    derefSymlinks: true,
   },
   rebuildConfig: {},
   makers: [
@@ -15,6 +19,7 @@ const config: ForgeConfig = {
     // new MakerZIP({}),
   ],
   plugins: [
+    new AutoUnpackNativesPlugin({}),
     // Fuses are used to enable/disable various Electron functionality
     // at package time, before code signing the application
     new FusesPlugin({

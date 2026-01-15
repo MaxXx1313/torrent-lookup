@@ -8,10 +8,12 @@
     "test": "echo \"Error: no test specified\" && exit 1",
 
     "prebuild:linux": "sh ./prebuild.sh",
-    "build:linux": "npx electron-builder --linux"
+    "build:linux": "npx electron-builder --linux",
+    "prebuild:win": "sh ./prebuild.sh",
+    "build:win": "npx electron-forge make --platform=win32"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["torrent"],
+  "author": "MaxXx1313",
   "license": "ISC",
   "dependencies": {
     "electron-store": "^11.0.2",

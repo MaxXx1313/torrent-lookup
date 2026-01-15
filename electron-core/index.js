@@ -8,6 +8,7 @@ import {scanLogic} from './core-lib/scan.js';
 import {appLogic} from "./core-lib/app.js";
 
 
+
 console.log('[Store]', app.getPath('userData'));
 
 const isDevMode = process.argv.includes('--dev');
@@ -51,6 +52,9 @@ function createWindow() {
 }// attach scanner logic
 // const scanner = new Scanner(myBridge);
 
+// TODO
+// add the following snippet as early as possible in the main process execution (before the app.ready event).
+// if (require('electron-squirrel-startup')) app.quit();
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
