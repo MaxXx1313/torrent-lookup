@@ -13,7 +13,7 @@ files:
 
 linux:
   target: AppImage
-  icon: torrent-icon-256.png
+  icon: resources/torrent-icon-256.png
   category: Utility
   maintainer: prog.maxxx1313@gmail.com
   description: Scan filesystem, find torrent file ans associate it with the downloaded files
