@@ -19,6 +19,11 @@
   },
   "devDependencies": {
     "electron": "^36.2.1",
-    "electron-builder": "^26.4.0"
+    "electron-builder": "^26.4.0",
+
+    "@electron-forge/cli": "^7.11.1",
+    "@electron-forge/maker-zip": "^7.11.1",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.11.1",
+    "@electron-forge/plugin-fuses": "^7.11.1"
   }
 }
