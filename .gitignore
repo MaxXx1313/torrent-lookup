@@ -5,3 +5,4 @@ dist
 test/analyzer/maps.json
 
 .tmp-tlookup
+electron-core/out
