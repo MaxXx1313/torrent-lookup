@@ -1,5 +1,7 @@
 ### run in develop mode
 
+
+Build library first:
 ```bash
 pushd lib
 npm install
