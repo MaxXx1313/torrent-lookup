@@ -1,5 +1,6 @@
 {
   "name": "electron-core",
+  "productName": "TLookup",
   "description": "Scan filesystem, find torrent file ans associate it with the downloaded files",
   "version": "1.0.0",
   "main": "index.js",
