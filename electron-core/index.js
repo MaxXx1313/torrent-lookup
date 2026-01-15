@@ -1,65 +1,44 @@
 // main.js
 
 // Modules to control application life and create native browser window
-const {app, BrowserWindow, ipcMain} = require('electron');
-const path = require('node:path');
-const {Scanner} = require('./core-lib/scan');
+import {app, BrowserWindow, ipcMain} from 'electron';
+import * as path from 'node:path';
+import * as URL from 'node:url';
+import {scanLogic} from './core-lib/scan.js';
+import {appLogic} from "./core-lib/app.js";
 
 
-const myBridge = {
-    /**
-     * Send message to UI
-     */
-    send: (topic, message) => {
-        console.log('[send]\t', topic, message);
-        if (_mainWindow) {
-            _mainWindow.webContents.send(topic, message);
-        } else {
-            // no active window
-            console.debug('[send]\t(no active window)', topic, message);
-        }
-    },
-    /**
-     * Receive message from UI
-     */
-    on: (topic, handler) => {
-        ipcMain.on(topic, (event, data) => {
-            console.log('[on]\t', topic);
-            return handler(data);
-        });
-    },
-    /**
-     * UI calls method and provide a result
-     */
-    handle: (topic, handler) => {
-        ipcMain.handle(topic, (event, data) => {
-            console.log('[handle]\t', topic);
-            return handler(data);
-        });
-    },
-};
+console.log('[Store]', app.getPath('userData'));
 
-// attach scanner logic
-const scanner = new Scanner(myBridge);
-
+const isDevMode = process.argv.includes('--dev');
+if (isDevMode) {
+    console.log('[App] Starting in develop mode');
+}
 
 /////////////////////////////
+const __filename = URL.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+console.log('__dirname',__dirname);
 
 let _mainWindow = null;
 
 function createWindow() {
     // Create the browser window.
     const mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 1024,
+        height: 732,
         webPreferences: {
             preload: path.join(__dirname, 'core-lib/preload.js'),
         },
     });
 
     // and load the index.html of the app.
-    // mainWindow.loadFile('app/index.html');
-    mainWindow.loadURL('http://localhost:5173');
+    if (isDevMode) {
+        mainWindow.loadURL('http://localhost:5173');
+    } else {
+        mainWindow.setMenu(null);
+        mainWindow.loadFile('app/index.html');
+    }
 
     // Open the DevTools.
     // mainWindow.webContents.openDevTools();
@@ -69,7 +48,8 @@ function createWindow() {
     mainWindow.on('closed', function () {
         _mainWindow = null;
     });
-}
+}// attach scanner logic
+// const scanner = new Scanner(myBridge);
 
 
 // This method will be called when Electron has finished
@@ -78,11 +58,15 @@ function createWindow() {
 app.whenReady().then(() => {
     createWindow();
 
-    ipcMain.on('app:devtools', () => {
+    ipcMain.handle('app:devtools', () => {
         if (_mainWindow) {
             _mainWindow.webContents.openDevTools();
         }
     });
+
+    appLogic(ipcMain);
+    scanLogic(ipcMain, _mainWindow);
+
 
     app.on('activate', () => {
         // On macOS it's common to re-create a window in the app when the
@@ -97,9 +81,9 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-        app.quit();
-    }
+    // if (process.platform !== 'darwin') {
+    app.quit();
+    // }
 })
 
 // In this file you can include the rest of your app's specific main process

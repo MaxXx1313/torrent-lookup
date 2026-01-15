@@ -1,9 +1,8 @@
-import { DEFAULT_WORKDIR_LOCATION, FILEN_MAPS } from "../const.js";
+import { DEFAULT_WORKDIR_LOCATION, FILES_MAPS } from "../const.js";
 import { Subject } from "rxjs";
-import { TorrentMapping } from "../analyze/Analyzer.js";
 
 import * as fs from 'node:fs';
-import * as  path from 'node:path';
+import * as path from 'node:path';
 import { ITorrentClient } from "./ITorrentClient.js";
 import { TlookupTransmission } from "../../plugins/tlookup-transmission.js";
 
@@ -11,18 +10,29 @@ import { TlookupTransmission } from "../../plugins/tlookup-transmission.js";
 /**
  *
  */
+export interface TorrentMap {
+    torrent: string; // torrent location
+    saveTo: string; // absolute file location
+}
+
+/**
+ *
+ */
 export interface PusherOptions {
     client: string;
     workdir?: string;
-    option?: object;
+    clientOptions?: ClientOptions;
 }
+
+// TODO: not finished yet
+export type ClientOptions = { [key: string]: string | number | boolean }
 
 /**
  *
  */
 export class PushManager {
 
-    public readonly opStatus: Subject<string> = new Subject();
+    public readonly opStatus$: Subject<string> = new Subject();
 
     public options: PusherOptions;
     public client: ITorrentClient;
@@ -30,32 +40,38 @@ export class PushManager {
     /**
      *
      */
-    constructor(options: PusherOptions) {
+    constructor(options?: PusherOptions) {
 
         this.options = {
             workdir: DEFAULT_WORKDIR_LOCATION,
             ...options,
         };
 
-        this.client = PushManager.getClient(options);
+        if (options?.client) {
+            this.setClient(options.client, options.clientOptions);
+        }
     }
 
     /**
      * Client must implement IPushProvider
      */
-    static getClient(options: PusherOptions): ITorrentClient {
+    static getClient(clientAlias: string, clientOptions?: ClientOptions): ITorrentClient {
         // TODO: autodetect client
-        if (!options.client) {
+        if (!clientAlias) {
             throw new Error('Client not set');
         }
-        switch (options.client) {
+        switch (clientAlias) {
             case 't':
             case 'transmission':
-                return new TlookupTransmission(options.option);
+                return new TlookupTransmission(clientOptions);
 
             default:
-                throw new Error('Unknown client: ' + options.client);
+                throw new Error('Unknown client: ' + clientAlias);
         }
+    }
+
+    setClient(clientAlias: string, clientOptions?: ClientOptions) {
+        this.client = PushManager.getClient(clientAlias, clientOptions);
     }
 
     /**
@@ -71,14 +87,13 @@ export class PushManager {
     push(location: string, saveTo: string): Promise<void> {
         return this.client.push(location, saveTo)
             .then(result => {
-                this.opStatus.next('Torrent ' + (result.isNew ? 'added' : 'exists') + ': ' + result.id + ':\t' + location);
+                this.opStatus$.next('Torrent ' + (result.isNew ? 'added' : 'exists') + ': ' + result.id + ':\t' + location);
             });
     }
 
     /**
-     * @private
      */
-    public async _pushAll(matchArr: TorrentMapping[]): Promise<any> {
+    async pushCustomMatch(matchArr: TorrentMap[]): Promise<any> {
         for (const torrentMapping of matchArr) {
             await this.push(torrentMapping.torrent, torrentMapping.saveTo);
         }
@@ -87,9 +102,19 @@ export class PushManager {
     /**
      * @private
      */
-    protected loadMapping(): TorrentMapping[] {
+    public async _pushAll(matchArr: TorrentMap[]): Promise<any> {
+        for (const torrentMapping of matchArr) {
+            await this.push(torrentMapping.torrent, torrentMapping.saveTo);
+        }
+    }
+
+
+    /**
+     * @private
+     */
+    protected loadMapping(): TorrentMap[] {
         console.log('[Push] use workdir:', this.options.workdir);
-        const mapsFileName = path.join(this.options.workdir, FILEN_MAPS);
+        const mapsFileName = path.join(this.options.workdir, FILES_MAPS);
         return JSON.parse(fs.readFileSync(mapsFileName, {encoding: 'utf-8'}).toString());
     }
 

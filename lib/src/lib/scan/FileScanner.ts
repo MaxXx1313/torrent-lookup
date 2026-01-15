@@ -3,8 +3,8 @@ import { Stats } from 'node:fs';
 import * as path from 'node:path';
 import { QueueWorker } from "./QueueWorker.js";
 import { matchCustom } from "../utils/myglob.js";
-import * as os from 'node:os';
 import ErrnoException = NodeJS.ErrnoException;
+import { normalizePath } from "../utils/path-utils.js";
 
 
 /**
@@ -17,7 +17,7 @@ export interface FileScannerOption {
      * @type {Array<string>} Array of CUSTOM globs string
      */
     exclude?: Array<string>;
-    followLinks?: boolean;
+    followSymLinks?: boolean;
 
     cbFileFound: (filepath?: string, stats?: Stats) => Promise<any>;
 
@@ -68,7 +68,7 @@ export class FileScanner {
             this._exclude.push.apply(this._exclude, this._options.exclude);
         }
 
-        this._exclude = this._exclude.map(_normalizePath);
+        this._exclude = this._exclude.map(normalizePath);
     }
 
 
@@ -124,7 +124,7 @@ export class FileScanner {
      * @param filepath
      */
     protected async scanFolder(filepath: string): Promise<any> {
-        return this._scanFolder(_normalizePath(filepath))
+        return this._scanFolder(normalizePath(filepath))
             .catch(this._options.cbError.bind(this));
     }
 
@@ -151,7 +151,7 @@ export class FileScanner {
             }
 
             if (stats.isSymbolicLink()) {
-                if (!this._options.followLinks) {
+                if (!this._options.followSymLinks) {
                     // skip symbolic link
                     continue;
                 }
@@ -196,23 +196,3 @@ export class FileScanner {
 
 
 } //- FileScanner
-
-
-/**
- * @param filepath
- * @protected
- */
-function _normalizePath(filepath: string) {
-    // fix windows drive root
-    if (filepath.match(/^\w{1}:\\?$/)) {
-        // location is a pure drive letter: "C:" o "C:\"
-        filepath = filepath.substring(0, 2) + '/';
-    }
-
-    // fix home path
-    if (filepath.match(/^\~(?:[\/\\]|$)/)) {
-        // location starting from '~'
-        filepath = os.homedir() + filepath.substring(1);
-    }
-    return filepath;
-}

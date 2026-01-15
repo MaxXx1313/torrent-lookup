@@ -11,6 +11,7 @@ import {
 import { FileScanner } from "./FileScanner.js";
 import { Subject } from "rxjs";
 import { FileMatcher } from '../utils/FileMatcher.js';
+import { timeoutPromise } from "../utils/tools.js";
 
 
 export interface TorrentScannerOptions {
@@ -28,6 +29,25 @@ export interface TorrentScannerOptions {
      * @see FileScannerOption.exclude
      */
     exclude?: string[];
+
+    /**
+     * Maximum files per second.
+     * 0 - no limit
+     *
+     * @default 0
+     */
+    maxFps?: number;
+
+    /**
+     * Not tested!
+     * @default false
+     */
+    followSymLinks?: boolean;
+
+    /**
+     *
+     */
+    onEntry?: (entry: TorrentScannerEntry) => void;
 }
 
 /**
@@ -43,6 +63,8 @@ export interface TorrentScannerStats {
      * Torrent files found
      */
     torrents: number;
+
+    filesPerSecond: number;
 }
 
 
@@ -66,15 +88,14 @@ export class TorrentScanner {
     public readonly onEntry: Subject<TorrentScannerEntry> = new Subject();
 
     public options: TorrentScannerOptions;
-
     public stats: TorrentScannerStats;
 
-    private scanner: FileScanner;
+    private scanner?: FileScanner | null;
 
     private _dataFileStream: WriteStream;
     private _torrFileStream: WriteStream;
 
-    // private _lastFile: string;
+    private _lastFileFoundTs?: number | null;
 
 
     /**
@@ -83,20 +104,20 @@ export class TorrentScanner {
     constructor(options: TorrentScannerOptions) {
 
         this.options = {
-            workdir: DEFAULT_WORKDIR_LOCATION,
-            ...(options || {}),
+            workdir: options?.workdir || DEFAULT_WORKDIR_LOCATION,
+            followSymLinks: !!options?.followSymLinks,
+            target: [],
+            exclude: SCAN_EXCLUDE_DEFAULT,
+            maxFps: Math.max((options?.maxFps || 0), 0),
         }
-
-        this.scanner = new FileScanner({
-            exclude: [
-                ...SCAN_EXCLUDE_DEFAULT,
-                ...(this.options.exclude || []),
-            ],
-            cbFileFound: this._onFile.bind(this),
-        });
-
-        if (this.options.target) {
-            this.addTarget(this.options.target);
+        if (options?.target) {
+            this.addTarget(options.target)
+        }
+        if (options?.exclude) {
+            this.addExclusion(options.exclude)
+        }
+        if (options?.onEntry) {
+            this.onEntry.subscribe(options.onEntry);
         }
     }
 
@@ -105,33 +126,78 @@ export class TorrentScanner {
      * @param target
      */
     addTarget(target: string | string[]) {
-        this.scanner.addTarget(target);
+        const targets = Array.isArray(target) ? target : [target];
+        this.options.target.push(...targets);
+    }
+
+    clearTargets() {
+        this.options.target = [];
+    }
+
+    /**
+     * Add one or multiple exclusions
+     * @param target
+     */
+    addExclusion(target: string | string[]) {
+        const targets = Array.isArray(target) ? target : [target];
+        this.options.exclude.push(...targets);
+    }
+
+    clearExclusion() {
+        this.options.exclude = SCAN_EXCLUDE_DEFAULT;
     }
 
     /**
      *
      */
     run(): Promise<any> {
+        if (this.scanner) {
+            return Promise.reject('Already started');
+        }
         // SCAN
-        this.resetStats();
+        this.scanner = new FileScanner({
+            followSymLinks: !!this.options.followSymLinks,
+            exclude: [
+                ...(this.options.exclude || []),
+            ],
+            cbFileFound: this._onFile.bind(this),
+        });
+        this.scanner.addTarget(this.options.target);
+
+        //
+        this._resetStats();
         return Promise.resolve()
             .then(() => this._beforeScan())
-            .then(() => this.scanner.run())
-            .finally(() => this._afterScan());
+            .then(() => {
+                this._lastFileFoundTs = Date.now();
+                return this.scanner.run();
+            })
+            .finally(() => {
+                this.scanner = null;
+                return this._afterScan()
+            });
     }
 
     /**
      *
      */
-    terminate() {
-        return this.scanner.terminate();
+    async terminate() {
+        return this.scanner?.terminate();
     }
 
     /**
      *
      */
     isRunning() {
-        return this.scanner.isRunning();
+        return this.scanner?.isRunning() || false;
+    }
+
+    /**
+     * @return {boolean}
+     */
+    isTorrentFile(location: string, stats?: Stats) {
+        return path.extname(location) === TORRENT_EXTENSION;
+        // return (location.match(/(\.\w+)$/) || [])[1] == TORRENT_EXTENSION;
     }
 
     /**
@@ -162,7 +228,6 @@ export class TorrentScanner {
             }),
         ]);
     }
-
 
     /**
      * @param {string} filepath
@@ -196,25 +261,34 @@ export class TorrentScanner {
                     err ? reject(err) : resolve();
                 });
             }
+        }).then(() => {
+            // calculate stats
+            const now = Date.now();
+            const timePassedMs = now - this._lastFileFoundTs;
+            this._lastFileFoundTs = now;
+            this.stats.filesPerSecond = Math.round(1000 / timePassedMs);
+
+            // apply files-per-second limit
+            if (this.options.maxFps > 0) {
+                const expectedTimeMs = Math.round(1000 / this.options.maxFps);
+                const extraDelay = expectedTimeMs - timePassedMs;
+                if (extraDelay > 0) {
+                    return timeoutPromise(extraDelay);
+                }
+            }
+            return Promise.resolve();
         });
     }
 
     /**
      *
      */
-    protected resetStats() {
+    protected _resetStats() {
         this.stats = {
             files: 0, // without torrent files
-            torrents: 0
+            torrents: 0,
+            filesPerSecond: 0,
         };
-    }
-
-    /**
-     * @return {boolean}
-     */
-    isTorrentFile(location: string, stats?: Stats) {
-        return path.extname(location) === TORRENT_EXTENSION;
-        // return (location.match(/(\.\w+)$/) || [])[1] == TORRENT_EXTENSION;
     }
 
 } // TorrentScanner

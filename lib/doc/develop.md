@@ -5,5 +5,5 @@
 
 ### build and run
 ```bash
-  npx ts-node src/bin/tlookup.ts 
+  npx bun src/bin/tlookup.ts 
 ```

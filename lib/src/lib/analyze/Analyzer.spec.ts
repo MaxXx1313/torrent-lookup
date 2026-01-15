@@ -1,6 +1,6 @@
+import { describe, test, beforeEach } from "bun:test";
 import { Analyzer } from './Analyzer';
 import path from 'path';
-import { beforeEach, describe, it } from 'node:test';
 import assert from 'node:assert';
 
 
@@ -54,7 +54,7 @@ describe('Analyzer.spec', function () {
         ];
 
 
-        it('loadTorrentFileSync', function () {
+        test('loadTorrentFileSync', function () {
             const expected = {
                 'file1.txt:13': [inputArr[0]],
                 'file2.txt:14': [inputArr[1]],
@@ -65,7 +65,7 @@ describe('Analyzer.spec', function () {
         });
 
 
-        it('matchFile', function () {
+        test('matchFile', function () {
             analyzer.__loadTorrentFile(torrentLocation);
             const expected = {
                 ...inputArr[0],
@@ -80,7 +80,7 @@ describe('Analyzer.spec', function () {
         });
 
 
-        it('analyzeCacheData', function () {
+        test('analyzeCacheData', function () {
 
             analyzer.__loadTorrentFile(torrentLocation);
             for (const fileInfo of filesToMatch) {

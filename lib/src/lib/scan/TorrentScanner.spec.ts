@@ -1,12 +1,12 @@
+import { describe, test } from "bun:test";
 import { TorrentScanner } from './TorrentScanner';
 import { FileScanner } from './FileScanner';
-import { describe, it } from 'node:test';
 import assert from 'node:assert';
 
 
 describe('TorrentScanner.spec', function () {
 
-    it('isTorrentFile', function () {
+    test('isTorrentFile', function () {
 
         const scanner = new TorrentScanner({target: []});
 
@@ -15,7 +15,7 @@ describe('TorrentScanner.spec', function () {
     });
 
 
-    it('isExcluded', function () {
+    test('isExcluded', function () {
 
         const scanner = new FileScanner({
             exclude: ['.skippedfolder', 'node_modules'],

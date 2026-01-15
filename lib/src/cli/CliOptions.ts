@@ -12,6 +12,7 @@ export interface CliOptions {
      */
     target: string[];
     tmp: string;
+    fps?: number;
 
     /**
      * for 'push' only
@@ -21,5 +22,5 @@ export interface CliOptions {
      * client options
      * for 'push' only
      */
-    option: OptionsParsed;
+    clientOptions: OptionsParsed;
 }

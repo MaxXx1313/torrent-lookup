@@ -1,0 +1,95 @@
+@import './base.css';
+@import './fonts/Space_Grotesk/SpaceGronesk.scss';
+
+#app {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0;
+    font-weight: normal;
+}
+
+
+@keyframes slide {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(250%);
+    }
+}
+
+@keyframes rotateccw {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(-360deg);
+    }
+}
+
+
+@keyframes search {
+    0% {
+        transform: translate(0px, 8px);
+    }
+    16% {
+        transform: translate(7px, 4px);
+    }
+    32% {
+        transform: translate(7px, -4px);
+    }
+    50% {
+        transform: translate(0px, -8px);
+    }
+    66% {
+        transform: translate(-7px, -4px);
+    }
+    84% {
+        transform: translate(-7px, 4px);
+    }
+    100% {
+        transform: translate(0px, 8px);
+    }
+}
+
+.animate-search {
+    animation: search 2s infinite linear
+}
+
+.animate-rotate-ccw {
+    animation: rotateccw 2s infinite linear
+}
+
+.animate-rotate-cw {
+    animation: rotateccw 2s infinite linear reverse;
+}
+
+/*
+
+a,
+.green {
+  text-decoration: none;
+  color: hsla(160, 100%, 37%, 1);
+  transition: 0.4s;
+  padding: 3px;
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    display: flex;
+    place-items: center;
+  }
+
+  #app {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 0 2rem;
+  }
+}
+*/

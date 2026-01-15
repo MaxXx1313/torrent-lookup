@@ -1,11 +1,11 @@
-import { DEFAULT_WORKDIR_LOCATION, FILE_DATA, FILE_TORRENTS, FILEN_MAPS } from "../const.js";
+import { DEFAULT_WORKDIR_LOCATION, FILE_DATA, FILE_TORRENTS, FILES_MAPS } from "../const.js";
 
 import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
 import { promiseByLine } from '../utils/line-by-line.js';
 import { bencodeReadSync } from '../utils/bencode/bencode.js';
 import { FileMatcher } from '../utils/FileMatcher.js';
-import { extractBasePath } from '../utils/tools.js';
+import { extractBasePath } from '../utils/path-utils.js';
 
 
 /**
@@ -16,7 +16,7 @@ interface TorrentFileInfo {
     /**
      * file name + extension inside torrent file
      */
-    base: string; // file name + extension
+    name: string; // file name + extension
 
     /**
      * Folder path inside torrent file
@@ -38,7 +38,7 @@ interface TorrentFileInfo {
     /**
      * Torrent file location
      */
-    torrent: string;
+    torrentFileLocation: string;
 }
 
 
@@ -48,6 +48,7 @@ interface TorrentFileInfo {
 export interface TorrentMapping {
     torrent: string; // torrent location
     saveTo: string; // absolute file location
+    saveToOptions?: string[]; // another options (any path which has at least one file from the torrent)
     // TODO:
     // mapping: Array<>; // set of renamed/moved files
 }
@@ -90,14 +91,6 @@ export class Analyzer {
      * @private
      */
     public _decision: TorrentMapping[];
-
-    /**
-     *  'key' is torrent file location
-     *  value is TorrentInfo[]
-     *  @private
-     */
-    private _mapping: { [location: string]: TorrentFileInfo[] } = {};
-
     /**
      *
      */
@@ -106,7 +99,12 @@ export class Analyzer {
         torrents: 0, // torrent files amount
         maps: 0, // amount of found matches
     };
-
+    /**
+     *  'key' is torrent file location
+     *  value is TorrentInfo[]
+     *  @private
+     */
+    private _mapping: { [location: string]: TorrentFileInfo[] } = {};
 
     /**
      * @param options
@@ -125,32 +123,14 @@ export class Analyzer {
         console.log('[Analyzer] use workdir:', this.options.workdir);
         const torrentsFileName = path.join(this.options.workdir, FILE_TORRENTS);
         const dataFileName = path.join(this.options.workdir, FILE_DATA);
-        const mapsFileName = path.join(this.options.workdir, FILEN_MAPS);
+        const mapsFileName = path.join(this.options.workdir, FILES_MAPS);
 
+        this._hash = {};
         await this._loadTorrentFilesFromFile(torrentsFileName);
         await this._matchFilesFromFile(dataFileName);
         await this._makeDecision();
         await this._saveDecisionTo(mapsFileName);
         return this._decision;
-    }
-
-    /**
-     *
-     */
-    protected _loadTorrentFilesFromFile(dataFileLocation: string): Promise<void> {
-        console.log('[Analyzer] Loading files');
-
-        return promiseByLine(dataFileLocation, (line: string) => {
-            return this.__loadTorrentFile(line)
-                .catch(e => {
-                    console.error('[Analyzer] Unable to load torrent file:', line);
-                    console.error(e);
-                });
-        }).then(() => {
-            this.stats.torrents = Object.keys(this._hash).length;
-            console.log(`[Analyzer] Loaded ${this.stats.torrents} torrent files`);
-        });
-
     }
 
     /**s
@@ -165,29 +145,29 @@ export class Analyzer {
         if (!data.info.files) {
             // single file
             files = [{
-                base: data.info.name,
+                name: data.info.name,
                 dir: '',
                 length: data.info.length,
 
-                torrent: filepath,
+                torrentFileLocation: filepath,
                 match: [],
             }];
         } else {
             // multiple files
-            const name = data.info.name;
+            const baseDir = data.info.name;
 
             // TODO: need to validate this
             files = data.info.files.map((fileData) => {
 
-                fileData.path.unshift(name);
+                fileData.path.unshift(baseDir);
                 const filename = fileData.path.pop();
                 const filedir = fileData.path.join('/');
                 return {
-                    base: filename,
+                    name: filename,
                     dir: filedir,
                     length: fileData.length,
 
-                    torrent: filepath,
+                    torrentFileLocation: filepath,
                     match: [],
                 }
             });
@@ -195,7 +175,7 @@ export class Analyzer {
 
         // add to hash
         for (const file of files) {
-            const key = _hashId(file.base, file.length);
+            const key = _hashId(file.name, file.length);
             if (!this._hash[key]) {
                 this._hash[key] = [];
             }
@@ -203,33 +183,7 @@ export class Analyzer {
         }
     }
 
-
     /**
-     *
-     */
-    protected _matchFilesFromFile(dataFile: string): Promise<void> {
-        console.log('[Analyzer] Matching files');
-
-        return promiseByLine(dataFile, (fileInfoString) => {
-
-            const fileInfo = FileMatcher.explodeFileInfo(fileInfoString)
-            if (!fileInfo) {
-                console.log('[Analyzer] Internal error: unable to parse info:', fileInfoString);
-                return null;
-            }
-
-            //
-            this.__matchFile(fileInfo.location, fileInfo.size);
-
-            this.stats.files++;
-        }).then(() => {
-            console.log(`[Analyzer] Loaded ${this.stats.files} regular files`);
-        });
-    }
-
-    /**
-     * @param {string} location
-     * @param {number} size
      * @private
      *
      * Matching is quite challenged task.
@@ -237,24 +191,31 @@ export class Analyzer {
      *  1. try to match exact file + size
      *  TODO: 2. try to match exact filename with no size
      */
-    public __matchFile(location: string, size: number) {
+    public __matchFile(fileLocation: string, size: number) {
 
-        const pathInfo = path.parse(location);
+        const pathInfo = path.parse(fileLocation);
+        const fileName = pathInfo.base;
+        const fileDir = pathInfo.dir;
 
         // 1. match exact file + size
-        const key = _hashId(pathInfo.base, size);
+        const key = _hashId(fileName, size);
         if (this._hash[key]) {
             const matchTorrentInfo = this._hash[key];
 
             for (const tInfo of matchTorrentInfo) {
-                // TODO: 'no-relocate-inside-torrent' option
-                // 2. match path
-                const savedTo = extractBasePath(pathInfo.dir, tInfo.dir);
-                // console.log(' matched', pathInfo.dir, item.dir, savedTo);
+                // Check if fileLocation has the base folder same as torrent inner path.
+                // Also, torrent inner path can be empty.
+
+                // Note: some torrent parts can be relocated in different folder. We don't support it yet
+                // TODO: 'allow-relocate-inside-torrent' option
+                const savedTo = extractBasePath(fileDir, tInfo.dir);
+                // console.log(' matched', fileDir, item.dir, savedTo);
                 if (savedTo) {
                     // location found
                     tInfo.match = tInfo.match || [];
                     tInfo.match.push(savedTo);
+                } else {
+                    // file path is not match torrent
                 }
             }
         }
@@ -266,7 +227,6 @@ export class Analyzer {
     public getDecision() {
         return this._decision;
     }
-
 
     /**
      * Analyze everything that is loaded and matched.
@@ -281,16 +241,16 @@ export class Analyzer {
         this._mapping = {};
         for (const key in this._hash) {
             for (const torrentInfo of this._hash[key]) {
-                const torrent = torrentInfo.torrent;
-                this._mapping[torrent] = this._mapping[torrent] || [];
-                this._mapping[torrent].push(torrentInfo);
+                const tPath = torrentInfo.torrentFileLocation;
+                this._mapping[tPath] = this._mapping[tPath] || [];
+                this._mapping[tPath].push(torrentInfo);
             }
         }
         this._hash = null; // free some memory
 
         //
         let mapping: TorrentMapping[] = [];
-        for (const torrent in this._mapping) {
+        for (const tPath in this._mapping) {
 
             /*
               Here we calculate score based on how many files from the torrent are kept in the same location
@@ -300,7 +260,7 @@ export class Analyzer {
             // key is absolute path, value is a score
             const scoreHash: { [path: string]: number } = {};
 
-            for (const torrentInfo of this._mapping[torrent]) {
+            for (const torrentInfo of this._mapping[tPath]) {
                 if (!torrentInfo.match) {
                     // nothing found for this torrent file
                     return;
@@ -324,11 +284,17 @@ export class Analyzer {
                 }
             }
 
+            // get all possible options
+            // It's any path which has at least one file from torrent
+            const options = Object.keys(scoreHash)
+                .sort((a, b) => scoreHash[b] - scoreHash[a]);
+
             //
             if (saveTo) {
                 mapping.push({
-                    torrent: torrent,
+                    torrent: tPath,
                     saveTo: saveTo,
+                    saveToOptions: options,
                 });
             }
         }
@@ -337,6 +303,48 @@ export class Analyzer {
 
         this.stats.maps = this._decision.length;
         console.log(`[Analyzer] Found ${this.stats.maps} matches`);
+    }
+
+    /**
+     *
+     */
+    protected _loadTorrentFilesFromFile(dataFileLocation: string): Promise<void> {
+        console.log('[Analyzer] Loading files');
+
+        return promiseByLine(dataFileLocation, (line: string) => {
+            return this.__loadTorrentFile(line)
+                .catch(e => {
+                    console.error('[Analyzer] Unable to load torrent file:', line);
+                    console.error(e);
+                });
+        }).then(() => {
+            this.stats.torrents = Object.keys(this._hash).length;
+            console.log(`[Analyzer] Loaded ${this.stats.torrents} torrent files`);
+        });
+
+    }
+
+    /**
+     *
+     */
+    protected _matchFilesFromFile(dataFile: string): Promise<void> {
+        console.log('[Analyzer] Matching files');
+
+        return promiseByLine(dataFile, (fileInfoString) => {
+
+            const fileInfo = FileMatcher.explodeFileInfo(fileInfoString)
+            if (!fileInfo) {
+                console.log('[Analyzer] Internal error: unable to parse info:', fileInfoString);
+                return null;
+            }
+
+            //
+            this.__matchFile(fileInfo.location, fileInfo.size);
+
+            this.stats.files++;
+        }).then(() => {
+            console.log(`[Analyzer] Loaded ${this.stats.files} regular files`);
+        });
     }
 
     /**

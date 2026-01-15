@@ -1,4 +1,4 @@
-import { DEFAULT_WORKDIR_LOCATION, FILEN_MAPS } from "../const.js";
+import { DEFAULT_WORKDIR_LOCATION, FILES_MAPS } from "../const.js";
 
 import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
@@ -37,7 +37,7 @@ export class Info {
      *
      */
     getMapping(): Promise<TorrentMapping[]> {
-        const mapsFileName = path.join(this.options.tmp, FILEN_MAPS);
+        const mapsFileName = path.join(this.options.tmp, FILES_MAPS);
         return this.loadResultFile(mapsFileName);
     }
 

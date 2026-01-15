@@ -3,3 +3,7 @@ tmp
 dist
 .idea
 test/analyzer/maps.json
+
+.tmp-tlookup
+electron-core/app
+electron-core/out

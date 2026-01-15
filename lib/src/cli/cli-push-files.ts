@@ -10,11 +10,11 @@ export function cliPushFiles(options: CliOptions): Promise<any> {
     // assert.ok(options.client, 'Client must be set. use -c|--client to make it');
 
     const pusher = new PushManager({
-        client: options.client,
         workdir: options.tmp,
-        option: options.option,
+        client: options.client,
+        clientOptions: options.clientOptions,
     });
-    pusher.opStatus.subscribe(status => {
+    pusher.opStatus$.subscribe(status => {
         console.log(status);
     });
     return pusher.pushAll();

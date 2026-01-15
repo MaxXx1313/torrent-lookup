@@ -1,126 +1,108 @@
-import {Analyzer, TorrentScanner} from 'tlookup';
-import {dialog} from 'electron';
+import {Analyzer, Info, PushManager, TorrentScanner} from "tlookup";
 
-const reportDebounceTime = 300;
+export function scanLogic(ipcMain, mainWindow) {
 
-export class Scanner {
+    let _mappings = [];
 
-    scanner = new TorrentScanner();
+    const scanner = new TorrentScanner();
+    const analyzer = new Analyzer();
+    const info = new Info();
+    const pushManager = new PushManager();
 
-    _myBridge;
-    _decision;
-
-    _status = 'idle';
-
-    /**
-     * @param myBridge
-     */
-    constructor(myBridge) {
-        this._myBridge = myBridge;
-
-        myBridge.on('scan:start', (data) => {
-            return this.startScan(data);
-        });
-        myBridge.on('scan:stop', (data) => {
-            return this.stopScan(data);
-        });
-        myBridge.handle('scan:select-folder', (data) => {
-            return this.selectFolder();
-        });
-
-
-        this.scanner.onEntry.subscribe(_onProgress);
-
-        let _lastReportTime = 0;
-
-        function _onProgress(entry) {
-            if (entry.isTorrent) {
-                myBridge.send('scan:found', entry.location);
-            } else {
-
-                // debounce logic
-                const now = Date.now();
-                if (now - _lastReportTime < reportDebounceTime) {
-                    return;
-                }
-                _lastReportTime = now;
-
-                myBridge.send('scan:progress', entry.location);
-            }
-        }
-
-
-        this._myBridge.on('app:ready', () => {
-            this._myBridge.send('scan:status', this._status);
-            if (this._decision) {
-                this._myBridge.send('analyze:decision', this._decision);
-            }
-        });
+    let _exportParameters = {
+        username: 'admin',
+        password: 'admin',
+        port: 9091,
     }
 
-    /**
-     *
-     */
-    stopScan() {
-        this.scanner.terminate();
-    }
+    // load mappings
+    info.getMapping().then(m => {
+        _mappings = m || [];
+    });
+
+    scanner.onEntry.subscribe((entry) => {
+        // ipcMain.emit('scan:entry', entry.location);
+        mainWindow.webContents.send('scan:entry', entry.location);
+        mainWindow.webContents.send('scan:stats', scanner.stats);
+    });
+
+    pushManager.opStatus$.subscribe((msg) => {
+        mainWindow.webContents.send('export:log', msg);
+    });
 
     /**
-     *
+     * Start scanning process
      */
-    async selectFolder() {
-        console.log('[scan] selectFolder');
-        const results = await dialog.showOpenDialog({
-            properties: ['openDirectory', 'multiSelections', 'dontAddToRecent'],
-        });
-        console.debug('[scan] selectFolder results', results);
-        if (results.canceled) {
-            return null;
-        } else {
-            return results.filePaths || null;
-        }
-    }
+    ipcMain.handle('scan:start', async (event, config) => {
+        const targets = config?.targets || [];
+        const exclude = config?.exclude || [];
 
+        await scanner.terminate();
 
-    /**
-     * @param {object} options
-     * @param {string[]} options.targets
-     * @returns {Promise<void>}
-     */
-    async startScan(options) {
-        if (this.scanner.isRunning()) {
-            console.log('[scan] already started');
-            return;
-        }
+        scanner.clearTargets();
+        scanner.clearExclusion();
 
-        await this.scanner.terminate();
-        this.scanner.addTarget(options.targets || []);
-        this._decision = null;
+        scanner.addTarget(targets);
+        scanner.addExclusion(exclude);
 
-        console.log('[scan] started', options.targets);
-        this._setStatus('scan');
-        return this.scanner.run().then(() => {
-            console.log('Scanned %s files, found %s torrent files', this.scanner.stats.files, this.scanner.stats.torrents);
-        }).then(() => {
-            this._setStatus('analyze');
-            const analyzer = new Analyzer();
-            return analyzer.analyze().then(() => {
-                this._decision = analyzer.getDecision();
-                this._myBridge.send('analyze:decision', this._decision);
-                return this._decision;
+        scanner.run()
+            .then(() => analyzer.analyze())
+            .then(mappings => {
+                _mappings = mappings;
+            })
+            .finally(() => {
+                mainWindow.webContents.send('scan:finished');
             });
-        }).catch((e) => {
-            throw e;
-        }).finally(() => {
-            this._setStatus('idle');
-        });
-    }
+    });
 
-    _setStatus(status) {
-        this._status = status;
-        this._myBridge.send('scan:status', this._status);
-    }
+    /**
+     * Stop scanning process
+     */
+    ipcMain.handle('scan:stop', async () => {
+        await scanner.terminate();
+    });
+
+    /**
+     *
+     */
+    ipcMain.handle('export:get-user-decision', async () => {
+        return _mappings || [];
+    });
+
+    /**
+     *
+     */
+    ipcMain.handle('export:set-user-decision', async (event, mappings) => {
+        _mappings = mappings || [];
+    });
+
+
+    /**
+     *
+     */
+    ipcMain.handle('export:get-parameters', async () => {
+        return _exportParameters;
+    });
+
+    /**
+     *
+     */
+    ipcMain.handle('export:set-parameters', async (event, options) => {
+        _exportParameters = options;
+        const transmissionOptions = {
+            endpoint: `http://${options.username}:${options.password}@localhost:${options.port}`,
+        }
+        pushManager.setClient('transmission', transmissionOptions);
+    });
+    /**
+     *
+     */
+    ipcMain.handle('export:push', async () => {
+        const mappingsActive = (_mappings || []).filter(m => !m.isDisabled);
+        if (!mappingsActive?.length) {
+            return Promise.reject('Nothing to push');
+        }
+        await pushManager.pushCustomMatch(mappingsActive);
+    });
 
 }
-
-

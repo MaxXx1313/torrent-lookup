@@ -74,19 +74,6 @@ export function request(opts, postData: any = null) {
     });
 }
 
-/**
- * Get basepath from {@param filepath} to {@param dir}, if it's a child
- * Otherwise return null
- */
-export function extractBasePath(filepath: string, dir: string): string {
-    if (dir == '') {
-        return filepath;
-    }
-    if (filepath.endsWith(path.sep + dir)) {
-        return filepath.substring(0, filepath.length - dir.length - 1);
-    }
-    return null;
-}
 
 /**
  *
@@ -97,6 +84,14 @@ export function nexTickPromise() {
     });
 }
 
+/**
+ *
+ */
+export function timeoutPromise(delay: number = 0) {
+    return new Promise(resolve => {
+        setTimeout(resolve, delay);
+    });
+}
 
 //## tick
 let _tic_time = 0;
@@ -109,3 +104,4 @@ export function tick() {
     _tic_time = Date.now();
     return _tic_time - t;
 }
+

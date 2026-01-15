@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="">
+    <head>
+        <meta charset="UTF-8">
+        <title>Torrent lookup utility</title>
+
+        <link rel="icon" href="/assets/favicon.ico">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+<!--        <base href="/" />--> <!-- < this breaks electron runtime -->
+
+        <meta name="color-scheme" content="dark light" />
+        <meta name="format-detection" content="telephone=no"/>
+        <meta name="msapplication-tap-highlight" content="no"/>
+
+        <link rel="shortcut icon" type="image/png" href="/assets/favicon.png"/>
+
+        <!-- add to homescreen for ios -->
+        <meta name="mobile-web-app-capable" content="yes"/>
+        <meta name="apple-mobile-web-app-status-bar-style" content="dark"/>
+
+    </head>
+    <body class="dark bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100">
+        <div id="app"></div>
+        <script type="module" src="/src/main.ts"></script>
+    </body>
+</html>

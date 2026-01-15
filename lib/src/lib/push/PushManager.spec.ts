@@ -1,5 +1,5 @@
+import { describe, test } from "bun:test";
 import { PushManager } from './PushManager';
-import { describe, it } from 'node:test';
 import assert from 'node:assert';
 
 
@@ -20,7 +20,7 @@ describe('Pusher.spec', function () {
     }
 
 
-    it('_pushAll', function () {
+    test('_pushAll', function () {
         const input = [
             {
                 "saveTo": "/tmp/download-1",

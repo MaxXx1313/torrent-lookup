@@ -1,0 +1,11 @@
+
+/* Set up font for modern browsers, all weights */
+@supports (font-variation-settings: normal) {
+  @font-face {
+    font-family: 'Space Grotesk';
+    src: url('@/assets/fonts/Space_Grotesk/SpaceGrotesk-VariableFont_wght.ttf') format('woff2 supports variations'),
+    url('@/assets/fonts/Space_Grotesk/SpaceGrotesk-VariableFont_wght.ttf') format('woff2-variations');
+    font-weight: 300 700;
+    font-stretch: 25% 151%;
+  }
+}
