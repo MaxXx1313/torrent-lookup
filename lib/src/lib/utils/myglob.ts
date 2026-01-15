@@ -10,8 +10,8 @@ const _pattenCache = {};
 export function matchCustom(filepath: string, pattern: string, opts?: { platform?: string }): boolean {
     const platform = opts?.platform || process.platform;
     if (platform === 'win32') {
-        filepath = filepath.replace(/\\/g, path.posix.sep).toLowerCase();
-        pattern = pattern.replace(/\\/g, path.posix.sep).toLowerCase();
+        filepath = filepath.toLowerCase();
+        pattern = pattern.toLowerCase();
     }
 
     // put compare function to cache
@@ -39,13 +39,18 @@ function isAbsolute(filepath: string, opts: { platform: string }) {
 
 
 function _createPathTestFunction(pattern: string, opts: { platform: string }) {
-    const patternPrepared = path.normalize(pattern + path.sep)
-        .replace(/\//g, '\/')
+    const patternPrepared = path.normalize(pattern + path.posix.sep)
         .replace(/\*/g, '.+');
-    const patternRegEx = new RegExp(patternPrepared);
+    const patternRegEx = new RegExp(_unifySlashes(patternPrepared));
 
     return function (filepath: string) {
-        const filepathWithSlash = path.normalize(filepath + path.sep);
+        const filepathWithSlash = _unifySlashes(path.normalize(filepath + path.posix.sep));
         return patternRegEx.test(filepathWithSlash);
     };
+}
+
+
+function _unifySlashes(str: string) {
+    return str.replace(/\//g, '\/') // escape slash for regexp
+        .replace(/\\/g, '\/'); // escape slash for regexp
 }
