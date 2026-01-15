@@ -11,9 +11,9 @@ The application helps you:
 * Find which files have actually been downloaded
 * Upload found torrents to Transmission client (currently the only supported client)
 
-
-![image](./doc/img1.png)
-
 ## Related Tools
 
 For command-line usage, check out the [TLookup CLI](./lib/README.md) tool.
+
+
+![image](./doc/img1.png)
