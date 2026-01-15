@@ -1,5 +1,4 @@
-# tlookup3
-
+# TLookup Cli
 
 [![npm](https://img.shields.io/npm/v/tlookup.svg?style=flat-square)](https://npmjs.com/tlookup)
 
@@ -12,27 +11,15 @@ Command-line tool for looking torrent files and downloaded content. Match them t
 - macos
 
 **Supported clients:**
-* Transmission (all platforms)
+* Transmission (win, linux, mac)
   - enable remote access with user/pass: `admin`/`admin`, so it's available at "http://admin:admin@localhost:9091"
 
 
 
 ## Install
 
-```bash
-npm install -g tlookup (not pushed yet)
-```
 
-# Usage example
-
-```bash
-npm install -g https://github.com/MaxXx1313/torrent-lookup
-npm run build
-npm start -- scan
-npm start -- push t
-```
-
-
+TBD: to be updated
 
 
 
