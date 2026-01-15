@@ -52,9 +52,11 @@ function createWindow() {
 }// attach scanner logic
 // const scanner = new Scanner(myBridge);
 
-// TODO
 // add the following snippet as early as possible in the main process execution (before the app.ready event).
 // if (require('electron-squirrel-startup')) app.quit();
+if (import.meta.env?.ELECTRON_SQUIRREL_STARTUP) {
+    app.quit();
+}
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
