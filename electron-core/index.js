@@ -8,7 +8,6 @@ import {scanLogic} from './core-lib/scan.js';
 import {appLogic} from "./core-lib/app.js";
 
 
-
 console.log('[Store]', app.getPath('userData'));
 
 const isDevMode = process.argv.includes('--dev');
@@ -19,7 +18,7 @@ if (isDevMode) {
 /////////////////////////////
 const __filename = URL.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-console.log('__dirname',__dirname);
+console.log('__dirname', __dirname);
 
 let _mainWindow = null;
 
@@ -54,7 +53,9 @@ function createWindow() {
 
 // add the following snippet as early as possible in the main process execution (before the app.ready event).
 // if (require('electron-squirrel-startup')) app.quit();
-if (import.meta.env?.ELECTRON_SQUIRREL_STARTUP) {
+const isSquirrelService = process.argv.includes('--squirrel-install')
+    || process.argv.includes('--squirrel-uninstall');//  || process.argv.includes('--squirrel-updated');
+if (isSquirrelService) {
     app.quit();
 }
 
