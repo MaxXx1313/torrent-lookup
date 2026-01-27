@@ -102,7 +102,14 @@ export function scanLogic(ipcMain, mainWindow) {
         if (!mappingsActive?.length) {
             return Promise.reject('Nothing to push');
         }
-        await pushManager.pushCustomMatch(mappingsActive);
+
+        const total = mappingsActive.length;
+        mainWindow.webContents.send('export:push-progress', {total, completed: 0});
+        for (let i = 0; i < mappingsActive.length; i++) {
+            const torrentMapping = mappingsActive[i];
+            await pushManager.push(torrentMapping.torrent, torrentMapping.saveTo);
+            mainWindow.webContents.send('export:push-progress', {total, completed: i + 1});
+        }
     });
 
 }

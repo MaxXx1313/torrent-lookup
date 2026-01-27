@@ -58,7 +58,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // ui4
     getConfig: callable('app:get-config'),
     setConfig: callable('app:set-config'),
-    // getDefaultLocations: callable('app:get-default-locations'),
+    // getDefaultLocations: callable('app:get-default-locations'), // TODO: incomplete
     getSystemExcluded: callable('app:get-system-excluded'),
 
     selectFolder: callable('app:select-folder'),
@@ -76,4 +76,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
     exportSetParameters: callable('export:set-parameters'),
     exportStart: callable('export:push'),
     onExportLog: event('export:log'),
+    // onExportProgress: event('export:push-progress'), // TODO: incomplete
 });
