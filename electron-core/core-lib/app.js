@@ -37,6 +37,10 @@ export function appLogic(ipcMain) {
         return selectFolder();
     });
 
+    ipcMain.handle('app:get-default-locations', (event) => {
+        return getDefaultLocations();
+    });
+
 }
 
 
@@ -44,14 +48,40 @@ export function appLogic(ipcMain) {
  *
  */
 async function selectFolder() {
-    console.log('[scan] selectFolder');
+    console.log('[app] selectFolder');
     const results = await dialog.showOpenDialog({
         properties: ['openDirectory', 'multiSelections', 'dontAddToRecent'],
     });
-    console.debug('[scan] selectFolder results', results);
+    console.debug('[app] selectFolder results', results);
     if (results.canceled) {
         return null;
     } else {
         return results.filePaths || null;
     }
+}
+
+
+/**
+ *
+ */
+async function getDefaultLocations() {
+    console.log('[app] getDefaultLocations');
+    let results = [];
+    // TODO: enumerate all drives
+    switch (process.platform) {
+        case "linux":
+            results = ['~'];
+            break;
+        case "win32":
+            results = ['~'];
+            break;
+        case "darwin":
+            results = ['~'];
+            break;
+        default:
+            return Promise.reject('Platform not supported')
+    }
+    //
+    console.debug('[app] getDefaultLocations results', results);
+    return results;
 }

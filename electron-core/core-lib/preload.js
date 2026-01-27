@@ -2,6 +2,9 @@
 const {contextBridge, ipcRenderer} = require('electron/renderer');
 
 
+/**
+ * @return Promise<T>
+ */
 function callable(name) {
     return function () {
         const argsArray = Array.from(arguments);
@@ -20,8 +23,7 @@ function callable(name) {
 }
 
 /**
- * return unsubscribe function.
- * This is
+ * @return {()=>void} unsubscribe function
  */
 function event(eventName) {
     return (callback) => {
@@ -35,6 +37,9 @@ function event(eventName) {
     }
 }
 
+/**
+ * @return {()=>void} unsubscribe function
+ */
 function eventOnce(eventName) {
     return (callback) => {
         const _cb = (_event, value) => {
@@ -53,6 +58,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // ui4
     getConfig: callable('app:get-config'),
     setConfig: callable('app:set-config'),
+    // getDefaultLocations: callable('app:get-default-locations'),
     getSystemExcluded: callable('app:get-system-excluded'),
 
     selectFolder: callable('app:select-folder'),
