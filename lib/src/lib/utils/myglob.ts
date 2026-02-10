@@ -3,7 +3,6 @@ import * as path from 'node:path';
 
 const _pattenCache = {};
 
-
 /**
  *
  */

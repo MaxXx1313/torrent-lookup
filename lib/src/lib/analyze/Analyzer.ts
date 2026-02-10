@@ -20,6 +20,7 @@ interface TorrentFileInfo {
 
     /**
      * Folder path inside torrent file
+     * TODO: can we remove it?
      */
     dir: string;
 
@@ -28,6 +29,8 @@ interface TorrentFileInfo {
      */
     length: number; // file size
 
+    // TODO: add sha to handle duplicates
+    // TODO: split into two interfaces: one is data read from torrent, the other is a mapping
     /**
      * List of possible matches. Absolute path to base dir
      * (i.e. 'match' + 'dir' + 'base' is an absolute path to a file).
@@ -47,9 +50,10 @@ interface TorrentFileInfo {
  */
 export interface TorrentMapping {
     torrent: string; // torrent location
+    // TODO: manage torrent duplicates
     saveTo: string; // absolute file location
     saveToOptions?: string[]; // another options (any path which has at least one file from the torrent)
-    // TODO:
+    // TODO: manage partial downloads
     // mapping: Array<>; // set of renamed/moved files
 }
 
@@ -189,7 +193,7 @@ export class Analyzer {
      * Matching is quite challenged task.
      * So far we do simple step:
      *  1. try to match exact file + size
-     *  TODO: 2. try to match exact filename with no size
+     *  TODO: 2. try to match exact filename with no size for sibling files
      */
     public __matchFile(fileLocation: string, size: number) {
 

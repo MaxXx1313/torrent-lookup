@@ -272,6 +272,8 @@ export class TorrentScanner {
             }
         }).then(() => {
             // calculate stats
+            // TODO: timeout cannot b eless than 10-20ms, which leads to max 50-100 fps. other values are not effective
+            // TOOD: fps jumps too often. need to limit to 1s
             const now = Date.now();
             const timePassedMs = now - this._lastFileFoundTs;
             this._lastFileFoundTs = now;

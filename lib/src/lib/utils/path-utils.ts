@@ -1,6 +1,7 @@
 import os from "node:os";
 import * as path from 'node:path';
 
+// TODO: add unit tests
 /**
  * @param filepath
  * @protected

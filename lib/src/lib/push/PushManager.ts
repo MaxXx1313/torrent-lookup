@@ -27,6 +27,8 @@ export interface PusherOptions {
 // TODO: not finished yet
 export type ClientOptions = { [key: string]: string | number | boolean }
 
+// TODO: get client options method
+
 /**
  *
  */
