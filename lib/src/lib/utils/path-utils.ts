@@ -2,36 +2,38 @@ import os from "node:os";
 import * as path from 'node:path';
 
 // TODO: add unit tests
-/**
- * @param filepath
- * @protected
- */
-export function normalizePath(filepath: string) {
-    // fix windows drive root
-    if (filepath.match(/^\w{1}:\\?$/)) {
-        // location is a pure drive letter: "C:" o "C:\"
-        filepath = filepath.substring(0, 2) + '/';
-    }
 
-    // fix home path
-    if (filepath.match(/^\~(?:[\/\\]|$)/)) {
-        // location starting from '~'
-        filepath = os.homedir() + filepath.substring(1);
-    }
-    return filepath;
-}
+export class PathUtils {
+    /**
+     * @param filepath
+     * @protected
+     */
+    static normalizePath(filepath: string) {
+        // fix windows drive root
+        if (filepath.match(/^\w{1}:\\?$/)) {
+            // location is a pure drive letter: "C:" o "C:\"
+            filepath = filepath.substring(0, 2) + '/';
+        }
 
-
-/**
- * Get basepath from {@param filepath} to {@param dir}, if it's a child
- * Otherwise return null
- */
-export function extractBasePath(filepath: string, dir: string): string {
-    if (dir == '') {
+        // fix home path
+        if (filepath.match(/^\~(?:[\/\\]|$)/)) {
+            // location starting from '~'
+            filepath = os.homedir() + filepath.substring(1);
+        }
         return filepath;
     }
-    if (filepath.endsWith(path.sep + dir)) {
-        return filepath.substring(0, filepath.length - dir.length - 1);
+
+    /**
+     * Get basepath from {@param filepath} to {@param dir}, if it's a child
+     * Otherwise return null
+     */
+    static extractBasePath(filepath: string, dir: string): string {
+        if (dir == '') {
+            return filepath;
+        }
+        if (filepath.endsWith(path.sep + dir)) {
+            return filepath.substring(0, filepath.length - dir.length - 1);
+        }
+        return null;
     }
-    return null;
 }

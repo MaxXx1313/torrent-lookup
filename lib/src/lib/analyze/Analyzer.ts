@@ -5,7 +5,7 @@ import * as fs from 'node:fs/promises';
 import { promiseByLine } from '../utils/line-by-line.js';
 import { bencodeReadSync } from '../utils/bencode/bencode.js';
 import { FileMatcher } from '../utils/FileMatcher.js';
-import { extractBasePath } from '../utils/path-utils.js';
+import { PathUtils } from '../utils/path-utils.js';
 
 
 /**
@@ -212,7 +212,7 @@ export class Analyzer {
 
                 // Note: some torrent parts can be relocated in different folder. We don't support it yet
                 // TODO: 'allow-relocate-inside-torrent' option
-                const savedTo = extractBasePath(fileDir, tInfo.dir);
+                const savedTo = PathUtils.extractBasePath(fileDir, tInfo.dir);
                 // console.log(' matched', fileDir, item.dir, savedTo);
                 if (savedTo) {
                     // location found

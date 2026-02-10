@@ -3,7 +3,7 @@ import { Stats } from 'node:fs';
 import * as path from 'node:path';
 import { QueueWorker } from "./QueueWorker.js";
 import { _createPathTestFunction, matchCustom } from "../utils/myglob.js";
-import { normalizePath } from "../utils/path-utils.js";
+import { PathUtils } from "../utils/path-utils.js";
 import ErrnoException = NodeJS.ErrnoException;
 
 
@@ -68,7 +68,7 @@ export class FileScanner {
             this._exclude.push.apply(this._exclude, this._options.exclude);
         }
 
-        this._exclude = this._exclude.map(normalizePath);
+        this._exclude = this._exclude.map(PathUtils.normalizePath);
     }
 
     /**
@@ -158,7 +158,7 @@ export class FileScanner {
      * @param filepath
      */
     protected async scanFolder(filepath: string): Promise<any> {
-        return this._scanFolder(normalizePath(filepath))
+        return this._scanFolder(PathUtils.normalizePath(filepath))
             .catch(this._options.cbError.bind(this));
     }
 
