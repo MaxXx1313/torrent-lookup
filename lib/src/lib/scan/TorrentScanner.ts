@@ -31,6 +31,11 @@ export interface TorrentScannerOptions {
     exclude?: string[];
 
     /**
+     * When true - predefined exclude patters is not used
+     */
+    skipSystemExclude?: boolean;
+
+    /**
      * Maximum files per second.
      * 0 - no limit
      *
@@ -39,13 +44,13 @@ export interface TorrentScannerOptions {
     maxFps?: number;
 
     /**
-     * Not tested!
+     * TODO: Not tested!
      * @default false
      */
     followSymLinks?: boolean;
 
     /**
-     *
+     * Progress report function
      */
     onEntry?: (entry: TorrentScannerEntry) => void;
 }
@@ -108,10 +113,14 @@ export class TorrentScanner {
             followSymLinks: !!options?.followSymLinks,
             target: [],
             exclude: SCAN_EXCLUDE_DEFAULT,
+            skipSystemExclude: !!options?.skipSystemExclude,
             maxFps: Math.max((options?.maxFps || 0), 0),
         }
         if (options?.target) {
             this.addTarget(options.target)
+        }
+        if (options?.skipSystemExclude) {
+            this.options.exclude = [];
         }
         if (options?.exclude) {
             this.addExclusion(options.exclude)
@@ -144,7 +153,7 @@ export class TorrentScanner {
     }
 
     clearExclusion() {
-        this.options.exclude = SCAN_EXCLUDE_DEFAULT;
+        this.options.exclude = this.options.skipSystemExclude ? [] : SCAN_EXCLUDE_DEFAULT;
     }
 
     /**
@@ -204,8 +213,8 @@ export class TorrentScanner {
      * Perform operations before scan
      */
     protected _beforeScan(): void {
-        fs.mkdirSync(this.options.workdir, {recursive: true});
         console.log('[Scanner] use workdir:', this.options.workdir);
+        fs.mkdirSync(this.options.workdir, {recursive: true});
 
         const dataFileName = path.join(this.options.workdir, FILE_DATA);
         const torrFileName = path.join(this.options.workdir, FILE_TORRENTS);
