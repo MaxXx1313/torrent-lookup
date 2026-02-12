@@ -7,21 +7,21 @@ import assert from 'node:assert';
 describe('TorrentScanner.e2e', function () {
 
     // normalize path
-    const target = path.resolve(__dirname + '/../../../test/fixtures');
+    const fixturePath = path.resolve(__dirname + '/../../../test/fixtures');
 
     it('simple scan', function (done) {
 
         const expectedFiles = [
-            target + "/t1/sourcefile/test1.txt",
-            target + "/t2/sourcefolder/file1.txt",
-            target + "/t2/sourcefolder/file2.txt",
-            target + "/t2/sourcefolder/file3.txt",
-            target + "/t2-alt/sourcefolder/file1.txt",
+            fixturePath + "/t1/sourcefile/test1.txt",
+            fixturePath + "/t2/sourcefolder/file1.txt",
+            fixturePath + "/t2/sourcefolder/file2.txt",
+            fixturePath + "/t2/sourcefolder/file3.txt",
+            fixturePath + "/t2-alt/sourcefolder/file1.txt",
         ];
 
         const expectedTorrents = [
-            target + "/t1/fixture1 - test1.txt.torrent",
-            target + "/t2/fixture2 - sourcefolder.torrent",
+            fixturePath + "/t1/fixture1 - test1.txt.torrent",
+            fixturePath + "/t2/fixture2 - sourcefolder.torrent",
         ];
         const statsExpected = {
             files: 5,
@@ -41,7 +41,7 @@ describe('TorrentScanner.e2e', function () {
             }
         });
 
-        scanner.run(target).then(() => {
+        scanner.run(fixturePath).then(() => {
             console.log('scan finished');
             sub.unsubscribe();
 
@@ -52,6 +52,33 @@ describe('TorrentScanner.e2e', function () {
                 files: scanner.stats.files,
                 torrents: scanner.stats.torrents,
             }, statsExpected);
+
+            done();
+        });
+    });
+
+    it('fps should apply', function (done) {
+
+
+        const fileFoundTs = [];
+
+        const scanner = new TorrentScanner({maxFps: 1});
+        const sub = scanner.onEntry.subscribe((entry) => {
+            console.log('scan', entry.location);
+            fileFoundTs.push(Date.now());
+
+        });
+
+        scanner.run(fixturePath + '/t1').then(() => {
+            console.log('scan finished');
+            sub.unsubscribe();
+
+            for (let i = 1; i < fileFoundTs.length; i++) {
+                const diff = fileFoundTs[i] - fileFoundTs[i - 1];
+                if (diff < 900) {
+                    assert.fail('Fps is not respected: ' + diff);
+                }
+            }
 
             done();
         });
