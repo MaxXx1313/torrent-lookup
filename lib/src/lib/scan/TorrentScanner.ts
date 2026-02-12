@@ -80,6 +80,7 @@ export interface TorrentScannerStats {
     filesPerSecond: number;
 }
 
+const _FPS_ENFORCE_TIME = 1000;
 
 /**
  * 1. use Scanner to scan files and folders
@@ -99,7 +100,8 @@ export class TorrentScanner {
     private _dataFileStream: WriteStream;
     private _torrFileStream: WriteStream;
 
-    private _lastFileFoundTs?: number | null;
+    private _fpsLastEnforce?: number | null;
+    private _fpsFilesCount = 0;
 
 
     /**
@@ -177,7 +179,8 @@ export class TorrentScanner {
         return Promise.resolve()
             .then(() => this._beforeScan())
             .then(() => {
-                this._lastFileFoundTs = Date.now();
+                this._fpsLastEnforce = Date.now();
+                this._fpsFilesCount = 0;
                 return this.scanner.run();
             })
             .finally(() => {
@@ -267,22 +270,25 @@ export class TorrentScanner {
                 });
             }
         }).then(() => {
-            // calculate stats
-            // TODO: timeout cannot b eless than 10-20ms, which leads to max 50-100 fps. other values are not effective
-            // TOOD: fps jumps too often. need to limit to 1s
+            // calculate fps
             const now = Date.now();
-            const timePassedMs = now - this._lastFileFoundTs;
-            this._lastFileFoundTs = now;
-            this.stats.filesPerSecond = Math.round(1000 / timePassedMs);
+            const timePassedMs = now - this._fpsLastEnforce;
+            this._fpsFilesCount++;
+            this.stats.filesPerSecond = Math.round(this._fpsFilesCount * 1000 / timePassedMs);
 
-            // apply files-per-second limit
-            if (this.options.maxFps > 0) {
-                const expectedTimeMs = Math.round(1000 / this.options.maxFps);
-                const extraDelay = expectedTimeMs - timePassedMs;
-                if (extraDelay > 0) {
-                    return timeoutPromise(extraDelay);
+            if (this.options.maxFps <= 0) {
+                if (this._fpsFilesCount >= this.options.maxFps) {
+                    // fps limit reached. check the time taken
+                    this._fpsLastEnforce = now;
+                    this._fpsFilesCount = 0;
+
+                    const extraDelay = 1000 - timePassedMs;
+                    if (extraDelay > 0) {
+                        return timeoutPromise(extraDelay);
+                    }
                 }
             }
+
             return Promise.resolve();
         });
     }
