@@ -1,10 +1,10 @@
 import { TorrentScanner } from './TorrentScanner';
 import * as path from 'node:path';
-import { describe, it } from 'node:test';
+import { describe, it } from 'bun:test';
 import assert from 'node:assert';
 
 
-describe.skip('TorrentScanner.e2e', function () {
+describe('TorrentScanner.e2e', function () {
 
     // normalize path
     const target = path.resolve(__dirname + '/../../../test/fixtures');
@@ -16,6 +16,7 @@ describe.skip('TorrentScanner.e2e', function () {
             target + "/t2/sourcefolder/file1.txt",
             target + "/t2/sourcefolder/file2.txt",
             target + "/t2/sourcefolder/file3.txt",
+            target + "/t2-alt/sourcefolder/file1.txt",
         ];
 
         const expectedTorrents = [
@@ -23,35 +24,33 @@ describe.skip('TorrentScanner.e2e', function () {
             target + "/t2/fixture2 - sourcefolder.torrent",
         ];
         const statsExpected = {
-            files: 4,
+            files: 5,
             torrents: 2,
         };
 
         let files = [];
         let torrents = [];
 
-        const scanner = new TorrentScanner({
-            target: [target],
-        });
-
+        const scanner = new TorrentScanner();
         const sub = scanner.onEntry.subscribe((entry) => {
             // console.log('scan', location);
-            if (entry.type === 'file') {
-                if (entry.isTorrent) {
-                    torrents.push(entry.location);
-                } else {
-                    files.push(entry.location);
-                }
+            if (entry.isTorrent) {
+                torrents.push(entry.location);
+            } else {
+                files.push(entry.location);
             }
         });
 
-        scanner.run().then(() => {
+        scanner.run(target).then(() => {
             sub.unsubscribe();
 
             assertArray(files, expectedFiles);
             assertArray(torrents, expectedTorrents);
 
-            assert.equal(scanner.stats, statsExpected);
+            assert.deepEqual({
+                files: scanner.stats.files,
+                torrents: scanner.stats.torrents,
+            }, statsExpected);
 
             // done();
         });
@@ -65,11 +64,10 @@ describe.skip('TorrentScanner.e2e', function () {
  */
 function assertArray(expectedArray: any[], actualArray: any[]) {
     for (const elem of actualArray) {
-        assert.equal(expectedArray.includes(elem), true);
+        assert.equal(expectedArray.includes(elem), true, `Element not expected: ${elem}`);
     }
-    // make it easy to recognize error
     for (const elem of expectedArray) {
-        assert.equal(actualArray.includes(elem), true);
+        assert.equal(actualArray.includes(elem), true, `Element not found: ${elem}`);
     }
     assert.equal(expectedArray.length, actualArray.length);
 }

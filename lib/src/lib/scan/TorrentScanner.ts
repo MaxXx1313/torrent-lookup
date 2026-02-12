@@ -105,7 +105,7 @@ export class TorrentScanner {
     /**
      * @param {TorrentScannerOptions} options
      */
-    constructor(options: TorrentScannerOptions) {
+    constructor(options?: TorrentScannerOptions) {
         this._scanner = new QueueWorker(this._scanFolder.bind(this), {stopOnError: true});
 
         this.options = {
@@ -124,15 +124,6 @@ export class TorrentScanner {
         if (options?.onEntry) {
             this.onEntry.subscribe(options.onEntry);
         }
-    }
-
-    /**
-     * Add one or multiple targets
-     * @param target
-     * @deprecated
-     */
-    addTarget(target: string | string[]) {
-
     }
 
     /**

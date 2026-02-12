@@ -39,13 +39,10 @@ export function scanLogic(ipcMain, mainWindow) {
 
         await scanner.terminate();
 
-        scanner.clearTargets();
         scanner.clearExclusion();
-
-        scanner.addTarget(targets);
         scanner.addExclusion(exclude);
 
-        return scanner.run()
+        return scanner.run(targets)
             .then(() => analyzer.analyze())
             .then(mappings => {
                 _mappings = mappings;

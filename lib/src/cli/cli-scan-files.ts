@@ -19,7 +19,6 @@ export function cliScanFiles(options: CliOptions): Promise<any> {
     //
     const scanner = new TorrentScanner({
         workdir: options.tmp,
-        target: options.target,
         maxFps: options.fps,
         onEntry: (entry: TorrentScannerEntry) => {
             if (entry.isTorrent) {
@@ -33,7 +32,7 @@ export function cliScanFiles(options: CliOptions): Promise<any> {
 
     // SCAN
     logger.startLOP();
-    return scanner.run().then(() => {
+    return scanner.run(options.target).then(() => {
         logger.stopLOP();
         logger.log('Scanned %s files, found %s torrent files', scanner.stats.files, scanner.stats.torrents);
     }).catch((e) => {
