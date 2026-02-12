@@ -69,6 +69,7 @@ export class QueueWorker<T, R = any> {
         if (this._queue.length === 0) {
             console.warn('QueueWorker: empty queue');
         }
+        this._terminateFlag = false;
         this._digest();
         return this.onStop.pipe(take(1)).toPromise().then(e => {
             if (e) {

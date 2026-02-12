@@ -16,12 +16,12 @@ import { timeoutPromise } from "../utils/tools.js";
 
 export interface TorrentScannerOptions {
     /**
-     * Target folder to scan
+     * Target folder(s) to scan
      */
     target?: string[];
 
     /**
-     * Folder for storing temp results
+     * Folder for storing results
      */
     workdir?: string;
 
@@ -58,6 +58,14 @@ export interface TorrentScannerOptions {
 /**
  *
  */
+export interface TorrentScannerEntry {
+    location: string;
+    isTorrent?: boolean // for file only
+}
+
+/**
+ *
+ */
 export interface TorrentScannerStats {
     /**
      * Arbitrary (not a torrent) files found
@@ -72,15 +80,6 @@ export interface TorrentScannerStats {
     filesPerSecond: number;
 }
 
-
-/**
- *
- */
-export interface TorrentScannerEntry {
-    type: 'file' | 'folder' | 'other';
-    location: string;
-    isTorrent?: boolean // for file only
-}
 
 /**
  * 1. use Scanner to scan files and folders
@@ -248,7 +247,6 @@ export class TorrentScanner {
             const isTorrent = this.isTorrentFile(filepath, stats);
 
             this.onEntry.next({
-                type: "file",
                 isTorrent,
                 location: filepath,
             });
@@ -263,8 +261,6 @@ export class TorrentScanner {
             } else {
                 this.stats.files++;
 
-                // get relative location
-                // const locRelative = this.shiftRelative(location);
                 const fileInfoStr = FileMatcher.combineFileInfo({location: filepath, size: stats.size});
                 this._dataFileStream.write(fileInfoStr + '\n', (err) => {
                     err ? reject(err) : resolve();
@@ -296,7 +292,7 @@ export class TorrentScanner {
      */
     protected _resetStats() {
         this.stats = {
-            files: 0, // without torrent files
+            files: 0,
             torrents: 0,
             filesPerSecond: 0,
         };
