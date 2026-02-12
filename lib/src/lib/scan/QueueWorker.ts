@@ -51,8 +51,8 @@ export class QueueWorker<T, R = any> {
      * @param {Array<T>} jobItems
      * @param {boolean} prepend
      */
-    addJobs(jobItems: T[], prepend: boolean = false): void {
-        if (!prepend) {
+    addJobs(jobItems: T[], opts?: { prepend?: boolean }): void {
+        if (!opts?.prepend) {
             this._queue.push.apply(this._queue, jobItems);
         } else {
             this._queue.unshift.apply(this._queue, jobItems);

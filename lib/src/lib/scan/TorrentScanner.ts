@@ -16,10 +16,6 @@ import { timeoutPromise } from "../utils/tools";
 
 
 export interface TorrentScannerOptions {
-    /**
-     * Target folder(s) to scan
-     */
-    target?: string[];
 
     /**
      * Folder for storing results
@@ -27,7 +23,8 @@ export interface TorrentScannerOptions {
     workdir?: string;
 
     /**
-     * @see FileScannerOption.exclude
+     * Patten for excluding files/folders from scan.
+     * @type {Array<string>} Array of CUSTOM globs string
      */
     exclude?: string[];
 
@@ -91,6 +88,9 @@ export class TorrentScanner {
 
     public readonly onEntry: Subject<TorrentScannerEntry> = new Subject();
 
+    /**
+     * it's safeto modify options before the process started
+     */
     public options: TorrentScannerOptions;
     public stats: TorrentScannerStats;
 
@@ -111,13 +111,9 @@ export class TorrentScanner {
         this.options = {
             workdir: options?.workdir || DEFAULT_WORKDIR_LOCATION,
             followSymLinks: !!options?.followSymLinks,
-            target: [],
-            exclude: SCAN_EXCLUDE_DEFAULT,
+            exclude: [],
             skipSystemExclude: !!options?.skipSystemExclude,
             maxFps: Math.max((options?.maxFps || 0), 0),
-        }
-        if (options?.target) {
-            this.addTarget(options.target)
         }
         if (options?.skipSystemExclude) {
             this.options.exclude = [];
@@ -133,38 +129,59 @@ export class TorrentScanner {
     /**
      * Add one or multiple targets
      * @param target
+     * @deprecated
      */
     addTarget(target: string | string[]) {
-        const targets = Array.isArray(target) ? target : [target];
-        this.options.target.push(...targets);
-    }
 
-    clearTargets() {
-        this.options.target = [];
     }
 
     /**
      * Add one or multiple exclusions
-     * @param target
+     * @param excludeTemplate
      */
-    addExclusion(target: string | string[]) {
-        const targets = Array.isArray(target) ? target : [target];
-        this.options.exclude.push(...targets);
+    addExclusion(excludeTemplate: string | string[]) {
+        const templateArr = Array.isArray(excludeTemplate) ? excludeTemplate : [excludeTemplate];
+        for (const tmpl of templateArr) {
+            if (this.isExcludeTemplateValid(tmpl)) {
+                this.options.exclude.push(tmpl);
+            }
+        }
     }
 
     clearExclusion() {
-        this.options.exclude = this.options.skipSystemExclude ? [] : SCAN_EXCLUDE_DEFAULT;
+        this.options.exclude = [];
+    }
+
+
+    isExcludeTemplateValid(template: string) {
+        try {
+            MyGlob.createPathTestFunction(template);
+            return true;
+        } catch (e) {
+            console.error(`[Scanner] Invalid pattern: "${template}"`, e);
+            return false;
+        }
     }
 
     /**
-     *
+     * Run scanning procedure
      */
-    run(): Promise<any> {
+    run(targets: string | string[]): Promise<any> {
         if (this._scanner.isRunning()) {
             return Promise.reject('Already started');
         }
-        // SCAN
-        this._scanner.addJobs(this.options.target);
+
+        // verify targets
+        const targetArr = Array.isArray(targets) ? targets : [targets];
+        const targetsFiltered = [];
+        for (const tgt of targetArr) {
+            if (!this.isExcluded(tgt)) {
+                targetsFiltered.push(tgt);
+            } else {
+                console.warn('[Scanner] Target is excluded:', tgt);
+            }
+        }
+
 
         //
         this._resetStats();
@@ -173,6 +190,7 @@ export class TorrentScanner {
             .then(() => {
                 this._fpsLastEnforce = Date.now();
                 this._fpsFilesCount = 0;
+                this._scanner.addJobs(targetsFiltered);
                 return this._scanner.run();
             })
             .finally(() => {
@@ -181,7 +199,8 @@ export class TorrentScanner {
     }
 
     /**
-     *
+     * terminate scanning.
+     * This also resets all scan targets
      */
     async terminate() {
         return this._scanner.terminate();
@@ -206,11 +225,19 @@ export class TorrentScanner {
      * @private
      */
     isExcluded(filepath: string) {
-        const excluded = !this.options.exclude.every(rule => !MyGlob.match(filepath, rule));
-        if (excluded) {
-            console.debug('Excluded:', filepath);
+        const isExcludedCustom = !this.options.exclude.every(rule => !MyGlob.match(filepath, rule));
+        if (isExcludedCustom) {
+            console.debug('[Scanner] Excluded:', filepath);
+            return true;
         }
-        return excluded;
+        if (!this.options.skipSystemExclude) {
+            const isExcludedSystem = !SCAN_EXCLUDE_DEFAULT.every(rule => !MyGlob.match(filepath, rule));
+            if (isExcludedSystem) {
+                console.debug('[Scanner] Excluded (system):', filepath);
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -272,11 +299,11 @@ export class TorrentScanner {
             }
 
             if (stats.isDirectory()) {
-                this.addTarget(childLocation);
+                this._scanner.addJobs([childLocation], {prepend: true});
             } else if (stats.isFile()) {
                 await this._onFile(childLocation, stats);
             } else {
-                console.debug('FileScanner: Skip unknown entry type:', childLocation);
+                console.debug('[Scanner] Skip unknown entry type:', childLocation);
             }
 
         }
