@@ -2,7 +2,7 @@ import * as fs from 'node:fs/promises';
 import { Stats } from 'node:fs';
 import * as path from 'node:path';
 import { QueueWorker } from "./QueueWorker.js";
-import { _createPathTestFunction, matchCustom } from "../utils/myglob.js";
+import { MyGlob } from "../utils/myglob.js";
 import { PathUtils } from "../utils/path-utils.js";
 import ErrnoException = NodeJS.ErrnoException;
 
@@ -117,7 +117,7 @@ export class FileScanner {
         this._exclude = [];
         for (const excludeElement of excludeToTest) {
             try {
-                _createPathTestFunction(excludeElement);
+                MyGlob.createPathTestFunction(excludeElement);
                 this._exclude.push(excludeElement);
             } catch (e) {
                 console.error(`Invalid file pattern: "${excludeElement}"`, e);
@@ -146,7 +146,7 @@ export class FileScanner {
     isExcluded(filepath: string) {
         // let locationComponents = filepath.split(path.sep);
 
-        const excluded = !this._exclude.every(rule => !matchCustom(filepath, rule));
+        const excluded = !this._exclude.every(rule => !MyGlob.match(filepath, rule));
         if (excluded) {
             console.debug('Excluded:', filepath);
         }

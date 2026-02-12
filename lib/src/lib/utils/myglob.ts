@@ -1,39 +1,64 @@
 import * as path from 'node:path';
 
+/**
+ *
+ */
+export class MyGlob {
 
-const _patternCache = {};
+    static _patternCache = {};
+
+    /**
+     */
+    static match(filepath: string, pattern: string, opts?: { platform?: string }): boolean {
+        // put compare function to cache
+        if (!MyGlob._patternCache[pattern]) {
+            MyGlob._patternCache[pattern] = MyGlob.createPathTestFunction(pattern, opts);
+        }
+        return MyGlob._patternCache[pattern](filepath);
+    }
+
+    /**
+     */
+    static _preparePatternRegexString(pattern: string, opts?: { platform?: string }) {
+        const platform = opts?.platform || process.platform;
+        if (platform === 'win32') {
+            pattern = pattern.toLowerCase();
+        }
+        const patternPrepared = path.normalize(pattern + path.posix.sep)
+            .replace(/\*/g, '.+');
+        return _unifySlashes(patternPrepared);
+    }
+
+    /**
+     */
+    static _preparePathString(filepath: string, opts?: { platform?: string }) {
+        const platform = opts?.platform || process.platform;
+        if (platform === 'win32') {
+            filepath = filepath.toLowerCase();
+        }
+
+        return _unifySlashes(path.normalize(filepath + path.posix.sep));
+    }
+
+    /**
+     */
+    static createPathTestFunction(pattern: string, opts?: { platform?: string }) {
+        const patternRegExpString = MyGlob._preparePatternRegexString(pattern, opts);
+        const patternRegExp = new RegExp(patternRegExpString);
+
+        return (filepath: string) => {
+            const filepathWithSlash = MyGlob._preparePathString(filepath, opts);
+            return patternRegExp.test(filepathWithSlash);
+        };
+    }
+
+}
 
 /**
  *
  */
-export function matchCustom(filepath: string, pattern: string, opts?: { platform?: string }): boolean {
-    const platform = opts?.platform || process.platform;
-    if (platform === 'win32') {
-        filepath = filepath.toLowerCase();
-        pattern = pattern.toLowerCase();
-    }
-
-    // put compare function to cache
-    if (!_patternCache[pattern]) {
-        _patternCache[pattern] = _createPathTestFunction(pattern, {platform});
-    }
-    return _patternCache[pattern](filepath);
-}
-
-
-export function _createPathTestFunction(pattern: string, opts?: { platform: string }) {
-    const patternPrepared = path.normalize(pattern + path.posix.sep)
-        .replace(/\*/g, '.+');
-    const patternRegEx = new RegExp(_unifySlashes(patternPrepared));
-
-    return function (filepath: string) {
-        const filepathWithSlash = _unifySlashes(path.normalize(filepath + path.posix.sep));
-        return patternRegEx.test(filepathWithSlash);
-    };
-}
-
-
 function _unifySlashes(str: string) {
     return str.replace(/\//g, '\/') // escape slash for regexp
         .replace(/\\/g, '\/'); // escape slash for regexp
 }
+
