@@ -1,7 +1,7 @@
 import * as path from 'node:path';
 
 
-const _pattenCache = {};
+const _patternCache = {};
 
 /**
  *
@@ -14,26 +14,10 @@ export function matchCustom(filepath: string, pattern: string, opts?: { platform
     }
 
     // put compare function to cache
-    if (!_pattenCache[pattern]) {
-        _pattenCache[pattern] = _createPathTestFunction(pattern, {platform});
+    if (!_patternCache[pattern]) {
+        _patternCache[pattern] = _createPathTestFunction(pattern, {platform});
     }
-    return _pattenCache[pattern](filepath);
-}
-
-
-function isAbsolute(filepath: string, opts: { platform: string }) {
-    if (!filepath) {
-        throw new Error('Invalid path');
-    }
-    switch (opts.platform) {
-        case 'win32':
-            return path.win32.isAbsolute(filepath);
-        default:
-            return path.posix.isAbsolute(filepath);
-    }
-    // return path.isAbsolute(filepath);
-    // return filepath.startsWith('/') || filepath.match(/^\w\:/);
-    // return path.win32.isAbsolute(filepath) || path.posix.isAbsolute(filepath);
+    return _patternCache[pattern](filepath);
 }
 
 

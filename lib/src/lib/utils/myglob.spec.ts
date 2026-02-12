@@ -13,6 +13,7 @@ describe('matchCustom.spec', () => {
     test('absolute path', () => {
         assert.equal(matchCustom('/root/.npm/project/lib/somefile.js', '/root/.npm'), true);
         assert.equal(matchCustom('/root/lib/.npm/project/lib/somefile.js', '/root/.npm'), false);
+        assert.equal(matchCustom('/test/root/lib/.npm/project/lib/somefile.js', '/root/.npm'), false);
     });
 
     test('single wildcard', () => {
@@ -20,7 +21,7 @@ describe('matchCustom.spec', () => {
         assert.equal(matchCustom('/root/.npm/project/lib/somefile.js', '*.json'), false);
     });
 
-    test('trailing slash in file', function () {
+    test('trailing slash in filename', function () {
         assert.equal(matchCustom('/root/.npm', '.npm'), true);
         assert.equal(matchCustom('/root/.npm/', '.npm'), true);
     });
