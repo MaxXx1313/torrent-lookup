@@ -2,17 +2,15 @@ import os from "node:os";
 import * as path from 'node:path';
 
 // TODO: add unit tests
-
 export class PathUtils {
     /**
-     * @param filepath
-     * @protected
+     * Return correct path without ending slash or backslash for all platforms
      */
     static normalizePath(filepath: string) {
         // fix windows drive root
         if (filepath.match(/^\w{1}:\\?$/)) {
             // location is a pure drive letter: "C:" o "C:\"
-            filepath = filepath.substring(0, 2) + '/';
+            filepath = filepath.substring(0, 2) + '\\';
         }
 
         // fix home path
