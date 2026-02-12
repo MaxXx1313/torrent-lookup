@@ -44,4 +44,31 @@ describe('PathUtils', () => {
             });
         });
     });
+
+    describe('extractBasePath', () => {
+        const isWindows = process.platform === "win32";
+
+        describe.if(!isWindows)('posix', () => {
+            test('Should extract base path', () => {
+                assert.equal(PathUtils.extractBasePath('/folder1/folder2/folder3', 'folder2/folder3'), '/folder1');
+                assert.equal(PathUtils.extractBasePath('/folder1/folder2/file1.txt', 'file1.txt'), '/folder1/folder2');
+
+                // more deep examples
+                assert.equal(PathUtils.extractBasePath('/f1/f2/f3/f4/f5/f6', 'f6'), '/f1/f2/f3/f4/f5');
+                assert.equal(PathUtils.extractBasePath('/f1/f2/f3/f4/f5/f6', 'f5/f6'), '/f1/f2/f3/f4');
+                assert.equal(PathUtils.extractBasePath('/f1/f2/f3/f4/f5/f6', 'f4/f5/f6'), '/f1/f2/f3');
+            });
+
+            describe('Should return null', () => {
+                test('if not a subfolder', () => {
+                    assert.equal(PathUtils.extractBasePath('/folder1/folder2/folder3', 'folder2/folder4'), null);
+                });
+                test('if not exact match', () => {
+                    assert.equal(PathUtils.extractBasePath('/f1/f2/f3/f4/f5/f6', 'f4/f6'), null);
+                    assert.equal(PathUtils.extractBasePath('/f1/f2/f3/f4/f5/f6', 'f4/g5/f6'), null);
+                });
+            });
+        });
+
+    });
 });

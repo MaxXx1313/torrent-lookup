@@ -1,7 +1,6 @@
 import os from "node:os";
 import * as path from 'node:path';
 
-// TODO: add unit tests
 export class PathUtils {
     /**
      * Return correct path without ending slash or backslash for all platforms
@@ -22,7 +21,7 @@ export class PathUtils {
     }
 
     /**
-     * Get basepath from {@param filepath} to {@param dir}, if it's a child
+     * Get basepath from {@param filepath} to {@param dir}, if it's a child.
      * Otherwise return null
      */
     static extractBasePath(filepath: string, dir: string): string {
