@@ -24,9 +24,9 @@ export class MyGlob {
         if (platform === 'win32') {
             pattern = pattern.toLowerCase();
         }
-        const patternPrepared = path.normalize(pattern + path.posix.sep)
+        const patternPrepared = path.posix.sep + path.posix.normalize(_unifySlashes(pattern) + path.posix.sep)
             .replace(/\*/g, '.+');
-        return _unifySlashes(patternPrepared);
+        return patternPrepared;
     }
 
     /**
@@ -37,7 +37,7 @@ export class MyGlob {
             filepath = filepath.toLowerCase();
         }
 
-        return _unifySlashes(path.normalize(filepath + path.posix.sep));
+        return path.posix.sep + path.posix.normalize(_unifySlashes(filepath) + path.posix.sep);
     }
 
     /**

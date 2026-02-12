@@ -9,11 +9,12 @@ describe('MyGlob', () => {
         test('should match sample name', () => {
             assert.equal(MyGlob.match('/root/.npm/project/lib/somefile.js', '.npm'), true);
             assert.equal(MyGlob.match('/root/.npmz/project/lib/somefile.js', ".npm"), false);
+            assert.equal(MyGlob.match('/root/no.npm/project/lib/somefile.js', ".npm"), false);
         });
 
         describe('posix', () => {
 
-            test('absolute path', () => {
+            test('linux path', () => {
                 assert.equal(MyGlob.match('/root/.npm/project/lib/somefile.js', '/root/.npm'), true);
                 assert.equal(MyGlob.match('/root/lib/.npm/project/lib/somefile.js', '/root/.npm'), false);
                 assert.equal(MyGlob.match('/test/root/lib/.npm/project/lib/somefile.js', '/root/.npm'), false);
@@ -35,8 +36,9 @@ describe('MyGlob', () => {
             });
 
 
-            test('linux case', () => {
+            test('character case should matter', () => {
                 assert.equal(MyGlob.match('/root/.NPM/project/lib/somefile.js', ".npm", {platform: 'posix'}), false);
+                assert.equal(MyGlob.match('/root/.NPM/project/lib/somefile.js', ".NPM", {platform: 'posix'}), true);
             });
 
 
@@ -49,13 +51,17 @@ describe('MyGlob', () => {
 
             test('windows path', function () {
                 assert.equal(MyGlob.match('C:\\Windows\\system32\\myfile.js', 'C:\\Windows', {platform: 'win32'}), true);
+                assert.equal(MyGlob.match('C:\\Windows\\system32\\myfile.js', 'C:/Windows', {platform: 'win32'}), true);
+                assert.equal(MyGlob.match('C:/Windows/system32/myfile.js', 'C:/Windows', {platform: 'win32'}), true);
+                assert.equal(MyGlob.match('C:/Windows/system32/myfile.js', 'C:\\Windows', {platform: 'win32'}), true);
             });
 
-            test('windows case', () => {
+            test('character case should not matter', () => {
                 assert.equal(MyGlob.match('C:/Windows/system32/myfile.js', 'C:\\windows', {platform: 'win32'}), true);
                 assert.equal(MyGlob.match('C:/WINDOWS/system32/myfile.js', 'C:\\windows', {platform: 'win32'}), true);
                 assert.equal(MyGlob.match('C:/WiNdOwS/system32/myfile.js', 'C:\\windows', {platform: 'win32'}), true);
                 assert.equal(MyGlob.match('C:/windows/system32/myfile.js', 'C:\\WINDOWS', {platform: 'win32'}), true);
+                assert.equal(MyGlob.match('C:/windows/system32/myfile.js', 'C:\\WiNdOwS', {platform: 'win32'}), true);
             });
         });
     });
