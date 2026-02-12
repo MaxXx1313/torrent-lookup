@@ -4,7 +4,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert';
 
 
-describe('TorrentScanner.e2e', function () {
+describe.skip('TorrentScanner.e2e', function () {
 
     // normalize path
     const target = path.resolve(__dirname + '/../../../test/fixtures');

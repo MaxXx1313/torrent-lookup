@@ -20,7 +20,7 @@ describe.skip('Pusher.spec', function () {
     }
 
 
-    test('_pushAll', function () {
+    test.skip('_pushAll', function () {
         const input = [
             {
                 "saveTo": "/tmp/download-1",
