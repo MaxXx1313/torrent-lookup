@@ -339,16 +339,18 @@ export class TorrentScanner {
         this._fpsFilesCount++;
         this.stats.filesPerSecond = Math.round(this._fpsFilesCount * 1000 / timePassedMs);
 
-        if (this.options.maxFps <= 0) {
+        if (this.options.maxFps > 0) {
             if (this._fpsFilesCount >= this.options.maxFps) {
                 // fps limit reached. check the time taken
-                this._fpsLastEnforce = now;
-                this._fpsFilesCount = 0;
 
                 const extraDelay = 1000 - timePassedMs;
                 if (extraDelay > 0) {
-                    return timeoutPromise(extraDelay);
+                    // console.debug('[Scan] apply fps limit: ', extraDelay);
+                    await timeoutPromise(extraDelay);
                 }
+
+                this._fpsLastEnforce = Date.now();
+                this._fpsFilesCount = 0;
             }
         }
 
