@@ -33,7 +33,7 @@ describe('TorrentScanner.e2e', function () {
 
         const scanner = new TorrentScanner();
         const sub = scanner.onEntry.subscribe((entry) => {
-            // console.log('scan', location);
+            console.log('scan', entry.location);
             if (entry.isTorrent) {
                 torrents.push(entry.location);
             } else {
@@ -42,6 +42,7 @@ describe('TorrentScanner.e2e', function () {
         });
 
         scanner.run(target).then(() => {
+            console.log('scan finished');
             sub.unsubscribe();
 
             assertArray(files, expectedFiles);
@@ -52,7 +53,7 @@ describe('TorrentScanner.e2e', function () {
                 torrents: scanner.stats.torrents,
             }, statsExpected);
 
-            // done();
+            done();
         });
     });
 
