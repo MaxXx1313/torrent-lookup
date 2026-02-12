@@ -1,5 +1,5 @@
 import * as fs from 'node:fs';
-import { Stats, WriteStream } from 'node:fs';
+import * as fsPromise from 'node:fs/promises';
 import * as path from 'node:path';
 import {
     DEFAULT_WORKDIR_LOCATION,
@@ -8,10 +8,11 @@ import {
     SCAN_EXCLUDE_DEFAULT,
     TORRENT_EXTENSION
 } from "../const.js";
-import { FileScanner } from "./FileScanner.js";
 import { Subject } from "rxjs";
 import { FileMatcher } from '../utils/FileMatcher.js';
-import { timeoutPromise } from "../utils/tools.js";
+import { MyGlob } from "../utils/myglob";
+import { QueueWorker } from "./QueueWorker";
+import { timeoutPromise } from "../utils/tools";
 
 
 export interface TorrentScannerOptions {
@@ -80,8 +81,6 @@ export interface TorrentScannerStats {
     filesPerSecond: number;
 }
 
-const _FPS_ENFORCE_TIME = 1000;
-
 /**
  * 1. use Scanner to scan files and folders
  *   1.1 check is that file is a torrent file
@@ -95,19 +94,19 @@ export class TorrentScanner {
     public options: TorrentScannerOptions;
     public stats: TorrentScannerStats;
 
-    private scanner?: FileScanner | null;
-
-    private _dataFileStream: WriteStream;
-    private _torrFileStream: WriteStream;
+    private _dataFileStream: fs.WriteStream;
+    private _torrFileStream: fs.WriteStream;
 
     private _fpsLastEnforce?: number | null;
     private _fpsFilesCount = 0;
 
+    private readonly _scanner: QueueWorker<string>;
 
     /**
      * @param {TorrentScannerOptions} options
      */
     constructor(options: TorrentScannerOptions) {
+        this._scanner = new QueueWorker(this._scanFolder.bind(this), {stopOnError: true});
 
         this.options = {
             workdir: options?.workdir || DEFAULT_WORKDIR_LOCATION,
@@ -161,18 +160,11 @@ export class TorrentScanner {
      *
      */
     run(): Promise<any> {
-        if (this.scanner) {
+        if (this._scanner.isRunning()) {
             return Promise.reject('Already started');
         }
         // SCAN
-        this.scanner = new FileScanner({
-            followSymLinks: !!this.options.followSymLinks,
-            exclude: [
-                ...(this.options.exclude || []),
-            ],
-            cbFileFound: this._onFile.bind(this),
-        });
-        this.scanner.addTarget(this.options.target);
+        this._scanner.addJobs(this.options.target);
 
         //
         this._resetStats();
@@ -181,10 +173,9 @@ export class TorrentScanner {
             .then(() => {
                 this._fpsLastEnforce = Date.now();
                 this._fpsFilesCount = 0;
-                return this.scanner.run();
+                return this._scanner.run();
             })
             .finally(() => {
-                this.scanner = null;
                 return this._afterScan()
             });
     }
@@ -193,22 +184,33 @@ export class TorrentScanner {
      *
      */
     async terminate() {
-        return this.scanner?.terminate();
+        return this._scanner.terminate();
     }
 
     /**
      *
      */
     isRunning() {
-        return this.scanner?.isRunning() || false;
+        return this._scanner.isRunning();
     }
 
     /**
      * @return {boolean}
      */
-    isTorrentFile(location: string, stats?: Stats) {
+    isTorrentFile(location: string, stats?: fs.Stats) {
         return path.extname(location) === TORRENT_EXTENSION;
-        // return (location.match(/(\.\w+)$/) || [])[1] == TORRENT_EXTENSION;
+    }
+
+    /**
+     * @param filepath
+     * @private
+     */
+    isExcluded(filepath: string) {
+        const excluded = !this.options.exclude.every(rule => !MyGlob.match(filepath, rule));
+        if (excluded) {
+            console.debug('Excluded:', filepath);
+        }
+        return excluded;
     }
 
     /**
@@ -242,55 +244,97 @@ export class TorrentScanner {
 
     /**
      * @param {string} filepath
-     * @param {fs.Stats} stats
      */
-    protected _onFile(filepath: string, stats: Stats): Promise<any> {
-        return new Promise<void>((resolve, reject) => {
-            filepath = path.resolve(filepath); // make path absolute;
-            const isTorrent = this.isTorrentFile(filepath, stats);
+    protected async _scanFolder(filepath: string): Promise<any> {
+        // TODO: verbose log
+        const folderEntries = await fsPromise.readdir(path.resolve(filepath));
+        // console.log('_scanFolder: "%s"', filepath, folderEntries);
 
-            this.onEntry.next({
-                isTorrent,
-                location: filepath,
-            });
-
-            if (isTorrent) {
-                this.stats.torrents++;
-
-                // write to torrent list
-                this._torrFileStream.write(filepath + '\n', (err) => {
-                    err ? reject(err) : resolve();
-                });
-            } else {
-                this.stats.files++;
-
-                const fileInfoStr = FileMatcher.combineFileInfo({location: filepath, size: stats.size});
-                this._dataFileStream.write(fileInfoStr + '\n', (err) => {
-                    err ? reject(err) : resolve();
-                });
+        for (const fileOrFolder of folderEntries) {
+            // get absolute path
+            const childLocation = path.join(filepath, fileOrFolder);
+            if (this.isExcluded(childLocation)) {
+                continue;
             }
-        }).then(() => {
-            // calculate fps
-            const now = Date.now();
-            const timePassedMs = now - this._fpsLastEnforce;
-            this._fpsFilesCount++;
-            this.stats.filesPerSecond = Math.round(this._fpsFilesCount * 1000 / timePassedMs);
 
-            if (this.options.maxFps <= 0) {
-                if (this._fpsFilesCount >= this.options.maxFps) {
-                    // fps limit reached. check the time taken
-                    this._fpsLastEnforce = now;
-                    this._fpsFilesCount = 0;
 
-                    const extraDelay = 1000 - timePassedMs;
-                    if (extraDelay > 0) {
-                        return timeoutPromise(extraDelay);
-                    }
+            // get stats
+            const stats = await fsPromise.lstat(childLocation);
+            if (!stats) {
+                continue;
+            }
+
+            if (stats.isSymbolicLink()) {
+                if (!this.options.followSymLinks) {
+                    // skip symbolic link
+                    continue;
                 }
             }
 
-            return Promise.resolve();
+            if (stats.isDirectory()) {
+                this.addTarget(childLocation);
+            } else if (stats.isFile()) {
+                await this._onFile(childLocation, stats);
+            } else {
+                console.debug('FileScanner: Skip unknown entry type:', childLocation);
+            }
+
+        }
+    }
+
+    /**
+     * @param {string} filepath
+     * @param {fs.Stats} stats
+     */
+    protected async _onFile(filepath: string, stats: fs.Stats): Promise<any> {
+        filepath = path.resolve(filepath); // make path absolute;
+        const isTorrent = this.isTorrentFile(filepath, stats);
+
+        this.onEntry.next({
+            isTorrent,
+            location: filepath,
         });
+
+        if (isTorrent) {
+            this.stats.torrents++;
+
+            // write to torrent list
+            await new Promise<void>((resolve, reject) => {
+                this._torrFileStream.write(filepath + '\n', (err) => {
+                    err ? reject(err) : resolve();
+                });
+            });
+        } else {
+            this.stats.files++;
+
+            const fileInfoStr = FileMatcher.combineFileInfo({location: filepath, size: stats.size});
+            await new Promise<void>((resolve, reject) => {
+                this._dataFileStream.write(fileInfoStr + '\n', (err) => {
+                    err ? reject(err) : resolve();
+                });
+            });
+        }
+
+        // calculate fps
+        const now = Date.now();
+        const timePassedMs = now - this._fpsLastEnforce;
+        this._fpsFilesCount++;
+        this.stats.filesPerSecond = Math.round(this._fpsFilesCount * 1000 / timePassedMs);
+
+        if (this.options.maxFps <= 0) {
+            if (this._fpsFilesCount >= this.options.maxFps) {
+                // fps limit reached. check the time taken
+                this._fpsLastEnforce = now;
+                this._fpsFilesCount = 0;
+
+                const extraDelay = 1000 - timePassedMs;
+                if (extraDelay > 0) {
+                    return timeoutPromise(extraDelay);
+                }
+            }
+        }
+
+        return Promise.resolve();
     }
 
     /**
