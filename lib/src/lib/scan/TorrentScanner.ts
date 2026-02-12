@@ -42,7 +42,6 @@ export interface TorrentScannerOptions {
     maxFps?: number;
 
     /**
-     * TODO: Not tested!
      * @default false
      */
     followSymLinks?: boolean;
@@ -283,10 +282,10 @@ export class TorrentScanner {
             }
 
             if (stats.isSymbolicLink()) {
-                if (!this.options.followSymLinks) {
-                    // skip symbolic link
-                    continue;
+                if (!!this.options.followSymLinks) {
+                    this._scanner.addJobs([childLocation], {prepend: true});
                 }
+                continue;
             }
 
             if (stats.isDirectory()) {
