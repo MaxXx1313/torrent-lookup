@@ -29,9 +29,10 @@ describe('Analyzer.spec', function () {
         ];
 
         const torrentFile1 = assetsPath + '/t1/fixture1 - test1.txt.torrent';
+        const torrentFile1Copy = assetsPath + '/t1/fixture1 - test1.txt-copy.torrent';
         const torrentFile2 = assetsPath + '/t2/fixture2 - sourcefolder.torrent';
 
-        const torrent1Hash = '--';
+        const torrent1Hash = '38f94a70451b361e7e83af8888447aad';
         const torrent2Hash = 'afc459db274e2b15c88af762a258ab44';
 
         const inputArr = [
@@ -100,15 +101,24 @@ describe('Analyzer.spec', function () {
         test('analyzeCacheData', function () {
 
             analyzer.__loadTorrentFile(torrentFile1);
+            analyzer.__loadTorrentFile(torrentFile1Copy);
             analyzer.__loadTorrentFile(torrentFile2);
             for (const fileInfo of filesToMatch) {
                 analyzer.__matchFile(fileInfo.name, fileInfo.size);
             }
 
             ///
-            const expected = {
+            const expected1 = {
                 torrentContentHash: torrent1Hash,
                 torrentLocation: torrentFile1,
+                torrentsDuplicatedLocation: [torrentFile1Copy],
+                saveTo: undefined,
+                saveToOptions: [],
+            };
+
+            const expected2 = {
+                torrentContentHash: torrent2Hash,
+                torrentLocation: torrentFile2,
                 torrentsDuplicatedLocation: [],
 
                 saveTo: {
@@ -149,7 +159,17 @@ describe('Analyzer.spec', function () {
             };
 
             analyzer._makeDecision();
-            assert.deepEqual(analyzer._decision[1].saveToOptions, expected.saveToOptions);
+
+            // console.log(analyzer._decision[0]);
+
+            //
+            const mapping2Result = analyzer._decision.find(d => d.torrentLocation === torrentFile2);
+            assert.deepEqual(mapping2Result.saveToOptions, expected2.saveToOptions);
+            assert.deepEqual(mapping2Result, expected2);
+
+            //
+            const mapping1Result = analyzer._decision.find(d => d.torrentLocation === torrentFile1);
+            assert.deepEqual(mapping1Result, expected1);
         });
     });
 
