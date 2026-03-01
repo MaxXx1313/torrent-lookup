@@ -13,19 +13,19 @@ export interface IElectronAPI {
     // ui4
     getConfig: MyCallable<AppConfiguration>;
     setConfig: MyCallable<AppConfiguration>;
-    getSystemExcluded: MyCallable<string[]>;
-    selectFolder: () => Promise<string[] | null>;
+    getSystemExcluded: MyCallable<void, string[]>;
+    selectFolder: MyCallable<void, string[] | null>;
 
-    scanStart: (opts: { targets: string[], exclude?: string[] }) => Promise<void>;
+    scanStart: (opts: { targets: string[], exclude?: string[] }) => MyCallable;
     onScanEntry: MyEvent<string>;
     onScanStats: MyEvent<TorrentScannerStats>;
     onScanFinished: MyEventOnce<void>;
     scanStop: MyCallable<void>;
 
     setUserMappings: MyCallable<TorrentMapping[], void>;
-    getUserMappings: MyCallable<TorrentMapping[]>;
+    getUserMappings: MyCallable<void, TorrentMapping[]>;
 
-    exportGetParameters: MyCallable<TransmissionOptions>;
+    exportGetParameters: MyCallable<void, TransmissionOptions>;
     exportSetParameters: MyCallable<TransmissionOptions, void>;
     exportStart: MyCallable<void>;
     onExportLog: MyEvent<string>;
@@ -42,13 +42,11 @@ type MyEvent<T> = (callback: (arg: T) => void) => () => void;
  */
 type MyEventOnce<T> = (callback: (arg: T) => void) => () => void;
 
-interface MyCallable {
-    <O>(): Promise<O>;
+/**
+ *
+ */
+type MyCallable<T = void, R = void> = (arg1: T) => Promise<R>;
 
-    <T1, O>(arg1: T1): Promise<O>;
-
-    <T1, T2, O>(arg1: T1, arg2: T2): Promise<O>;
-}
 
 
 
