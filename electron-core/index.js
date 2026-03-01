@@ -1,26 +1,23 @@
-// main.js
-
-// Modules to control application life and create native browser window
 import {app, BrowserWindow, ipcMain} from 'electron';
 import * as path from 'node:path';
 import * as URL from 'node:url';
-import {scanLogic} from './core-lib/scan.js';
-import {appLogic} from "./core-lib/app.js";
+import {MyEventBus} from "./core-lib/my-event-bus";
+import {ProjectManager} from "./core-lib/project-manager";
 
-
-console.log('[Store]', app.getPath('userData'));
 
 const isDevMode = process.argv.includes('--dev');
 if (isDevMode) {
     console.log('[App] Starting in develop mode');
 }
 
+
+const myEventBus = new MyEventBus(ipcMain);
+const projectManager = new ProjectManager(myEventBus);
+
 /////////////////////////////
 const __filename = URL.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 console.log('__dirname', __dirname);
-
-let _mainWindow = null;
 
 function createWindow() {
     // Create the browser window.
@@ -31,6 +28,7 @@ function createWindow() {
             preload: path.join(__dirname, 'core-lib/preload.js'),
         },
     });
+    myEventBus._addWindow(mainWindow);
 
     // and load the index.html of the app.
     if (isDevMode) {
@@ -43,10 +41,8 @@ function createWindow() {
     // Open the DevTools.
     // mainWindow.webContents.openDevTools();
 
-    _mainWindow = mainWindow;
-
     mainWindow.on('closed', function () {
-        _mainWindow = null;
+        myEventBus._removeWindow(mainWindow);
     });
 }// attach scanner logic
 // const scanner = new Scanner(myBridge);
@@ -54,7 +50,9 @@ function createWindow() {
 // add the following snippet as early as possible in the main process execution (before the app.ready event).
 // if (require('electron-squirrel-startup')) app.quit();
 const isSquirrelService = process.argv.includes('--squirrel-install')
-    || process.argv.includes('--squirrel-uninstall');//  || process.argv.includes('--squirrel-updated');
+    || process.argv.includes('--squirrel-uninstall');
+//  || process.argv.includes('--squirrel-updated');
+
 if (isSquirrelService) {
     app.quit();
 }
@@ -62,18 +60,15 @@ if (isSquirrelService) {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+Promise.all([
+    projectManager.loadInfo(),
+    app.whenReady(),
+]).then(() => {
     createWindow();
 
-    ipcMain.handle('app:devtools', () => {
-        if (_mainWindow) {
-            _mainWindow.webContents.openDevTools();
-        }
+    ipcMain.handle('app:devtools', (event) => {
+        event.sender.openDevTools();
     });
-
-    appLogic(ipcMain);
-    scanLogic(ipcMain, _mainWindow);
-
 
     app.on('activate', () => {
         // On macOS it's common to re-create a window in the app when the
@@ -88,10 +83,10 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-    // if (process.platform !== 'darwin') {
-    app.quit();
-    // }
-})
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
+});
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.

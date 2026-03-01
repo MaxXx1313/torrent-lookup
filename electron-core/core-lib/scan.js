@@ -1,6 +1,9 @@
 import {Analyzer, Info, PushManager, TorrentScanner} from "tlookup";
 
-export function scanLogic(ipcMain, mainWindow) {
+/**
+ * @param {MyEventBus} ipcMain
+ */
+export function scanLogic(ipcMain) {
 
     let _mappings = [];
 
@@ -22,12 +25,12 @@ export function scanLogic(ipcMain, mainWindow) {
 
     scanner.onEntry.subscribe((entry) => {
         // ipcMain.emit('scan:entry', entry.location);
-        mainWindow.webContents.send('scan:entry', entry.location);
-        mainWindow.webContents.send('scan:stats', scanner.stats);
+        ipcMain.emit('scan:entry', entry.location);
+        ipcMain.emit('scan:stats', scanner.stats);
     });
 
     pushManager.opStatus$.subscribe((msg) => {
-        mainWindow.webContents.send('export:log', msg);
+        ipcMain.emit('export:log', msg);
     });
 
     /**
@@ -48,7 +51,7 @@ export function scanLogic(ipcMain, mainWindow) {
                 _mappings = mappings;
             })
             .finally(() => {
-                mainWindow.webContents.send('scan:finished');
+                ipcMain.emit('scan:finished');
             });
     });
 
@@ -101,11 +104,11 @@ export function scanLogic(ipcMain, mainWindow) {
         }
 
         const total = mappingsActive.length;
-        mainWindow.webContents.send('export:push-progress', {total, completed: 0});
+        ipcMain.emit('export:push-progress', {total, completed: 0});
         for (let i = 0; i < mappingsActive.length; i++) {
             const torrentMapping = mappingsActive[i];
             await pushManager.push(torrentMapping.torrent, torrentMapping.saveTo);
-            mainWindow.webContents.send('export:push-progress', {total, completed: i + 1});
+            ipcMain.emit('export:push-progress', {total, completed: i + 1});
         }
     });
 
