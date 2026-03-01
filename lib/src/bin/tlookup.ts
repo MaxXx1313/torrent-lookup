@@ -117,6 +117,11 @@ const optionDefinitions: OptionDefinition[] = [
             await cliAnalyzeFiles(options);
             break;
 
+        // TODO: temporary for debugging
+        case 'analyze' as any:
+            await cliAnalyzeFiles(options);
+            break;
+
         case 'push':
             const pushDefinitions = [
                 {name: 'client', defaultOption: true}

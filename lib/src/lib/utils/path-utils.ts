@@ -21,16 +21,20 @@ export class PathUtils {
     }
 
     /**
-     * Get basepath from {@param filepath} to {@param dir}, if it's a child.
-     * Otherwise return null
+     * Get basepath from {@param filepath} to {@param dir}, if it's a child, otherwise return null
      */
     static extractBasePath(filepath: string, dir: string): string {
-        if (dir == '') {
+        if (!dir?.length) {
             return filepath;
         }
-        if (filepath.endsWith(path.sep + dir)) {
-            return filepath.substring(0, filepath.length - dir.length - 1);
+        const fileParts = filepath.split(path.sep);
+        const dirParts = dir.split(path.sep);
+        for (let i = 0; i < dirParts.length; i++) {
+            if (fileParts[fileParts.length - i - 1] !== dirParts[dirParts.length - i - 1]) {
+                return null;
+            }
         }
-        return null;
+        // filepath ends with dir
+        return fileParts.slice(0, fileParts.length - dirParts.length).join(path.sep);
     }
 }

@@ -48,7 +48,13 @@ describe('PathUtils', () => {
     describe('extractBasePath', () => {
         const isWindows = process.platform === "win32";
 
+
         describe.if(!isWindows)('posix', () => {
+
+            test('Should work with empty', () => {
+                assert.equal(PathUtils.extractBasePath('/folder1/folder2/folder3', ''), '/folder1/folder2/folder3');
+            });
+
             test('Should extract base path', () => {
                 assert.equal(PathUtils.extractBasePath('/folder1/folder2/folder3', 'folder2/folder3'), '/folder1');
                 assert.equal(PathUtils.extractBasePath('/folder1/folder2/file1.txt', 'file1.txt'), '/folder1/folder2');

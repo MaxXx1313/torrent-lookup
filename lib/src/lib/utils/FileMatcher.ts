@@ -8,6 +8,14 @@ export interface TLFileInfo {
  */
 export class FileMatcher {
 
+    /**
+     *
+     */
+    static _hashId(strPath: string, length: number) {
+        return strPath + ':' + length;
+    }
+
+
     static combineFileInfo(fileInfoStr: TLFileInfo): string {
         // why endline appears in filename?
         return fileInfoStr.location.replace(/[\r\n]/g, '') + ':' + fileInfoStr.size;

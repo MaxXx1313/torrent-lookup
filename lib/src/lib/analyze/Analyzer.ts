@@ -16,27 +16,26 @@ interface TorrentFileInfo {
     /**
      * file name + extension inside torrent file
      */
-    name: string; // file name + extension
+    tFilename: string; // file name + extension
 
     /**
      * Folder path inside torrent file
-     * TODO: can we remove it?
      */
-    dir: string;
+    tFolder: string[];
 
     /**
      * file size (also from torrent file)
      */
-    length: number; // file size
+    tSize: number; // file size
 
     // TODO: add sha to handle duplicates
     // TODO: split into two interfaces: one is data read from torrent, the other is a mapping
     /**
      * List of possible matches. Absolute path to base dir
-     * (i.e. 'match' + 'dir' + 'base' is an absolute path to a file).
+     * (i.e. 'pathMatch' + 'tFolder' + 'tFilename' is an absolute path to a file).
      * We match file by name + size
      */
-    match: string[];
+    pathMatch: string[];
 
     /**
      * Torrent file location
@@ -131,7 +130,7 @@ export class Analyzer {
 
         this._hash = {};
         await this._loadTorrentFilesFromFile(torrentsFileName);
-        await this._matchFilesFromFile(dataFileName);
+        await this._matchFilesFromDataFile(dataFileName);
         await this._makeDecision();
         await this._saveDecisionTo(mapsFileName);
         return this._decision;
@@ -145,41 +144,40 @@ export class Analyzer {
         const data = bencodeReadSync(filepath);
 
         // console.log(data.info.files);
-        let files: TorrentFileInfo[];
+        const files: TorrentFileInfo[] = [];
         if (!data.info.files) {
             // single file
-            files = [{
-                name: data.info.name,
-                dir: '',
-                length: data.info.length,
+            files.push({
+                tFilename: data.info.name,
+                tFolder: [],
+                tSize: data.info.length,
 
                 torrentFileLocation: filepath,
-                match: [],
-            }];
+                pathMatch: [],
+            });
         } else {
             // multiple files
             const baseDir = data.info.name;
 
-            // TODO: need to validate this
-            files = data.info.files.map((fileData) => {
-
+            for (const fileData of data.info.files) {
                 fileData.path.unshift(baseDir);
                 const filename = fileData.path.pop();
-                const filedir = fileData.path.join('/');
-                return {
-                    name: filename,
-                    dir: filedir,
-                    length: fileData.length,
+                const filedir = fileData.path.slice();
+                files.push({
+                    tFilename: filename,
+                    tFolder: filedir,
+                    tSize: fileData.length,
 
                     torrentFileLocation: filepath,
-                    match: [],
-                }
-            });
+                    pathMatch: [],
+                });
+            }
+
         }
 
         // add to hash
         for (const file of files) {
-            const key = _hashId(file.name, file.length);
+            const key = FileMatcher._hashId(file.tFilename, file.tSize);
             if (!this._hash[key]) {
                 this._hash[key] = [];
             }
@@ -202,25 +200,27 @@ export class Analyzer {
         const fileDir = pathInfo.dir;
 
         // 1. match exact file + size
-        const key = _hashId(fileName, size);
-        if (this._hash[key]) {
-            const matchTorrentInfo = this._hash[key];
+        const key = FileMatcher._hashId(fileName, size);
 
-            for (const tInfo of matchTorrentInfo) {
-                // Check if fileLocation has the base folder same as torrent inner path.
-                // Also, torrent inner path can be empty.
+        const torrentsWithFile = this._hash[key];
+        if (!torrentsWithFile) {
+            // no such file in hash
+            return
+        }
 
-                // Note: some torrent parts can be relocated in different folder. We don't support it yet
-                // TODO: 'allow-relocate-inside-torrent' option
-                const savedTo = PathUtils.extractBasePath(fileDir, tInfo.dir);
-                // console.log(' matched', fileDir, item.dir, savedTo);
-                if (savedTo) {
-                    // location found
-                    tInfo.match = tInfo.match || [];
-                    tInfo.match.push(savedTo);
-                } else {
-                    // file path is not match torrent
-                }
+        for (const tInfo of torrentsWithFile) {
+            // Check if fileLocation has the base folder same as torrent inner path.
+            // Note: torrent inner path can be empty.
+            // Note: some torrent parts can be relocated in different folder. We don't support it yet
+
+            const savedTo = PathUtils.extractBasePath(fileDir, tInfo.tFolder.join(path.sep));
+            // console.log(' matched', fileDir, item.dir, savedTo);
+            if (savedTo) {
+                // location found
+                tInfo.pathMatch = tInfo.pathMatch || [];
+                tInfo.pathMatch.push(savedTo);
+            } else {
+                // file path is not match torrent
             }
         }
     }
@@ -265,7 +265,7 @@ export class Analyzer {
             const scoreHash: { [path: string]: number } = {};
 
             for (const torrentInfo of this._mapping[tPath]) {
-                if (!torrentInfo.match) {
+                if (!torrentInfo.pathMatch) {
                     // nothing found for this torrent file
                     return;
                 }
@@ -273,7 +273,7 @@ export class Analyzer {
                 // collect scores.
                 // for a single-file torrent this actually not make an impact.
                 // for multi-files torrent: calculate how any files withing same folder. Pick greatest.
-                for (const matchPath of torrentInfo.match) {
+                for (const matchPath of torrentInfo.pathMatch) {
                     scoreHash[matchPath] = (scoreHash[matchPath] || 0) + 1;
                 }
             }
@@ -331,7 +331,7 @@ export class Analyzer {
     /**
      *
      */
-    protected _matchFilesFromFile(dataFile: string): Promise<void> {
+    protected _matchFilesFromDataFile(dataFile: string): Promise<void> {
         console.log('[Analyzer] Matching files');
 
         return promiseByLine(dataFile, (fileInfoString) => {
@@ -362,10 +362,3 @@ export class Analyzer {
     }
 }
 
-
-/**
- *
- */
-function _hashId(strPath: string, length: number) {
-    return strPath + ':' + length;
-}

@@ -39,7 +39,8 @@
     "dev": "npm run tsc && npm start -- ",
     "build": "npm run tsc; chmod +x ./dist/bin/tlookup.js",
     "serve": "npx bun src/bin/tlookup.ts",
-    "start": "node dist/bin/tlookup.js"
+    "start": "node dist/bin/tlookup.js",
+    "start-dev": "npx bun src/bin/tlookup.ts"
   },
   "dependencies": {
     "bencode": "^4.0.0",

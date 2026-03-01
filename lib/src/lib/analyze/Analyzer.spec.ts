@@ -31,25 +31,25 @@ describe('Analyzer.spec', function () {
         const torrentLocation = assetsPath + '/t2/fixture2 - sourcefolder.torrent';
         const inputArr = [
             {
-                name: 'file1.txt',
-                dir: 'sourcefolder',
-                length: 13,
+                tFilename: 'file1.txt',
+                tFolder: ['sourcefolder'],
+                tSize: 13,
                 torrentFileLocation: torrentLocation,
-                match: [],
+                pathMatch: [],
             },
             {
-                name: 'file2.txt',
-                dir: 'sourcefolder',
-                length: 14,
+                tFilename: 'file2.txt',
+                tFolder: ['sourcefolder'],
+                tSize: 14,
                 torrentFileLocation: torrentLocation,
-                match: [],
+                pathMatch: [],
             },
             {
-                name: 'file3.txt',
-                dir: 'sourcefolder',
-                length: 14,
+                tFilename: 'file3.txt',
+                tFolder: ['sourcefolder'],
+                tSize: 14,
                 torrentFileLocation: torrentLocation,
-                match: [],
+                pathMatch: [],
             },
         ];
 
@@ -69,7 +69,7 @@ describe('Analyzer.spec', function () {
             analyzer.__loadTorrentFile(torrentLocation);
             const expected = {
                 ...inputArr[0],
-                match: ['/firstpath', '/secondpath'],
+                pathMatch: ['/firstpath', '/secondpath'],
             };
 
             for (const fileInfo of filesToMatch) {
