@@ -24,8 +24,9 @@ export function cliScanFiles(options: CliOptions): Promise<any> {
             if (entry.isTorrent) {
                 logger.log('Torrent file found:', entry.location);
             } else {
-                logger.logLOP(entry.location);
-                // logDebounced(entry.location);
+                const fpsPrefix = scanner.stats.filesPerSecond >= 0 ? `(${scanner.stats.filesPerSecond} f/s) ` : '';
+                logger.logLOP(fpsPrefix + entry.location);
+                // logger.log(`(${scanner.stats.filesPerSecond} f/s) ` + entry.location);
             }
         },
     });

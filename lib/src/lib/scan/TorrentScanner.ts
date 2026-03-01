@@ -334,9 +334,8 @@ export class TorrentScanner {
 
         // calculate fps
         const now = Date.now();
-        const timePassedMs = now - this._fpsLastEnforce;
+        const timePassedMs = Math.max(now - this._fpsLastEnforce, 1);
         this._fpsFilesCount++;
-        this.stats.filesPerSecond = Math.round(this._fpsFilesCount * 1000 / timePassedMs);
 
         if (this.options.maxFps > 0) {
             if (this._fpsFilesCount >= this.options.maxFps) {
@@ -348,6 +347,18 @@ export class TorrentScanner {
                     await timeoutPromise(extraDelay);
                 }
 
+                // recalculate fps according to delay time
+                const now = Date.now();
+                const timePassedMs_afterDelay = Math.max(now - this._fpsLastEnforce, 1);
+                this.stats.filesPerSecond =  Math.round(this._fpsFilesCount * 1000 / timePassedMs_afterDelay);
+
+                this._fpsLastEnforce = now;
+                this._fpsFilesCount = 0;
+            }
+        } else {
+            // update stats every second
+            if (timePassedMs >= 1000) {
+                this.stats.filesPerSecond = Math.round(this._fpsFilesCount * 1000 / timePassedMs);
                 this._fpsLastEnforce = Date.now();
                 this._fpsFilesCount = 0;
             }
@@ -363,7 +374,7 @@ export class TorrentScanner {
         this.stats = {
             files: 0,
             torrents: 0,
-            filesPerSecond: 0,
+            filesPerSecond: -1,
         };
     }
 
