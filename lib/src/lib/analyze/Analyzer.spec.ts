@@ -61,7 +61,7 @@ describe('Analyzer.spec', function () {
                 'file3.txt:14': [inputArr[2]],
             };
             analyzer.__loadTorrentFile(torrentLocation);
-            assert.deepEqual(analyzer._hash, expected);
+            assert.deepEqual(analyzer._hashByFileSize, expected);
         });
 
 
@@ -75,7 +75,7 @@ describe('Analyzer.spec', function () {
             for (const fileInfo of filesToMatch) {
                 analyzer.__matchFile(fileInfo.name, fileInfo.size);
             }
-            assert.deepEqual(analyzer._hash['file1.txt:13'], [expected]);
+            assert.deepEqual(analyzer._hashByFileSize['file1.txt:13'], [expected]);
 
         });
 

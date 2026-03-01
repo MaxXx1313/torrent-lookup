@@ -48,12 +48,28 @@ interface TorrentFileInfo {
  *
  */
 export interface TorrentMapping {
-    torrent: string; // torrent location
+    torrentLocation: string; // torrent location
+    torrentsDuplicatedLocation: string[];
+
     // TODO: manage torrent duplicates
-    saveTo: string; // absolute file location
-    saveToOptions?: string[]; // another options (any path which has at least one file from the torrent)
+    saveTo: TorrentMappingSaveLocation; // absolute file location
+    saveToOptions?: TorrentMappingSaveLocation[]; // another options (any path which has at least one file from the torrent)
     // TODO: manage partial downloads
-    // mapping: Array<>; // set of renamed/moved files
+}
+
+
+/**
+ *
+ */
+export interface TorrentMappingSaveLocation {
+    saveTo: string; // absolute file location
+
+    /**
+     * Relative path of files to be downloaded
+     * ({@link TorrentFileInfo.tFolder} + {@link TorrentFileInfo.tFilename})
+     */
+    filesWanted: string[];
+    filesUnwanted: string[];
 }
 
 
@@ -87,7 +103,7 @@ export class Analyzer {
      *  - one 'key' can be in one torrent file several times.
      *  @private
      */
-    public _hash: { [location: string]: TorrentFileInfo[] } = {};
+    public _hashByFileSize: { [fileAndSize: string]: TorrentFileInfo[] } = {};
 
     /**
      * Analyze result
@@ -107,7 +123,7 @@ export class Analyzer {
      *  value is TorrentInfo[]
      *  @private
      */
-    private _mapping: { [location: string]: TorrentFileInfo[] } = {};
+    private _hashByTorrentFile: { [torrentLocation: string]: TorrentFileInfo[] } = {};
 
     /**
      * @param options
@@ -128,7 +144,7 @@ export class Analyzer {
         const dataFileName = path.join(this.options.workdir, FILE_DATA);
         const mapsFileName = path.join(this.options.workdir, FILES_MAPS);
 
-        this._hash = {};
+        this._hashByFileSize = {};
         await this._loadTorrentFilesFromFile(torrentsFileName);
         await this._matchFilesFromDataFile(dataFileName);
         await this._makeDecision();
@@ -178,10 +194,10 @@ export class Analyzer {
         // add to hash
         for (const file of files) {
             const key = FileMatcher._hashId(file.tFilename, file.tSize);
-            if (!this._hash[key]) {
-                this._hash[key] = [];
+            if (!this._hashByFileSize[key]) {
+                this._hashByFileSize[key] = [];
             }
-            this._hash[key].push(file);
+            this._hashByFileSize[key].push(file);
         }
     }
 
@@ -202,7 +218,7 @@ export class Analyzer {
         // 1. match exact file + size
         const key = FileMatcher._hashId(fileName, size);
 
-        const torrentsWithFile = this._hash[key];
+        const torrentsWithFile = this._hashByFileSize[key];
         if (!torrentsWithFile) {
             // no such file in hash
             return
@@ -241,20 +257,20 @@ export class Analyzer {
     public _makeDecision(): void {
         console.log('[Analyzer] Analyzing');
 
-        // group by torrent location
-        this._mapping = {};
-        for (const key in this._hash) {
-            for (const torrentInfo of this._hash[key]) {
+        // regroup by torrent location
+        this._hashByTorrentFile = {};
+        for (const key in this._hashByFileSize) {
+            for (const torrentInfo of this._hashByFileSize[key]) {
                 const tPath = torrentInfo.torrentFileLocation;
-                this._mapping[tPath] = this._mapping[tPath] || [];
-                this._mapping[tPath].push(torrentInfo);
+                this._hashByTorrentFile[tPath] = this._hashByTorrentFile[tPath] || [];
+                this._hashByTorrentFile[tPath].push(torrentInfo);
             }
         }
-        this._hash = null; // free some memory
+        this._hashByFileSize = null; // free some memory
 
         //
         let mapping: TorrentMapping[] = [];
-        for (const tPath in this._mapping) {
+        for (const tPath in this._hashByTorrentFile) {
 
             /*
               Here we calculate score based on how many files from the torrent are kept in the same location
@@ -264,7 +280,7 @@ export class Analyzer {
             // key is absolute path, value is a score
             const scoreHash: { [path: string]: number } = {};
 
-            for (const torrentInfo of this._mapping[tPath]) {
+            for (const torrentInfo of this._hashByTorrentFile[tPath]) {
                 if (!torrentInfo.pathMatch) {
                     // nothing found for this torrent file
                     return;
@@ -322,7 +338,7 @@ export class Analyzer {
                     console.error(e);
                 });
         }).then(() => {
-            this.stats.torrents = Object.keys(this._hash).length;
+            this.stats.torrents = Object.keys(this._hashByFileSize).length;
             console.log(`[Analyzer] Loaded ${this.stats.torrents} torrent files`);
         });
 
