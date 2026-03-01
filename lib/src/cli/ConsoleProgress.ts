@@ -18,6 +18,9 @@ export class ConsoleProgress {
 
     private _animationTimer;
 
+    isActive() {
+        return !!this._animationTimer;
+    }
 
     /**
      *
@@ -25,7 +28,7 @@ export class ConsoleProgress {
     log(...args) {
         this.clear();   //remove active line
         console.log.apply(console, args); // push data
-        // this._print(); // resume progress
+        this._print(); // resume progress
     }
 
     /**

@@ -88,7 +88,7 @@ export class TorrentScanner {
     public readonly onEntry: Subject<TorrentScannerEntry> = new Subject();
 
     /**
-     * it's safeto modify options before the process started
+     * it's safe to modify options before the process started
      */
     public options: TorrentScannerOptions;
     public stats: TorrentScannerStats;
@@ -118,7 +118,7 @@ export class TorrentScanner {
             this.options.exclude = [];
         }
         if (options?.exclude) {
-            this.addExclusion(options.exclude)
+            this.addExclusion(options.exclude);
         }
         if (options?.onEntry) {
             this.onEntry.subscribe(options.onEntry);
@@ -350,7 +350,7 @@ export class TorrentScanner {
                 // recalculate fps according to delay time
                 const now = Date.now();
                 const timePassedMs_afterDelay = Math.max(now - this._fpsLastEnforce, 1);
-                this.stats.filesPerSecond =  Math.round(this._fpsFilesCount * 1000 / timePassedMs_afterDelay);
+                this.stats.filesPerSecond = Math.round(this._fpsFilesCount * 1000 / timePassedMs_afterDelay);
 
                 this._fpsLastEnforce = now;
                 this._fpsFilesCount = 0;
