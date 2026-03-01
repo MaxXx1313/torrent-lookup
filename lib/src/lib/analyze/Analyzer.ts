@@ -155,7 +155,6 @@ export class Analyzer {
         const dataFileName = path.join(this.options.workdir, FILE_DATA);
         const mapsFileName = path.join(this.options.workdir, FILES_MAPS);
 
-        this._hashByFileSize = {};
         await this._loadTorrentFilesFromFile(torrentsFileName);
         await this._matchFilesFromDataFile(dataFileName);
         await this._makeDecision();
@@ -215,7 +214,7 @@ export class Analyzer {
     }
 
     /**
-     * @private
+     * @internal
      *
      * Matching is quite challenged task.
      * So far we do simple step:
@@ -281,7 +280,7 @@ export class Analyzer {
         }
         this._hashByFileSize = null; // free some memory
 
-        //
+        // combine info into mapping
         const mappingArr: TorrentMapping[] = [];
         for (const torrentLocation in _hashByTorrentFile) {
             const mapping = _extractMappingInfo(_hashByTorrentFile[torrentLocation]);
@@ -289,6 +288,8 @@ export class Analyzer {
                 mappingArr.push(mapping);
             }
         }
+        console.log(_hashByTorrentFile);
+        console.log(mappingArr);
 
         // detect duplicates
         const _mappingHashByTorrentHash: { [hash: string]: TorrentMapping } = {}; // torrentLocation => TorrentMapping[]
@@ -312,6 +313,7 @@ export class Analyzer {
     protected _loadTorrentFilesFromFile(dataFileLocation: string): Promise<void> {
         console.log('[Analyzer] Loading files');
 
+        this._hashByFileSize = {};
         return promiseByLine(dataFileLocation, (line: string) => {
             return this.__loadTorrentFile(line)
                 .catch(e => {
@@ -383,7 +385,7 @@ function _extractMappingInfo(tFileInfoArr: TorrentFileInfo[]): TorrentMapping {
 
         if (!torrentInfo.pathMatch.length) {
             // nothing found for this torrent file
-            return;
+            continue;
         }
 
         if (torrentInfo.torrentFileLocation !== torrentLocation) {
@@ -416,17 +418,14 @@ function _extractMappingInfo(tFileInfoArr: TorrentFileInfo[]): TorrentMapping {
     for (const torrentInfo of tFileInfoArr) {
         const tFilePath = torrentInfo.tFolder + path.sep + torrentInfo.tFilename;
 
-        for (const torrentDownloadProposal of torrentInfo.pathMatch) {
-
-            // add proposal either to save option
-            for (const sOpt of saveOptions) {
-                if (torrentDownloadProposal.basepath === sOpt.saveTo) {
-                    sOpt.filesWanted.push(tFilePath);
-                } else {
-                    sOpt.filesUnwanted.push(tFilePath);
-                }
+        // detect if the file is wanted
+        for (const sOpt of saveOptions) {
+            const isOptionMatch = !!torrentInfo.pathMatch.find(pm => pm.basepath === sOpt.saveTo);
+            if (isOptionMatch) {
+                sOpt.filesWanted.push(tFilePath);
+            } else {
+                sOpt.filesUnwanted.push(tFilePath);
             }
-
         }
     }
 
