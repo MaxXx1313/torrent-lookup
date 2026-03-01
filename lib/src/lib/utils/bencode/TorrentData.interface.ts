@@ -1,7 +1,7 @@
 /**
  *  bencoded data format (partial)
  */
-export interface TorrentData {
+export interface BEncodeData {
     base: string; // file name + extension
     encoding: string;
     info: {
