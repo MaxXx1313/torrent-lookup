@@ -2,6 +2,10 @@
  *  bencoded data format (partial)
  */
 export interface BEncodeData {
+    /**
+     * content_hash is used to maintain duplications
+     */
+    content_hash: string;
     base: string; // file name + extension
     encoding: string;
     info: {
