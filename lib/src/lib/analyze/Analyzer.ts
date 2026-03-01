@@ -58,7 +58,8 @@ interface TorrentFileInfo {
 export interface TorrentMapping {
     torrentContentHash: string;
     torrentLocation: string; // torrent location
-    torrentsDuplicatedLocation: string[];
+    // location of duplicates. Also contains original location
+    torrentAlternateLocations: string[];
 
     /**
      * highest score option from {@link saveToOptions}
@@ -294,7 +295,7 @@ export class Analyzer {
         for (const mapping of mappingArr) {
             if (_mappingHashByTorrentHash[mapping.torrentContentHash]) {
                 // duplication found
-                _mappingHashByTorrentHash[mapping.torrentContentHash].torrentsDuplicatedLocation.push(mapping.torrentLocation);
+                _mappingHashByTorrentHash[mapping.torrentContentHash].torrentAlternateLocations.push(mapping.torrentLocation);
             } else {
                 _mappingHashByTorrentHash[mapping.torrentContentHash] = mapping;
             }
@@ -429,7 +430,7 @@ function _extractMappingInfo(tFileInfoArr: TorrentFileInfo[]): TorrentMapping {
 
     // choose max score
     let maxScore = -1;
-    let saveTo: TorrentMappingSaveLocation | undefined;
+    let saveTo: TorrentMappingSaveLocation | null = null;
     for (const sOpt of saveOptions) {
         if (maxScore < sOpt.score) {
             maxScore = sOpt.score;
@@ -440,7 +441,7 @@ function _extractMappingInfo(tFileInfoArr: TorrentFileInfo[]): TorrentMapping {
     const mapping: TorrentMapping = {
         torrentLocation: torrentLocation,
         torrentContentHash: torrentContentHash,
-        torrentsDuplicatedLocation: [], // torrent duplicates managed later
+        torrentAlternateLocations: [torrentLocation], // torrent duplicates managed later
         saveTo: saveTo,
         saveToOptions: saveOptions,
 

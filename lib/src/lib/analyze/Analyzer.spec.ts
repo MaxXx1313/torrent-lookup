@@ -111,15 +111,15 @@ describe('Analyzer.spec', function () {
             const expected1 = {
                 torrentContentHash: torrent1Hash,
                 torrentLocation: torrentFile1,
-                torrentsDuplicatedLocation: [torrentFile1Copy],
-                saveTo: undefined,
+                torrentAlternateLocations: [torrentFile1, torrentFile1Copy],
+                saveTo: null,
                 saveToOptions: [],
             };
 
             const expected2 = {
                 torrentContentHash: torrent2Hash,
                 torrentLocation: torrentFile2,
-                torrentsDuplicatedLocation: [],
+                torrentAlternateLocations: [torrentFile2],
 
                 saveTo: {
                     saveTo: '/firstpath',
