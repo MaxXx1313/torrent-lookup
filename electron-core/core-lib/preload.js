@@ -28,7 +28,7 @@ function callable(name) {
 function event(eventName) {
     return (callback) => {
         const _cb = (_event, value) => {
-            console.log('[event] >\t', eventName, value);
+            console.log('[event] >>\t', eventName, value);
             callback(value);
         }
         ipcRenderer.on(eventName, _cb);
@@ -43,7 +43,7 @@ function event(eventName) {
 function eventOnce(eventName) {
     return (callback) => {
         const _cb = (_event, value) => {
-            console.log('[event] >\t', eventName, value);
+            console.log('[event] >>\t', eventName, value);
             callback(value);
         }
         ipcRenderer.once(eventName, _cb);
@@ -58,11 +58,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // ui4
     getConfig: callable('app:get-config'),
     setConfig: callable('app:set-config'),
-    // getDefaultLocations: callable('app:get-default-locations'), // TODO: incomplete
+    getDefaultLocations: callable('app:get-default-locations'), // TODO: unused yet
     getSystemExcluded: callable('app:get-system-excluded'),
 
     selectFolder: callable('app:select-folder'),
 
+    // scanner
     scanStart: callable('scan:start'),
     onScanEntry: event('scan:entry'),
     onScanStats: event('scan:stats'),
