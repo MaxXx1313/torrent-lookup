@@ -26,6 +26,7 @@ describe('Analyzer.spec', function () {
             {name: '/firstpath/sourcefolder/file1.txt', size: 13},
             {name: '/secondpath/sourcefolder/file1.txt', size: 13},
             {name: '/otherpath/wrongfolder/file1.txt', size: 13},
+            {name: '/firstpath/sourcefolder/file2.txt', size: 14},
         ];
 
         const torrentFile1 = assetsPath + '/t1/fixture1 - test1.txt.torrent';
@@ -123,24 +124,24 @@ describe('Analyzer.spec', function () {
 
                 saveTo: {
                     saveTo: '/firstpath',
-                    score: 1,
+                    score: 2,
                     filesWanted: [
                         'sourcefolder/file1.txt',
+                        'sourcefolder/file2.txt',
                     ],
                     filesUnwanted: [
-                        'sourcefolder/file2.txt',
                         'sourcefolder/file3.txt'
                     ],
                 },
                 saveToOptions: [
                     {
                         saveTo: '/firstpath',
-                        score: 1,
+                        score: 2,
                         filesWanted: [
                             'sourcefolder/file1.txt',
+                            'sourcefolder/file2.txt',
                         ],
                         filesUnwanted: [
-                            'sourcefolder/file2.txt',
                             'sourcefolder/file3.txt'
                         ],
                     },
@@ -165,6 +166,7 @@ describe('Analyzer.spec', function () {
             //
             const mapping2Result = analyzer._decision.find(d => d.torrentLocation === torrentFile2);
             assert.deepEqual(mapping2Result.saveToOptions, expected2.saveToOptions);
+            assert.deepEqual(mapping2Result.saveToOptions[0], expected2.saveToOptions[0]); // make sure order is matters!
             assert.deepEqual(mapping2Result, expected2);
 
             //

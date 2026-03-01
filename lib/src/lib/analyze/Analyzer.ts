@@ -428,22 +428,15 @@ function _extractMappingInfo(tFileInfoArr: TorrentFileInfo[]): TorrentMapping {
         }
     }
 
-    // choose max score
-    let maxScore = -1;
-    let saveTo: TorrentMappingSaveLocation | null = null;
-    for (const sOpt of saveOptions) {
-        if (maxScore < sOpt.score) {
-            maxScore = sOpt.score;
-            saveTo = sOpt;
-        }
-    }
+    //
+    const saveOptionsOrdered = saveOptions.sort((a, b) => b.score - a.score);
 
     const mapping: TorrentMapping = {
         torrentLocation: torrentLocation,
         torrentContentHash: torrentContentHash,
         torrentAlternateLocations: [torrentLocation], // torrent duplicates managed later
-        saveTo: saveTo,
-        saveToOptions: saveOptions,
+        saveTo: saveOptionsOrdered[0] || null,
+        saveToOptions: saveOptionsOrdered,
 
     };
     return mapping;
