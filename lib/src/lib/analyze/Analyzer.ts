@@ -56,6 +56,7 @@ interface TorrentFileInfo {
  *
  */
 export interface TorrentMapping {
+    torrentContentHash: string;
     torrentLocation: string; // torrent location
     torrentsDuplicatedLocation: string[];
 
@@ -134,12 +135,6 @@ export class Analyzer {
         torrents: 0, // torrent files amount
         maps: 0, // amount of found matches
     };
-    /**
-     *  'key' is torrent file location
-     *  value is TorrentInfo[]
-     *  @private
-     */
-    private _hashByTorrentFile: { [torrentLocation: string]: TorrentFileInfo[] } = {};
 
     /**
      * @param options
@@ -276,22 +271,36 @@ export class Analyzer {
         console.log('[Analyzer] Analyzing');
 
         // regroup by torrent location
-        this._hashByTorrentFile = {}; // torrentLocation => TorrentMapping[]
+        const _hashByTorrentFile: { [torrentLocation: string]: TorrentFileInfo[] } = {}; // torrentLocation => TorrentMapping[]
         for (const key in this._hashByFileSize) {
             for (const torrentInfo of this._hashByFileSize[key]) {
                 const tPath = torrentInfo.torrentFileLocation;
-                this._hashByTorrentFile[tPath] = this._hashByTorrentFile[tPath] || [];
-                this._hashByTorrentFile[tPath].push(torrentInfo);
+                _hashByTorrentFile[tPath] = _hashByTorrentFile[tPath] || [];
+                _hashByTorrentFile[tPath].push(torrentInfo);
             }
         }
         this._hashByFileSize = null; // free some memory
 
         //
-        for (const torrentLocation in this._hashByTorrentFile) {
-            const torrentFiles = this._hashByTorrentFile[torrentLocation];
-            const mappingInfo = _extractMappingInfo(torrentFiles);
-            this._decision.push(mappingInfo);
+        const mappingArr: TorrentMapping[] = [];
+        for (const torrentLocation in _hashByTorrentFile) {
+            const mapping = _extractMappingInfo(_hashByTorrentFile[torrentLocation]);
+            if (mapping) {
+                mappingArr.push(mapping);
+            }
         }
+
+        // detect duplicates
+        const _mappingHashByTorrentHash: { [hash: string]: TorrentMapping } = {}; // torrentLocation => TorrentMapping[]
+        for (const mapping of mappingArr) {
+            if (_mappingHashByTorrentHash[mapping.torrentContentHash]) {
+                // duplication found
+                _mappingHashByTorrentHash[mapping.torrentContentHash].torrentsDuplicatedLocation.push(mapping.torrentLocation);
+            } else {
+                _mappingHashByTorrentHash[mapping.torrentContentHash] = mapping;
+            }
+        }
+        this._decision = Object.values(_mappingHashByTorrentHash);
 
         this.stats.maps = this._decision.length;
         console.log(`[Analyzer] Found ${this.stats.maps} matches`);
@@ -359,6 +368,7 @@ function _extractMappingInfo(tFileInfoArr: TorrentFileInfo[]): TorrentMapping {
         return null;
     }
     const torrentLocation = tFileInfoArr[0].torrentFileLocation;
+    const torrentContentHash = tFileInfoArr[0].torrentContentHash;
 
     /*
       Here we calculate score based on how many files from the torrent are kept in the same location
@@ -377,7 +387,11 @@ function _extractMappingInfo(tFileInfoArr: TorrentFileInfo[]): TorrentMapping {
         }
 
         if (torrentInfo.torrentFileLocation !== torrentLocation) {
-            console.warn('unexpected data: having different torrentLocation');
+            console.warn('Skipping unexpected data: having different torrentLocation');
+            continue;
+        }
+        if (torrentInfo.torrentContentHash !== torrentContentHash) {
+            console.warn('Skipping unexpected data: having different torrentContentHash');
             continue;
         }
 
@@ -428,6 +442,7 @@ function _extractMappingInfo(tFileInfoArr: TorrentFileInfo[]): TorrentMapping {
 
     const mapping: TorrentMapping = {
         torrentLocation: torrentLocation,
+        torrentContentHash: torrentContentHash,
         torrentsDuplicatedLocation: [], // torrent duplicates managed later
         saveTo: saveTo,
         saveToOptions: saveOptions,
