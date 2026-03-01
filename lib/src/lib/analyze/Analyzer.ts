@@ -288,8 +288,6 @@ export class Analyzer {
                 mappingArr.push(mapping);
             }
         }
-        console.log(_hashByTorrentFile);
-        console.log(mappingArr);
 
         // detect duplicates
         const _mappingHashByTorrentHash: { [hash: string]: TorrentMapping } = {}; // torrentLocation => TorrentMapping[]

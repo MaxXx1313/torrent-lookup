@@ -28,31 +28,35 @@ describe('Analyzer.spec', function () {
             {name: '/otherpath/wrongfolder/file1.txt', size: 13},
         ];
 
-        const torrentLocation = assetsPath + '/t2/fixture2 - sourcefolder.torrent';
-        const torrentHash = 'afc459db274e2b15c88af762a258ab44';
+        const torrentFile1 = assetsPath + '/t1/fixture1 - test1.txt.torrent';
+        const torrentFile2 = assetsPath + '/t2/fixture2 - sourcefolder.torrent';
+
+        const torrent1Hash = '--';
+        const torrent2Hash = 'afc459db274e2b15c88af762a258ab44';
+
         const inputArr = [
             {
                 tFilename: 'file1.txt',
                 tFolder: ['sourcefolder'],
                 tSize: 13,
-                torrentFileLocation: torrentLocation,
-                torrentContentHash: torrentHash,
+                torrentFileLocation: torrentFile2,
+                torrentContentHash: torrent2Hash,
                 pathMatch: [],
             },
             {
                 tFilename: 'file2.txt',
                 tFolder: ['sourcefolder'],
                 tSize: 14,
-                torrentFileLocation: torrentLocation,
-                torrentContentHash: torrentHash,
+                torrentFileLocation: torrentFile2,
+                torrentContentHash: torrent2Hash,
                 pathMatch: [],
             },
             {
                 tFilename: 'file3.txt',
                 tFolder: ['sourcefolder'],
                 tSize: 14,
-                torrentFileLocation: torrentLocation,
-                torrentContentHash: torrentHash,
+                torrentFileLocation: torrentFile2,
+                torrentContentHash: torrent2Hash,
                 pathMatch: [],
             },
         ];
@@ -64,13 +68,13 @@ describe('Analyzer.spec', function () {
                 'file2.txt:14': [inputArr[1]],
                 'file3.txt:14': [inputArr[2]],
             };
-            analyzer.__loadTorrentFile(torrentLocation);
+            analyzer.__loadTorrentFile(torrentFile2);
             assert.deepEqual(analyzer._hashByFileSize, expected);
         });
 
 
         test('matchFile', function () {
-            analyzer.__loadTorrentFile(torrentLocation);
+            analyzer.__loadTorrentFile(torrentFile2);
             const expected = {
                 ...inputArr[0],
                 pathMatch: [
@@ -95,15 +99,16 @@ describe('Analyzer.spec', function () {
 
         test('analyzeCacheData', function () {
 
-            analyzer.__loadTorrentFile(torrentLocation);
+            analyzer.__loadTorrentFile(torrentFile1);
+            analyzer.__loadTorrentFile(torrentFile2);
             for (const fileInfo of filesToMatch) {
                 analyzer.__matchFile(fileInfo.name, fileInfo.size);
             }
 
             ///
             const expected = {
-                torrentContentHash: torrentHash,
-                torrentLocation: torrentLocation,
+                torrentContentHash: torrent1Hash,
+                torrentLocation: torrentFile1,
                 torrentsDuplicatedLocation: [],
 
                 saveTo: {
@@ -144,7 +149,7 @@ describe('Analyzer.spec', function () {
             };
 
             analyzer._makeDecision();
-            assert.deepEqual(analyzer._decision[0].saveToOptions, expected.saveToOptions);
+            assert.deepEqual(analyzer._decision[1].saveToOptions, expected.saveToOptions);
         });
     });
 
