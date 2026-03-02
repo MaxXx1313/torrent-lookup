@@ -3,6 +3,8 @@ import * as path from 'node:path';
 import * as URL from 'node:url';
 import {MyEventBus} from "./core-lib/my-event-bus";
 import {ProjectManager} from "./core-lib/project-manager";
+import {appLogic} from "./core-lib/app";
+import {scanLogic} from "./core-lib/scan";
 
 
 const isDevMode = process.argv.includes('--dev');
@@ -12,7 +14,7 @@ if (isDevMode) {
 
 
 const myEventBus = new MyEventBus(ipcMain);
-const projectManager = new ProjectManager(myEventBus);
+
 
 /////////////////////////////
 const __filename = URL.fileURLToPath(import.meta.url);
@@ -56,6 +58,12 @@ const isSquirrelService = process.argv.includes('--squirrel-install')
 if (isSquirrelService) {
     app.quit();
 }
+
+//
+// Attach handlers
+appLogic(myEventBus);
+scanLogic(myEventBus);
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

@@ -1,11 +1,19 @@
 /**
- *
+ * events:
+ *   scan:get-config
+ *   scan:set-config
  */
-export interface AppConfiguration {
+export interface ScanConfiguration {
     targets?: string[];
     exclude?: string[];
 }
 
+/**
+ * @deprecated use ScanConfiguration
+ */
+export interface AppConfiguration {
+
+}
 
 /**
  *

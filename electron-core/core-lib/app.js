@@ -1,38 +1,10 @@
-import Store from 'electron-store';
 import {dialog} from "electron";
-import {SCAN_EXCLUDE_DEFAULT} from "tlookup";
 import * as child from 'node:child_process';
 
+/**
+ * @param {MyEventBus} ipcMain
+ */
 export function appLogic(ipcMain) {
-
-    const store = new Store();
-
-
-    /**
-     * Read app config
-     */
-    ipcMain.handle('app:get-config', async () => {
-        try {
-            return store.get('config');
-        } catch (e) {
-            console.warn(e);
-            return {};
-        }
-    });
-
-    ipcMain.handle('app:get-system-excluded', async () => {
-        return SCAN_EXCLUDE_DEFAULT;
-    });
-
-    /**
-     * Write app config
-     */
-    ipcMain.handle('app:set-config', async (event, config) => {
-        const targets = config?.targets || [];
-        const exclude = config?.exclude || [];
-        return store.set('config', {targets, exclude});
-    });
-
 
     ipcMain.handle('app:select-folder', (event) => {
         return selectFolder();

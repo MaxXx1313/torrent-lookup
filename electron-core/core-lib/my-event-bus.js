@@ -1,3 +1,6 @@
+/**
+ *
+ */
 export class MyEventBus {
     /**
      * @type {IpcMain}
@@ -18,10 +21,10 @@ export class MyEventBus {
     }
 
     handle(eventName, callback) {
-        this.ipcMain.handle(eventName, (event, payload) => {
-            console.log('[callable] <\t', eventName, payload);
+        this.ipcMain.handle(eventName, (event, arg1, arg2) => {
+            console.log('[callable] <\t', eventName, arg1, arg2);
             return Promise.resolve()
-                .then(() => callback(payload));
+                .then(() => callback(arg1, arg2));
         });
     }
 

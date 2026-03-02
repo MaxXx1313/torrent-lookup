@@ -1,57 +1,100 @@
-import {Analyzer, Info, PushManager, TorrentScanner} from "tlookup";
+import {Analyzer, PushManager, SCAN_EXCLUDE_DEFAULT, TorrentScanner} from "tlookup";
+import Store from "electron-store";
+import {app} from "electron";
+import * as path from "node:path";
 
 /**
  * @param {MyEventBus} ipcMain
  */
 export function scanLogic(ipcMain) {
 
-    let _mappings = [];
+    const store = new Store();
 
-    const scanner = new TorrentScanner();
-    const analyzer = new Analyzer();
-    const info = new Info();
-    const pushManager = new PushManager();
+    const STORE_ROOT = app.getPath('userData');
+    const WORKDIR = path.join(STORE_ROOT, 'scan-data');
 
-    let _exportParameters = {
-        username: 'admin',
-        password: 'admin',
-        port: 9091,
-    }
+    const SCAN_CONFIG_KEY = 'scan-config';
 
-    // load mappings
-    info.getMapping().then(m => {
-        _mappings = m || [];
+    /////////////////
+    // Scan config
+    ipcMain.handle('app:get-scan-config', async () => {
+        try {
+            return store.get(SCAN_CONFIG_KEY);
+        } catch (e) {
+            console.warn(e);
+            return null;
+        }
     });
 
-    scanner.onEntry.subscribe((entry) => {
-        // ipcMain.emit('scan:entry', entry.location);
-        ipcMain.emit('scan:entry', entry.location);
-        ipcMain.emit('scan:stats', scanner.stats);
+    ipcMain.handle('app:set-scan-config', async (config) => {
+        const configToSave = {
+            targets: config?.targets || [],
+            exclude: config?.exclude || [],
+            followSymlinks: !!config?.followSymlinks,
+        };
+        return store.set(SCAN_CONFIG_KEY, configToSave);
     });
 
-    pushManager.opStatus$.subscribe((msg) => {
-        ipcMain.emit('export:log', msg);
+
+    ipcMain.handle('app:get-system-excluded', async () => {
+        return SCAN_EXCLUDE_DEFAULT;
     });
 
+    // TODO: add method to verify exclusion and targets
+    // TODO: (lib) add way to track single target progress
+
+    /**
+     * @type {TorrentScanner | null}
+     */
+    let scanner;
+
+
+    const analyzer = new Analyzer({
+        workdir: WORKDIR,
+    });
+
+    /////////////////
+    // Scan logic
+    const MAP_CONFIG_KEY = 'mapping-config';
+
+    /**
+     * @type {TorrentMapping[] | null}
+     * @private
+     */
+    let _mappingCache = null;
     /**
      * Start scanning process
      */
     ipcMain.handle('scan:start', async (event, config) => {
         const targets = config?.targets || [];
         const exclude = config?.exclude || [];
+        const followSymLinks = !!config?.followSymlinks;
 
-        await scanner.terminate();
+        if (scanner) {
+            await scanner.terminate();
+        }
 
-        scanner.clearExclusion();
-        scanner.addExclusion(exclude);
+        scanner = new TorrentScanner({
+            workdir: WORKDIR,
+            exclude,
+            skipSystemExclude: false,
+            followSymLinks,
+        });
+
+        scanner.onEntry.subscribe((entry) => {
+            ipcMain.emit('scan:entry', entry.location);
+            ipcMain.emit('scan:stats', scanner.stats);
+        });
 
         return scanner.run(targets)
             .then(() => analyzer.analyze())
             .then(mappings => {
-                _mappings = mappings;
+                _mappingCache = mappings;
+                return store.set(MAP_CONFIG_KEY, mappings);
             })
             .finally(() => {
                 ipcMain.emit('scan:finished');
+                scanner = null;
             });
     });
 
@@ -59,57 +102,126 @@ export function scanLogic(ipcMain) {
      * Stop scanning process
      */
     ipcMain.handle('scan:stop', async () => {
-        await scanner.terminate();
+        if (scanner) {
+            await scanner.terminate();
+            scanner = null;
+        }
+    });
+
+    /////////////////
+    // Analyze logic
+    /**
+     *
+     */
+    ipcMain.handle('analyze:get-mapping', async () => {
+        return _mappingCache;
     });
 
     /**
      *
      */
-    ipcMain.handle('export:get-user-decision', async () => {
-        return _mappings || [];
+    ipcMain.handle('analyze:set-mapping', async (mappings) => {
+        _mappingCache = mappings;
+        return store.set(MAP_CONFIG_KEY, mappings);
+    });
+
+
+    /////////////////
+    // Export logic
+
+    const EXPORT_CONFIG_PREFIX = 'export-';
+    /**
+     *
+     */
+    ipcMain.handle('export:get-clients', async () => {
+        return ['transmission'];
+    });
+
+
+    /**
+     *
+     */
+    ipcMain.handle('export:get-parameters', async (client) => {
+        if (!client) {
+            throw new Error('Client not passed');
+        }
+        const clientLc = client.toLowerCase();
+
+        return store.get(EXPORT_CONFIG_PREFIX + clientLc);
     });
 
     /**
      *
      */
-    ipcMain.handle('export:set-user-decision', async (event, mappings) => {
-        _mappings = mappings || [];
-    });
+    ipcMain.handle('export:set-parameters', async (client, parameters) => {
+        if (!client) {
+            throw new Error('Client not passed');
+        }
+        const clientLc = client.toLowerCase();
 
-
-    /**
-     *
-     */
-    ipcMain.handle('export:get-parameters', async () => {
-        return _exportParameters;
-    });
-
-    /**
-     *
-     */
-    ipcMain.handle('export:set-parameters', async (event, options) => {
-        _exportParameters = options;
         const transmissionOptions = {
             endpoint: `http://${options.username}:${options.password}@localhost:${options.port}`,
         }
-        pushManager.setClient('transmission', transmissionOptions);
+
+        return store.set(EXPORT_CONFIG_PREFIX + clientLc, parameters);
     });
+
+
+    /**
+     * @type {PushManager | null}
+     */
+    let pushManager;
     /**
      *
      */
-    ipcMain.handle('export:push', async () => {
-        const mappingsActive = (_mappings || []).filter(m => !m.isDisabled);
+    ipcMain.handle('export:start', async (client, parameters) => {
+
+        pushManager = new PushManager({
+            workdir: WORKDIR,
+        });
+        pushManager.setClient(client, parameters);
+
+        pushManager.opStatus$.subscribe((msg) => {
+            ipcMain.emit('export:log', msg);
+        });
+
+
+        const mappingsActive = (_mappingCache || []).filter(m => !m.saveTo);
         if (!mappingsActive?.length) {
             return Promise.reject('Nothing to push');
         }
 
-        const total = mappingsActive.length;
-        ipcMain.emit('export:push-progress', {total, completed: 0});
+        //
+        ipcMain.emit('export:progress', {total: mappingsActive.length, completed: 0});
         for (let i = 0; i < mappingsActive.length; i++) {
-            const torrentMapping = mappingsActive[i];
-            await pushManager.push(torrentMapping.torrent, torrentMapping.saveTo);
-            ipcMain.emit('export:push-progress', {total, completed: i + 1});
+            const exportItem = await mappingsActive[i];
+            await pushManager.push(exportItem.torrentLocation, exportItem.saveTo.saveTo, exportItem.saveTo.filesWanted);
+            ipcMain.emit('export:progress', {total: mappingsActive.length, completed: i + 1});
         }
+        ipcMain.emit('export:finished');
+
     });
 
+}
+
+/**
+ * @param {string} client
+ * @private
+ */
+function _getDefaultParameters(client) {
+
+    switch (client) {
+        case 'transmission':
+            return {
+                username: 'admin',
+                password: 'admin',
+                port: 9091,
+            };
+        case 'json':
+            return {
+                exportPath: '~',
+            };
+        default:
+            return {};
+    }
 }
