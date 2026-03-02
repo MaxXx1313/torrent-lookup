@@ -148,6 +148,7 @@ export function scanLogic(ipcMain) {
         const clientLc = client.toLowerCase();
 
         return store.get(EXPORT_CONFIG_PREFIX + clientLc);
+        // TODO: _getDefaultParameters
     });
 
     /**
