@@ -82,7 +82,7 @@ export class PushManager {
      */
     push(location: string, saveTo: string, filesWanted: string[]): Promise<void> {
         this.opStatus$.next(`Exporting "${location}" to "${saveTo}" (${filesWanted.length} files)`);
-        return this.client.push(location, saveTo)
+        return this.client.push(location, saveTo, filesWanted)
             .then(result => {
                 this.opStatus$.next('  Torrent ' + (result.isNew ? 'added' : 'exists') + ': ' + result.id + ':\t' + location);
             }).catch(e => {

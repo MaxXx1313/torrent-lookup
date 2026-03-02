@@ -74,16 +74,25 @@ export class TlookupTransmission implements ITorrentClient {
     /**
      * @implements ITorrentClient
      */
-    async push(torrentFile: string, downloadDir: string): Promise<PushResult> {
-        const addResult = await this.torrentAdd(torrentFile, downloadDir, {paused: false});
+    async push(torrentFile: string, downloadDir: string, filesWanted: string[]): Promise<PushResult> {
+        const addResult = await this._torrentAdd(torrentFile, downloadDir, {paused: true});
         console.log('torrentAdd', addResult);
         if (!addResult.isNew) {
-            await this.torrentSetLocation(addResult.id, downloadDir);
+            await this._torrentSetLocation(addResult.id, downloadDir);
         }
 
-        await this._setWantedByPercentage(addResult.id, UNWANTED_THRESHOLD);
+        await this._setWantedFiles(addResult.id, filesWanted);
+
+        // 'unpause' torrent
+        await this._rpcRequest('torrent-start', [addResult.id]);
+
+        if (!addResult.isNew) {
+            await this._rpcRequest('torrent-verify', [addResult.id]);
+        }
+
         return addResult as PushResult;
     }
+
 
     /**
      * Add or Update torrent
@@ -96,7 +105,7 @@ export class TlookupTransmission implements ITorrentClient {
      *
      * @more: https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt#L356
      */
-    torrentAdd(filename: string, downloadDir: string, opts = {}): Promise<{
+    _torrentAdd(filename: string, downloadDir: string, opts: { paused?: boolean } = {}): Promise<{
         id: number,
         name: string,
         hashString: string,
@@ -104,8 +113,9 @@ export class TlookupTransmission implements ITorrentClient {
     }> {
         opts['filename'] = filename;
         opts['download-dir'] = downloadDir;
+        opts['paused'] = !!opts?.paused;
 
-        return this.rpcRequest('torrent-add', opts)
+        return this._rpcRequest('torrent-add', opts)
             .then((res) => {
                 let result = res.body.arguments['torrent-added'] || res.body.arguments['torrent-duplicate'];
                 if (result) {
@@ -117,15 +127,14 @@ export class TlookupTransmission implements ITorrentClient {
             });
     }
 
-    // HOTFIX: update torrent location (for existed torrents)
+
     // https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt#L406
-    torrentSetLocation(id: number, downloadDir: string, opts = {}): Promise<any> {
+    _torrentSetLocation(id: number, downloadDir: string, opts = {}): Promise<any> {
         opts['ids'] = [id];
         opts['location'] = downloadDir;
         opts['move'] = false;
-        return this.rpcRequest('torrent-set-location', opts);
+        return this._rpcRequest('torrent-set-location', opts);
     }
-
 
     /**
      * Get torrent info by id
@@ -135,14 +144,14 @@ export class TlookupTransmission implements ITorrentClient {
      *
      * @more https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt#L127
      */
-    torrentGet(id: number, fields: string[], opts?): Promise<any> {
+    _torrentGet(id: number, fields: string[], opts?): Promise<any> {
         opts = opts || {};
 
         opts.ids = [id];
         opts.fields = fields;
         assert.ok(opts.fields);
 
-        return this.rpcRequest('torrent-get', opts)
+        return this._rpcRequest('torrent-get', opts)
             .then((res) => {
                 // console.log(res.body.arguments.torrents[0].files);
                 // console.log(res.body.arguments.torrents[0].fileStats);
@@ -155,55 +164,21 @@ export class TlookupTransmission implements ITorrentClient {
      * @param {Array<number>} id
      * @param {object} opts
      */
-    torrentSet(id: number, opts) {
+    _torrentSet(id: number, opts) {
         opts.ids = [id];
-        return this.rpcRequest('torrent-set', opts)
+        return this._rpcRequest('torrent-set', opts)
             .then((res) => {
                 return res.body.arguments; // basically, it's empty
             });
     }
 
     /**
-     *
-     */
-    _rpcResponse(res) {
-        if (res.body && res.body.result) {
-            if (res.body.result !== "success") {
-                throw new Error(res.body.result || 'Transmission reports an error');
-            }
-        }
-        return res;
-    }
-
-    /**
-     *
-     */
-    _rpcResponseJson(res) {
-        let ct = TlookupTransmission.getContentType(res.headers["content-type"]);
-
-        if (ct == "application/json") {
-            res.body = JSON.parse(res.body); // throws error
-        }
-        return res;
-    }
-
-    /**
-     *
-     */
-    _collectCsrf(res) {
-        if (res.headers[CSRF_HEADER]) {
-            this._csrf = res.headers[CSRF_HEADER];
-        }
-        return res;
-    }
-
-    /**
      * Mark files inside torrent file to download
      */
-    protected _setWantedByPercentage(torrentId: number, percentage: number = UNWANTED_THRESHOLD): Promise<any> {
+    _setWantedByPercentage(torrentId: number, percentage: number = UNWANTED_THRESHOLD): Promise<any> {
 
         // set
-        return this.torrentGet(torrentId, ['files'])
+        return this._torrentGet(torrentId, ['files'])
             .then(result => result[0])
             .then(torrentInfo => {
                 for (const file of torrentInfo.files) {
@@ -221,19 +196,51 @@ export class TlookupTransmission implements ITorrentClient {
                 }, {wanted: [], unwanted: []});
 
 
-                return this.torrentSet(torrentId, {
+                return this._torrentSet(torrentId, {
                     "files-wanted": wantedFilesData.wanted,
                     "files-unwanted": wantedFilesData.unwanted
                 });
             });
-
-
     }
 
     /**
-     *
+     * Mark files inside torrent file to download
      */
-    protected rpcRequest(method, data): Promise<any> {
+    private _setWantedFiles(torrentId: number, filesWanted: string[]): Promise<any> {
+
+        // set
+        return this._torrentGet(torrentId, ['files'])
+            .then(result => result[0])
+            .then(torrentInfo => {
+                const patch = {
+                    "files-wanted": [],
+                    "files-unwanted": [],
+                }
+
+                for (let iFile = 0; iFile < torrentInfo.files.length; iFile++) {
+                    const fileInfo = torrentInfo.files[iFile];
+
+                    // 'fileInfo.name' comparison verified for linux
+                    const isWanted = filesWanted.includes(fileInfo.name);
+
+                    // isAlmostDownloaded - used to keep partial downloads
+                    const downloadedPercentage = 100 * fileInfo.bytesCompleted / fileInfo.length;
+                    const isAlmostDownloaded = downloadedPercentage >= UNWANTED_THRESHOLD;
+
+                    if (isWanted || isAlmostDownloaded) {
+                        patch["files-wanted"].push(iFile);
+                    } else {
+                        patch["files-unwanted"].push(iFile);
+                    }
+                }
+
+                return this._torrentSet(torrentId, patch);
+            });
+    }
+
+    /**
+     */
+    private _rpcRequest(method: string, data: any): Promise<any> {
         let self = this;
 
         let opts = clone(this._endpointParsed);
@@ -251,13 +258,14 @@ export class TlookupTransmission implements ITorrentClient {
             opts.headers = opts.headers || {};
             opts.headers[CSRF_HEADER] = self._csrf;
 
-            console.log('[DEBUG] (transmission) request:', payload.method/*, opts*/);
+            // console.log('[DEBUG] (transmission) request:', payload.method/*, data*/);
+            console.log('[DEBUG] (transmission) request:', payload.method, data);
             // console.log(opts); console.log(payload);
 
             return request(opts, JSON.stringify(payload))
                 .then(self._collectCsrf.bind(self))
-                .then(self._rpcResponseJson.bind(self))
-                .then(self._rpcResponse.bind(self))
+                .then(self.__rpcResponseJson.bind(self))
+                .then(self.__rpcResponse.bind(self))
                 .then((res: any) => {
                     // console.log(res.body);
                     console.log('[DEBUG] (transmission) response:', res.body);
@@ -285,6 +293,39 @@ export class TlookupTransmission implements ITorrentClient {
             });
     }
 
+    /**
+     *
+     */
+    private __rpcResponse(res) {
+        if (res.body && res.body.result) {
+            if (res.body.result !== "success") {
+                throw new Error(res.body.result || 'Transmission reports an error');
+            }
+        }
+        return res;
+    }
+
+    /**
+     *
+     */
+    private __rpcResponseJson(res) {
+        let ct = TlookupTransmission.getContentType(res.headers["content-type"]);
+
+        if (ct == "application/json") {
+            res.body = JSON.parse(res.body); // throws error
+        }
+        return res;
+    }
+
+    /**
+     *
+     */
+    private _collectCsrf(res) {
+        if (res.headers[CSRF_HEADER]) {
+            this._csrf = res.headers[CSRF_HEADER];
+        }
+        return res;
+    }
 }// -Transmission class
 
 

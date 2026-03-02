@@ -131,6 +131,10 @@ const optionDefinitions: OptionDefinition[] = [
                 options.client = pushCommand.client;
             }
 
+            if (!options.client) {
+                throw new Error('No client specified')
+            }
+
             await cliPushFiles(options);
             break;
 
