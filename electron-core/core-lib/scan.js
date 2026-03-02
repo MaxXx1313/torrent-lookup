@@ -184,6 +184,9 @@ export function scanLogic(ipcMain) {
         pushManager.opStatus$.subscribe((msg) => {
             ipcMain.emit('export:log', msg);
         });
+        pushManager.opError$.subscribe((msg) => {
+            ipcMain.emit('export:log', msg);
+        });
 
 
         const mappingsActive = (_mappingCache || []).filter(m => !m.saveTo);

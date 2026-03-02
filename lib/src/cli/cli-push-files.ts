@@ -17,5 +17,8 @@ export function cliPushFiles(options: CliOptions): Promise<any> {
     pusher.opStatus$.subscribe(status => {
         console.log(status);
     });
+    pusher.opError$.subscribe(status => {
+        console.error(status);
+    });
     return pusher.pushAll();
 }
