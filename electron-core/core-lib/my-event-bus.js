@@ -38,7 +38,7 @@ export class MyEventBus {
     }
 
     emit(eventName, payload) {
-        console.log('[emit] >>\t', eventName, payload);
+        console.log('[emit] \t', eventName, payload);
 
         for (const contentWindow of this._windows) {
             contentWindow.webContents.send(eventName, payload);

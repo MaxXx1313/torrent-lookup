@@ -19,8 +19,8 @@
           <h1 class="text-4xl text-black tracking-tight text-slate-900 dark:text-white">
             Scanning Filesystem...</h1>
           <p class="text-[#92adc9] text-sm font-normal leading-normal max-w-lg mx-auto">
-            Matching local files with torrent metadata. This may take a while depending on your disk speed and volume
-            size.
+            Scanning your filesystem and linking files to their torrent metadata.
+            This may take some time, depending on your disk speed and how many files you have.
           </p>
         </div>
       </div>
@@ -33,7 +33,7 @@
             <div class="space-y-1">
               <p class="text-black-900 dark:text-white text-lg font-medium">Scanning directory contents</p>
             </div>
-            <div class="text-right">
+            <div class="text-right" v-if="filesPerSecond>=0">
               <p class="text-[#92adc9] text-base">{{ formatNumber(filesPerSecond) }} files/sec</p>
             </div>
           </div>
@@ -87,7 +87,7 @@
           <span class="font-semibold">Cancel Scan</span>
         </button>
         <p class="text-[#92adc9]/60 text-xs text-center italic">
-          Scanning will pause and keep current progress if cancelled.
+          Scanning will stop and keep current progress if cancelled.
         </p>
       </div>
     </div>
