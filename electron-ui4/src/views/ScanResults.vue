@@ -111,22 +111,22 @@
             <div class="flex flex-col">
               <span
                   class="text-slate-900 dark:text-white text-base font-semibold group-hover:text-primary transition-colors">
-                {{ getBaseName(r.torrent) }}
+                {{ getBaseName(r.torrentLocation) }}
               </span>
               <!--              <span class="text-slate-400 text-xs mt-1">3.4 GB • Added 2h ago</span>-->
             </div>
 
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 mb-2">
               <IconTorrent class="text-sm text-[18px] basis-[24px] flex-0 shrink-0"/>
               <div class="text-slate-500 dark:text-[#92adc9] text-sm font-medium italic break-all">
-                {{ r.torrent }}
+                {{ r.torrentLocation }}
               </div>
             </div>
 
-            <div class="flex items-center gap-2">
+            <div class="flex items-start gap-2">
               <span class="material-symbols-outlined text-slate-400 text-sm">folder</span>
               <div class="text-slate-500 dark:text-[#92adc9] text-sm font-medium italic break-all">
-                {{ r.saveTo }}
+                <SaveToOption :opt="r.saveTo"></SaveToOption>
               </div>
 
               <Menu as="div" class="relative inline-block" v-if="(r.saveToOptions?.length || 0) > 1">
@@ -146,7 +146,7 @@
                         <button class="text-left w-full block px-4 py-2 text-sm"
                                 @click="selectOption(r, opt)"
                                 :class="[active ? 'bg-slate-200 dark:bg-white/5 dark:text-white outline-hidden' : 'dark:text-gray-300']">
-                          {{ opt }}
+                          <SaveToOption :opt="opt"></SaveToOption>
                         </button>
                       </MenuItem>
                     </div>
@@ -339,8 +339,9 @@ import { useRouter } from 'vue-router';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
 import { DATA_SERVICE_KEY, DataService } from "@/data/data.service.ts";
 import { getBaseName } from "../../tools/path-util.ts";
-import type { TorrentMapping } from "../../../electron-core/core-lib/types";
+import { type TorrentMapping, TorrentMappingSaveLocation } from "../../../electron-core/core-lib/types";
 import IconTorrent from "@/components/icons/IconTorrent.vue";
+import SaveToOption from "@/components/SaveToOption.vue";
 
 const router = useRouter();
 
@@ -351,7 +352,7 @@ onMounted(async () => {
   mappings.value = await dataService.getUserMappings();
 });
 
-function selectOption(map: TorrentMapping, option: string) {
+function selectOption(map: TorrentMapping, option: TorrentMappingSaveLocation) {
   map.saveTo = option;
   dataService.saveUserMappings(toRaw(mappings.value) || []);
 }
@@ -364,10 +365,10 @@ function toggleEnabled(map: TorrentMapping, event: any) {
 
 async function goToExportPage() {
   router.replace('/export');
-};
+}
 
 function backToScan() {
   // You can use a string path or a named route object
   router.replace('/target');
-};
+}
 </script>

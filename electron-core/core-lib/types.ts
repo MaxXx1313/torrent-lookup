@@ -41,6 +41,8 @@ export interface TorrentMapping {
      */
     saveTo: TorrentMappingSaveLocation; // absolute file location
     saveToOptions: TorrentMappingSaveLocation[]; // another options (any path which has at least one file from the torrent)
+
+    isDisabled?: boolean;
 }
 
 
