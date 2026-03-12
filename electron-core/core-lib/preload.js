@@ -3,18 +3,20 @@ const {contextBridge, ipcRenderer} = require('electron/renderer');
 
 // this script runs on web environmnt
 
+let _callId = 0;
 /**
  * Callable is used to run an action and return a result.
  * @return Promise<T>
  */
 function callable(name) {
     return function () {
+        const uid = _callId++;
         const argsArray = Array.from(arguments);
-        console.log('[callable] <\t', name, argsArray);
+        console.log(`[invoke-${uid}] \t`, name, argsArray);
         return Promise.resolve()
             .then(() => ipcRenderer.invoke.apply(ipcRenderer, [name, ...argsArray]))
             .then((result) => {
-                console.log('[callable] >>\t', name, result);
+                console.log(`[result-${uid}] \t`, name, result);
 
                 return result;
             }).catch(e => {
@@ -59,7 +61,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
     // ui4
     getConfig: callable('app:get-scan-config'),
-    setConfig: callable('app:app:set-scan-config'),
+    setConfig: callable('app:set-scan-config'),
     getDefaultLocations: callable('app:get-default-locations'),
     getSystemExcluded: callable('app:get-system-excluded'),
     selectFolders: callable('app:select-folders'),

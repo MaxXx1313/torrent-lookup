@@ -21,10 +21,19 @@ export class MyEventBus {
     }
 
     handle(eventName, callback) {
-        this.ipcMain.handle(eventName, (event, arg1, arg2) => {
-            console.log('[callable] <\t', eventName, arg1, arg2);
+        this.ipcMain.handle(eventName, function (event) {
+            const argsArray = Array.from(arguments).slice(1);
+            console.log('[invoke] \t', eventName, argsArray);
             return Promise.resolve()
-                .then(() => callback(arg1, arg2));
+                .then(() => callback.apply(null, argsArray))
+                .then((result) => {
+                    console.log('[result] \t', eventName, result);
+                    return result;
+                })
+                .catch((e) => {
+                    console.log('[error] \t', e);
+                    throw e;
+                });
         });
     }
 
