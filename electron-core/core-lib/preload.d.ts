@@ -1,4 +1,4 @@
-import { ScanConfiguration, TorrentMapping, TorrentScannerStats, TransmissionOptions } from "./types";
+import { ExportClient, ExportOptions, ScanConfiguration, TorrentMapping, TorrentScannerStats, } from "./types";
 
 declare global {
     interface Window {
@@ -17,19 +17,21 @@ export interface IElectronAPI {
     getSystemExcluded: MyCallable<void, string[]>;
     selectFolders: MyCallable<void, string[] | null>;
 
-    scanStart: (opts: { targets: string[], exclude?: string[] }) => MyCallable;
+    scanStart: (opts: { targets: string[], exclude?: string[], followSymlinks?: boolean }) => MyCallable;
     onScanEntry: MyEvent<string>;
     onScanStats: MyEvent<TorrentScannerStats>;
     onScanFinished: MyEventOnce<void>;
-    scanStop: MyCallable<void>;
+    scanStop: MyCallable;
 
-    setUserMappings: MyCallable<TorrentMapping[], void>;
-    getUserMappings: MyCallable<void, TorrentMapping[]>;
+    getMappings: MyCallable<void, TorrentMapping[]>;
+    setMappings: MyCallable<TorrentMapping[], void>;
 
-    exportGetParameters: MyCallable<void, TransmissionOptions>;
-    exportSetParameters: MyCallable<TransmissionOptions, void>;
+    exportGetClients: MyCallable<void, ExportClient[]>;
+    exportGetParameters: MyCallable<void, ExportOptions>;
+    exportSetParameters: MyCallable<ExportOptions, void>;
     exportStart: MyCallable<void>;
     onExportLog: MyEvent<string>;
+    onExportProgress: MyEvent<{ total: number, completed: number }>;
 }
 
 

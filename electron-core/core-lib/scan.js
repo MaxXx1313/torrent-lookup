@@ -2,6 +2,7 @@ import {Analyzer, PushManager, SCAN_EXCLUDE_DEFAULT, TorrentScanner} from "tlook
 import Store from "electron-store";
 import {app} from "electron";
 import * as path from "node:path";
+import {timeoutPromise} from "tlookup/dist/lib/utils/tools";
 
 /**
  * @param {MyEventBus} ipcMain
@@ -113,14 +114,17 @@ export function scanLogic(ipcMain) {
     /**
      *
      */
-    ipcMain.handle('analyze:get-mapping', async () => {
+    ipcMain.handle('export:get-mapping', async () => {
+        if (_mappingCache === null) {
+            _mappingCache = store.get(MAP_CONFIG_KEY);
+        }
         return _mappingCache;
     });
 
     /**
      *
      */
-    ipcMain.handle('analyze:set-mapping', async (mappings) => {
+    ipcMain.handle('export:set-mapping', async (mappings) => {
         _mappingCache = mappings;
         return store.set(MAP_CONFIG_KEY, mappings);
     });
@@ -198,9 +202,10 @@ export function scanLogic(ipcMain) {
         //
         ipcMain.emit('export:progress', {total: mappingsActive.length, completed: 0});
         for (let i = 0; i < mappingsActive.length; i++) {
-            const exportItem = await mappingsActive[i];
+            const exportItem = mappingsActive[i];
             await pushManager.push(exportItem.torrentLocation, exportItem.saveTo.saveTo, exportItem.saveTo.filesWanted);
             ipcMain.emit('export:progress', {total: mappingsActive.length, completed: i + 1});
+            await timeoutPromise(500); // add some delay to not overwhelm the client
         }
         ipcMain.emit('export:finished');
 

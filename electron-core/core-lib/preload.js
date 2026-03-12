@@ -71,12 +71,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onScanFinished: eventOnce('scan:finished'),
     scanStop: callable('scan:stop'),
 
-    getUserMappings: callable('export:get-user-decision'),
-    setUserMappings: callable('export:set-user-decision'),
+    getMappings: callable('export:get-mapping'),
+    setMappings: callable('export:set-mapping'),
 
+    exportGetClients: callable('export:get-clients'),
     exportGetParameters: callable('export:get-parameters'),
     exportSetParameters: callable('export:set-parameters'),
-    exportStart: callable('export:push'),
+    exportStart: callable('export:start'),
     onExportLog: event('export:log'),
+    onExportProgress: event('export:progress'),
     // onExportProgress: event('export:push-progress'), // TODO: incomplete
 });
