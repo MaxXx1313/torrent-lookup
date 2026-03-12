@@ -2,9 +2,10 @@
   <!-- Top Header -->
   <header
       class="text-2xl h-12 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 backdrop-blur-md sticky top-0 z-10">
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 flex-1">
       <IconTorrent/>
-      <h2 class="font-semibold text-slate-700 dark:text-slate-300">Torrent lookup</h2>
+      <h2 class="font-semibold text-slate-700 dark:text-slate-300 flex-1">Torrent lookup</h2>
+      <div class="text-sm opacity-40">v{{version}}</div>
     </div>
     <!--
     <div class="flex items-center gap-3">
@@ -64,7 +65,10 @@ import { RouterView } from 'vue-router'
 import IconTorrent from "@/components/icons/IconTorrent.vue";
 
 import { DATA_SERVICE_KEY, DataService } from "@/data/data.service.ts";
+import { appVersion } from "@/version.ts";
 
 const dataService = new DataService();
 provide(DATA_SERVICE_KEY, dataService);
+
+const version = appVersion;
 </script>
