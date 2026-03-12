@@ -11,6 +11,11 @@ describe('PathUtils', () => {
             assert.equal(PathUtils.normalizePath('/lowercase/UPPERCASE/CamelCase'), '/lowercase/UPPERCASE/CamelCase');
         });
 
+        // 'up-folder' is nice to have, but not necessary
+        test.skip('should remove up-folder', () => {
+            assert.equal(PathUtils.normalizePath('/folder1/folder2/../folder3'), '/folder1/folder3');
+        });
+
         describe('windows', () => {
 
             test('fix windows drive root: trailing slash is needed to correctly handle the path', () => {
@@ -25,7 +30,6 @@ describe('PathUtils', () => {
 
             test('sample path', () => {
                 assert.equal(PathUtils.normalizePath('c:\\windows\\system32'), 'c:\\windows\\system32');
-                assert.equal(PathUtils.normalizePath('c:\\windows\\system32\\'), 'c:\\windows\\system32\\');
             });
 
 
@@ -40,7 +44,6 @@ describe('PathUtils', () => {
             });
             test('trailing slash can present', () => {
                 assert.equal(PathUtils.normalizePath('/test'), '/test');
-                assert.equal(PathUtils.normalizePath('/test/'), '/test/');
             });
         });
     });

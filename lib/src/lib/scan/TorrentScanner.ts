@@ -13,6 +13,7 @@ import { FileMatcher } from '../utils/FileMatcher.js';
 import { MyGlob } from "../utils/myglob.js";
 import { QueueWorker } from "./QueueWorker.js";
 import { timeoutPromise } from "../utils/tools.js";
+import { PathUtils } from "../utils/path-utils.js";
 
 
 export interface TorrentScannerOptions {
@@ -264,12 +265,13 @@ export class TorrentScanner {
      */
     protected async _scanFolder(filepath: string): Promise<any> {
         // TODO: verbose log
-        const folderEntries = await fsPromise.readdir(path.resolve(filepath));
+        const resolvedPath = PathUtils.normalizePath(filepath);
+        const folderEntries = await fsPromise.readdir(resolvedPath);
         // console.log('_scanFolder: "%s"', filepath, folderEntries);
 
         for (const fileOrFolder of folderEntries) {
             // get absolute path
-            const childLocation = path.join(filepath, fileOrFolder);
+            const childLocation = path.join(resolvedPath, fileOrFolder);
             if (this.isExcluded(childLocation)) {
                 continue;
             }
