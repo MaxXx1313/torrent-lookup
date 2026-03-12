@@ -2,7 +2,6 @@ import {Analyzer, PushManager, SCAN_EXCLUDE_DEFAULT, TorrentScanner} from "tlook
 import Store from "electron-store";
 import {app} from "electron";
 import * as path from "node:path";
-import {timeoutPromise} from "tlookup/dist/lib/utils/tools";
 
 /**
  * @param {MyEventBus} ipcMain
@@ -205,7 +204,7 @@ export function scanLogic(ipcMain) {
             const exportItem = mappingsActive[i];
             await pushManager.push(exportItem.torrentLocation, exportItem.saveTo.saveTo, exportItem.saveTo.filesWanted);
             ipcMain.emit('export:progress', {total: mappingsActive.length, completed: i + 1});
-            await timeoutPromise(500); // add some delay to not overwhelm the client
+            // await timeoutPromise(500); // add some delay to not overwhelm the client
         }
         ipcMain.emit('export:finished');
 

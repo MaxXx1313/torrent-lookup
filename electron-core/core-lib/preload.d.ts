@@ -38,17 +38,17 @@ export interface IElectronAPI {
 /**
  * return unsubscribe function
  */
-type MyEvent<T> = (callback: (arg: T) => void) => () => void;
+export type MyEvent<T> = (callback: (arg: T) => void) => () => void;
 /**
  * return unsubscribe function
  * Event happens just once
  */
-type MyEventOnce<T> = (callback: (arg: T) => void) => () => void;
+export type MyEventOnce<T> = (callback: (arg: T) => void) => () => void;
 
 /**
  *
  */
-type MyCallable<T = void, R = void> = (arg1: T) => Promise<R>;
+export type MyCallable<T = void, R = void> = (arg1: T) => Promise<R>;
 
 
 

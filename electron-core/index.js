@@ -1,10 +1,9 @@
 import {app, BrowserWindow, ipcMain} from 'electron';
 import * as path from 'node:path';
 import * as URL from 'node:url';
-import {MyEventBus} from "./core-lib/my-event-bus";
-import {ProjectManager} from "./core-lib/project-manager";
-import {appLogic} from "./core-lib/app";
-import {scanLogic} from "./core-lib/scan";
+import {MyEventBus} from "./core-lib/my-event-bus.js";
+import {appLogic} from "./core-lib/app.js";
+import {scanLogic} from "./core-lib/scan.js";
 
 
 const isDevMode = process.argv.includes('--dev');

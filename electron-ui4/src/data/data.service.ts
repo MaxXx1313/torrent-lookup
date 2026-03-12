@@ -1,6 +1,6 @@
 import { Observable, shareReplay } from 'rxjs';
-import type { AppConfiguration, TorrentMapping, TorrentScannerStats, TransmissionOptions } from "@/data/types.ts";
-import { MyEvent } from "../../../electron-core/core-lib/preload";
+import type { ScanConfiguration, TorrentMapping, TorrentScannerStats, TransmissionOptions } from "@/data/types.ts";
+import type { MyEvent } from "../../../electron-core/core-lib/preload";
 
 
 export const DATA_SERVICE_KEY = Symbol();
@@ -24,7 +24,7 @@ export class DataService {
         return window.electronAPI.getConfig();
     }
 
-    setConfig(config: AppConfiguration) {
+    setConfig(config: ScanConfiguration) {
         return window.electronAPI.setConfig(config);
     }
 
@@ -36,7 +36,7 @@ export class DataService {
         return window.electronAPI.selectFolders();
     }
 
-    startScan(config: AppConfiguration) {
+    startScan(config: ScanConfiguration) {
         window.electronAPI.scanStart({targets: config.targets || [], exclude: config.exclude});
     }
 
