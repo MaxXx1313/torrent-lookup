@@ -6,8 +6,8 @@ import * as child from 'node:child_process';
  */
 export function appLogic(ipcMain) {
 
-    ipcMain.handle('app:select-folder', (event) => {
-        return selectFolder();
+    ipcMain.handle('app:select-folders', (event) => {
+        return selectFolders();
     });
 
     ipcMain.handle('app:get-default-locations', (event) => {
@@ -18,10 +18,10 @@ export function appLogic(ipcMain) {
 
 
 /**
- *
+ * @return {string[] | null}
  */
-async function selectFolder() {
-    console.log('[app] selectFolder');
+async function selectFolders() {
+    console.log('[app] selectFolders');
     const results = await dialog.showOpenDialog({
         properties: ['openDirectory', 'multiSelections', 'dontAddToRecent'],
     });
@@ -35,7 +35,7 @@ async function selectFolder() {
 
 
 /**
- *
+ * @return {string[]}
  */
 async function getDefaultLocations() {
     console.log('[app] getDefaultLocations');
@@ -95,7 +95,7 @@ export function listDrivesWindows() {
                 .split(/[\r\n]/)
                 .map(e => e.trim())
                 .filter(e => e.match(/^[A-Z]:$/i)) // Basic filtering for drive letters
-                .map(d => d + '\\');
+                .map(d => d + '\\'); // must ends with slashes, otherwise path is incorrectly recognized
 
             resolve(drives);
         });

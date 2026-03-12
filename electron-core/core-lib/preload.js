@@ -1,8 +1,10 @@
 // preload.js
 const {contextBridge, ipcRenderer} = require('electron/renderer');
 
+// this script runs on web environmnt
 
 /**
+ * Callable is used to run an action and return a result.
  * @return Promise<T>
  */
 function callable(name) {
@@ -56,12 +58,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     openDevTools: callable('app:devtools'),
 
     // ui4
-    getConfig: callable('app:get-config'),
-    setConfig: callable('app:set-config'),
-    getDefaultLocations: callable('app:get-default-locations'), // TODO: unused yet
+    getConfig: callable('app:get-scan-config'),
+    setConfig: callable('app:app:set-scan-config'),
+    getDefaultLocations: callable('app:get-default-locations'),
     getSystemExcluded: callable('app:get-system-excluded'),
-
-    selectFolder: callable('app:select-folder'),
+    selectFolders: callable('app:select-folders'),
 
     // scanner
     scanStart: callable('scan:start'),

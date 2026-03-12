@@ -1,4 +1,4 @@
-import { AppConfiguration, TorrentMapping, TorrentScannerStats, TransmissionOptions } from "./types";
+import { ScanConfiguration, TorrentMapping, TorrentScannerStats, TransmissionOptions } from "./types";
 
 declare global {
     interface Window {
@@ -11,10 +11,11 @@ export interface IElectronAPI {
     // appReady: () => void;
 
     // ui4
-    getConfig: MyCallable<AppConfiguration>;
-    setConfig: MyCallable<AppConfiguration>;
+    getConfig: MyCallable<void, ScanConfiguration>;
+    setConfig: MyCallable<ScanConfiguration>;
+    getDefaultLocations: MyCallable<void, string[]>;
     getSystemExcluded: MyCallable<void, string[]>;
-    selectFolder: MyCallable<void, string[] | null>;
+    selectFolders: MyCallable<void, string[] | null>;
 
     scanStart: (opts: { targets: string[], exclude?: string[] }) => MyCallable;
     onScanEntry: MyEvent<string>;
