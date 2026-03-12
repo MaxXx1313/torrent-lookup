@@ -17,7 +17,7 @@ export interface IElectronAPI {
     getSystemExcluded: MyCallable<void, string[]>;
     selectFolders: MyCallable<void, string[] | null>;
 
-    scanStart: (opts: { targets: string[], exclude?: string[], followSymlinks?: boolean }) => MyCallable;
+    scanStart: (opts: ScanConfiguration) => MyCallable;
     onScanEntry: MyEvent<string>;
     onScanStats: MyEvent<TorrentScannerStats>;
     onScanFinished: MyEventOnce<void>;

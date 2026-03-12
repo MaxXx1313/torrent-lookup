@@ -35,7 +35,12 @@ export class DataService {
     selectFolder() {
         return window.electronAPI.selectFolders();
     }
+    getDefaultLocations() {
+        return window.electronAPI.getDefaultLocations();
+    }
 
+
+    //
     startScan(config: ScanConfiguration) {
         window.electronAPI.scanStart({targets: config.targets || [], exclude: config.exclude});
     }

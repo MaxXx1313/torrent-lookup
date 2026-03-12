@@ -6,6 +6,7 @@
 export interface ScanConfiguration {
     targets?: string[];
     exclude?: string[];
+    followSymlinks?: boolean;
 }
 
 /**
