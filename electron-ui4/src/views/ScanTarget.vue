@@ -84,7 +84,7 @@
                 <div class="flex items-center gap-4">
                   <div
                       class="size-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
-                    <span class="material-symbols-outlined">folder</span>
+                    <span class="material-symbols-outlined">{{getTargetIcon(t)}}</span>
                   </div>
                   <div>
                     <p class="text-sm font-medium text-slate-900 dark:text-slate-200">{{ t }}</p>
@@ -304,10 +304,21 @@ async function startScanning() {
   const config = await dataService.getConfig();
   dataService.startScan(config);
   router.replace('/progress');
-};
+}
 
 function goToResults() {
   router.replace('/results');
+}
+
+
+function getTargetIcon(target: string) {
+  if (target == '~'){
+    return 'home';
+  }
+  if (target.match(/^[a-z]:\\$/i)){
+    return 'hard_disk';
+  }
+  return 'folder';
 }
 
 function addTarget() {
