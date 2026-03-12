@@ -245,11 +245,11 @@
 import { inject, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { DATA_SERVICE_KEY, DataService } from '@/data/data.service';
-import type { AppConfiguration } from "../../../electron-core/core-lib/types";
+import type { ScanConfiguration } from "../../../electron-core/core-lib/types";
 
 
-const targets = ref<AppConfiguration['targets']>([]);
-const exclude = ref<AppConfiguration['exclude']>([]);
+const targets = ref<ScanConfiguration['targets']>([]);
+const exclude = ref<ScanConfiguration['exclude']>([]);
 const sysExcluded = ref<string>('');
 const addInProgress = ref<boolean>(false);
 const hasPreviousResults = ref<boolean>(false);

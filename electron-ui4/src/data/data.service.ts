@@ -1,10 +1,6 @@
 import { Observable, shareReplay } from 'rxjs';
 import type { AppConfiguration, TorrentMapping, TorrentScannerStats, TransmissionOptions } from "@/data/types.ts";
-
-
-export interface ScanOptions {
-    targets: string[];
-}
+import { MyEvent } from "../../../electron-core/core-lib/preload";
 
 
 export const DATA_SERVICE_KEY = Symbol();
@@ -37,7 +33,7 @@ export class DataService {
     }
 
     selectFolder() {
-        return window.electronAPI.selectFolder();
+        return window.electronAPI.selectFolders();
     }
 
     startScan(config: AppConfiguration) {
@@ -53,11 +49,11 @@ export class DataService {
     }
 
     getUserMappings(): Promise<TorrentMapping[]> {
-        return window.electronAPI.getUserMappings();
+        return window.electronAPI.getMappings();
     }
 
     saveUserMappings(m: TorrentMapping[]) {
-        return window.electronAPI.setUserMappings(m);
+        return window.electronAPI.setMappings(m);
     }
 
 
@@ -76,8 +72,6 @@ export class DataService {
 }
 
 ////
-type MyEvent<T> = (callback: (arg: T) => void) => () => void;
-
 function _observableFromElectron<T>(electronMethod: MyEvent<T>): Observable<T> {
     return new Observable<T>(subject => {
         const releaseFn = electronMethod(entry => {

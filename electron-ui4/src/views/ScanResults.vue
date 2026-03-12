@@ -339,7 +339,7 @@ import { useRouter } from 'vue-router';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
 import { DATA_SERVICE_KEY, DataService } from "@/data/data.service.ts";
 import { getBaseName } from "../../tools/path-util.ts";
-import type { TorrentMapping } from "@/data/types.ts";
+import type { TorrentMapping } from "../../../electron-core/core-lib/types";
 import IconTorrent from "@/components/icons/IconTorrent.vue";
 
 const router = useRouter();
