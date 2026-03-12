@@ -10,9 +10,9 @@ import {
 } from "../const.js";
 import { Subject } from "rxjs";
 import { FileMatcher } from '../utils/FileMatcher.js';
-import { MyGlob } from "../utils/myglob";
-import { QueueWorker } from "./QueueWorker";
-import { timeoutPromise } from "../utils/tools";
+import { MyGlob } from "../utils/myglob.js";
+import { QueueWorker } from "./QueueWorker.js";
+import { timeoutPromise } from "../utils/tools.js";
 
 
 export interface TorrentScannerOptions {
