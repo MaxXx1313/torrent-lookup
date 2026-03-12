@@ -65,7 +65,7 @@ export function scanLogic(ipcMain) {
     /**
      * Start scanning process
      */
-    ipcMain.handle('scan:start', async (event, config) => {
+    ipcMain.handle('scan:start', async (config) => {
         const targets = config?.targets || [];
         const exclude = config?.exclude || [];
         const followSymLinks = !!config?.followSymlinks;

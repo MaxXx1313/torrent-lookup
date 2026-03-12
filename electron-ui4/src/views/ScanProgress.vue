@@ -119,7 +119,7 @@ onMounted(async () => {
     filesPerSecond.value = stats.filesPerSecond;
   });
 
-  dataService.onScanFinished(() => {
+  bindToComponent(dataService.scanFinished$).subscribe(() => {
     router.replace('/results');
   });
 });

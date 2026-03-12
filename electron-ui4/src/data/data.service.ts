@@ -12,6 +12,7 @@ export class DataService {
 
     readonly scanEntry$ = _observableFromElectron<string>(window.electronAPI.onScanEntry);
     readonly scanStats$ = _observableFromElectron<TorrentScannerStats>(window.electronAPI.onScanStats);
+    readonly scanFinished$ = _observableFromElectron<void>(window.electronAPI.onScanFinished);
     readonly exportLogs$ = _observableFromElectron<string>(window.electronAPI.onExportLog);
 
     constructor() {
@@ -42,15 +43,11 @@ export class DataService {
 
     //
     startScan(config: ScanConfiguration) {
-        window.electronAPI.scanStart({targets: config.targets || [], exclude: config.exclude});
+        window.electronAPI.scanStart(config);
     }
 
     stopScan() {
         return window.electronAPI.scanStop();
-    }
-
-    onScanFinished(cb: () => void) {
-        return window.electronAPI.onScanFinished(cb);
     }
 
     getUserMappings(): Promise<TorrentMapping[]> {
