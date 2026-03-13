@@ -1,6 +1,7 @@
 import { Observable, shareReplay } from 'rxjs';
 import type { ScanConfiguration, TorrentMapping, TorrentScannerStats, TransmissionOptions } from "@/data/types.ts";
 import type { MyEvent } from "../../../electron-core/core-lib/preload";
+import type { ExportClient } from "../../../electron-core/core-lib/types.ts";
 
 
 export const DATA_SERVICE_KEY = Symbol();
@@ -59,12 +60,15 @@ export class DataService {
     }
 
 
-    exportGetParameters(): Promise<TransmissionOptions> {
-        return window.electronAPI.exportGetParameters();
+    exportGetClients(): Promise<ExportClient[]> {
+        return window.electronAPI.exportGetClients();
+    }
+    exportGetParameters(client:ExportClient): Promise<TransmissionOptions> {
+        return window.electronAPI.exportGetParameters(client);
     }
 
-    exportSetParameters(options: TransmissionOptions): Promise<void> {
-        return window.electronAPI.exportSetParameters(options);
+    exportSetParameters(client:ExportClient, options: TransmissionOptions): Promise<void> {
+        return window.electronAPI.exportSetParameters(client, options);
     }
 
     exportStart(): Promise<void> {

@@ -150,24 +150,19 @@ export function scanLogic(ipcMain) {
         }
         const clientLc = client.toLowerCase();
 
-        return store.get(EXPORT_CONFIG_PREFIX + clientLc);
-        // TODO: _getDefaultParameters
+        return store.get(EXPORT_CONFIG_PREFIX + clientLc) || _getDefaultParameters(client);
     });
 
     /**
      *
      */
-    ipcMain.handle('export:set-parameters', async (client, parameters) => {
+    ipcMain.handle('export:set-parameters', async (client, options) => {
         if (!client) {
             throw new Error('Client not passed');
         }
         const clientLc = client.toLowerCase();
 
-        const transmissionOptions = {
-            endpoint: `http://${options.username}:${options.password}@localhost:${options.port}`,
-        }
-
-        return store.set(EXPORT_CONFIG_PREFIX + clientLc, parameters);
+        return store.set(EXPORT_CONFIG_PREFIX + clientLc, options);
     });
 
 
@@ -178,12 +173,16 @@ export function scanLogic(ipcMain) {
     /**
      *
      */
-    ipcMain.handle('export:start', async (client, parameters) => {
+    ipcMain.handle('export:start', async (client, options) => {
 
         pushManager = new PushManager({
             workdir: WORKDIR,
         });
-        pushManager.setClient(client, parameters);
+        const transmissionOptions = {
+            endpoint: `http://${options.username}:${options.password}@localhost:${options.port}`,
+        }
+
+        pushManager.setClient(client, transmissionOptions);
 
         pushManager.opStatus$.subscribe((msg) => {
             ipcMain.emit('export:log', msg);

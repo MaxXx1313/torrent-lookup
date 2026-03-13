@@ -2,7 +2,7 @@
   <!-- Main Content Area -->
   <main class="flex-1 flex flex-col overflow-y-auto" v-if="exportIsActive">
 
-    <div class="max-w-4xl mx-auto w-full px-8 py-10">
+    <div class="max-w-4xl mx-auto w-full px-8 py-8">
       <!-- Progress State -->
       <div class="mb-10 text-center relative">
         <div
@@ -10,12 +10,11 @@
           <span class="material-symbols-outlined text-3xl animate-rotate-ccw">sync</span>
         </div>
         <h1 class="text-slate-900 dark:text-white text-3xl font-bold leading-tight mb-2">Exporting to
-          qBittorrent...</h1>
+          Transmission...</h1>
         <p class="text-slate-500 dark:text-[#92adc9]">Moving matched metadata to your local torrent client instance.</p>
       </div>
 
       <!-- Progress Bar Component -->
-      <!--
       <div
           class="bg-white dark:bg-[#1a2632] rounded-xl p-8 border border-slate-200 dark:border-[#233648] shadow-sm mb-8">
         <div class="flex flex-col gap-4">
@@ -34,7 +33,7 @@
           </div>
         </div>
       </div>
-      -->
+
       <!-- Live Log / Summary -->
       <!--
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -89,7 +88,7 @@
     </div>
 
     <!-- Actions -->
-    <div class="mt-2 flex flex-col items-center gap-4" v-if="hasError">
+    <div class="mt-2 mb-2 flex flex-col items-center gap-4" v-if="hasError">
       <button
           class="flex items-center gap-2 px-8 py-3 text-slate-600 dark:text-white bg-slate-200/50 dark:bg-white/5 hover:bg-white/10 rounded-lg transition-all border border-slate-600 dark:border-white/10 hover:border-slate-600/20 dark:hover:border-white/20"
           @click="gotoSettings">
