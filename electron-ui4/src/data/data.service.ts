@@ -1,7 +1,7 @@
 import { Observable, shareReplay } from 'rxjs';
 import type { ScanConfiguration, TorrentMapping, TorrentScannerStats, TransmissionOptions } from "@/data/types.ts";
 import type { MyEvent } from "../../../electron-core/core-lib/preload";
-import type { ExportClient, LogMessage } from "../../../electron-core/core-lib/types.ts";
+import type { ExportClient, ExportStats, LogMessage } from "../../../electron-core/core-lib/types.ts";
 
 
 export const DATA_SERVICE_KEY = Symbol();
@@ -15,6 +15,7 @@ export class DataService {
     readonly scanStats$ = _observableFromElectron<TorrentScannerStats>(window.electronAPI.onScanStats);
     readonly scanFinished$ = _observableFromElectron<void>(window.electronAPI.onScanFinished);
     readonly exportLogs$ = _observableFromElectron<LogMessage>(window.electronAPI.onExportLog);
+    readonly onExportProgress$ = _observableFromElectron<ExportStats>(window.electronAPI.onExportProgress);
 
     constructor() {
 

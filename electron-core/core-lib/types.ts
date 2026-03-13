@@ -84,3 +84,10 @@ export interface LogMessage {
     level: 'log' | 'error';
     message: string;
 }
+
+export interface ExportStats {
+    total: number;
+    completed: number;
+    percentage: number;
+    currentTarget: string;
+}
