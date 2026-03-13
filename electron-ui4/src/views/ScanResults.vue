@@ -11,6 +11,31 @@
         </p>
       </div>
     </div>
+
+    <div class="p-2 mb-8 rounded-xl bg-slate/5 border border-slate-700 shadow-slate/5">
+      <div class="flex items-center justify-end gap-4">
+
+        <label class="flex flex-col min-w-64 h-10 max-w-128">
+          <div class="flex w-full flex-1 items-stretch rounded-lg h-full overflow-hidden relative">
+            <div
+                class="text-slate-400 flex border-none bg-slate-100 dark:bg-[#233648] items-center justify-center pl-4 border-r-0">
+              <span class="material-symbols-outlined text-[20px]">search</span>
+            </div>
+            <input
+                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden text-slate-900 dark:text-white focus:outline-0 focus:ring-0 border-none bg-slate-100 dark:bg-[#233648] focus:border-none h-full placeholder:text-slate-400 px-4 pl-2 text-sm font-normal"
+                placeholder="Search torrents..." value="" v-model="searchModel"/>
+
+            <button
+                class="absolute right-0 top-0 bottom-0 px-2 py-1 text-slate-400 enabled:hover:bg-slate-400/10 rounded-md transition-colors flex items-center disabled:opacity-20"
+                v-if="!!searchModel"
+                @click="searchModel=''">
+              <span class="material-symbols-outlined text-sm">clear</span>
+            </button>
+          </div>
+        </label>
+      </div>
+    </div>
+
     <!-- Stats Overview -->
     <!--
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
@@ -95,7 +120,7 @@
         <tbody class="divide-y divide-slate-200 dark:divide-[#324d67]">
 
         <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors group"
-            v-if="mappings.length === 0">
+            v-if="mappingsPaged.length === 0">
           <td class="px-6 py-5 text-center" colspan="2">
             <p class="text-slate-500 dark:text-[#92adc9] text-sm font-normal italic">
               Nothing found
@@ -105,7 +130,7 @@
 
         <!-- Row 1: Confirmed -->
         <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors group"
-            v-for="r of mappings">
+            v-for="r of mappingsPaged">
           <td class="px-6 py-5"
               :class="[r.isDisabled ? 'opacity-30' : '']">
             <div class="flex flex-col">
@@ -121,12 +146,39 @@
               <div class="text-slate-500 dark:text-[#92adc9] text-sm font-medium italic break-all">
                 {{ r.torrentLocation }}
               </div>
+              <Menu as="div" class="relative inline-block" v-if="(r.torrentAlternateLocations?.length || 0) > 1">
+                <MenuButton
+                    class="inline-flex w-full justify-center text-slate-500 dark:text-white rounded-md bg-slate-200 dark:bg-[#233648] px-2 py-1 text-sm inset-ring-1 inset-ring-white/5 hover:bg-slate-900/20 dark:hover:bg-white/20">
+                  <span class="material-symbols-outlined">expand_more</span>
+                </MenuButton>
+
+                <transition enter-active-class="transition ease-out duration-100"
+                            enter-from-class="transform opacity-0 scale-95"
+                            enter-to-class="transform scale-100"
+                            leave-active-class="transition ease-in duration-75"
+                            leave-from-class="transform scale-100"
+                            leave-to-class="transform opacity-0 scale-95">
+                  <MenuItems
+                      class="absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-slate-50 dark:bg-gray-800 outline-1 -outline-offset-1 outline-slate-200 dark:outline-white/10">
+                    <div class="py-1">
+                      <MenuItem v-for="tDupl of r.torrentAlternateLocations" v-slot="{ active }">
+                        <button class="text-left w-full block px-4 py-2 text-sm"
+                                @click="selectOptionSource(r, tDupl)"
+                                :class="[active ? 'bg-slate-200 dark:bg-white/5 dark:text-white outline-hidden' : 'dark:text-gray-300']">
+                          {{ tDupl }}
+                        </button>
+                      </MenuItem>
+                    </div>
+                  </MenuItems>
+                </transition>
+              </Menu>
             </div>
 
             <div class="flex items-start gap-2">
               <span class="material-symbols-outlined text-slate-400 text-sm">folder</span>
               <div class="text-slate-500 dark:text-[#92adc9] text-sm font-medium italic break-all">
                 <SaveToOption :opt="r.saveTo"></SaveToOption>
+                <!--                {{r.saveTo.saveTo}}-->
               </div>
 
               <Menu as="div" class="relative inline-block" v-if="(r.saveToOptions?.length || 0) > 1">
@@ -308,6 +360,46 @@
         </tbody>
       </table>
 
+
+      <!-- Footer of Table -->
+      <div v-if="pageMax>1"
+           class="bg-slate-50 rounded-b-xl dark:bg-[#192633] px-6 py-4 border-t border-slate-200 dark:border-[#324d67] flex items-center justify-between">
+        <p class="text-xs text-slate-500 dark:text-[#92adc9] font-medium">Showing {{ pageStat.from }}-{{ pageStat.to }}
+          of {{ pageStat.total }} results</p>
+        <div class="flex gap-2">
+          <button
+              @click="pageIndex = pageIndex-1"
+              class="h-8 w-8 flex items-center justify-center rounded border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
+              :disabled="pageIndex===0">
+            <span class="material-symbols-outlined text-sm">chevron_left</span>
+          </button>
+
+          <template v-for="p in pageMax">
+            <button v-if="pageIndex === p-1"
+                    @click="pageIndex = p-1"
+                    class="h-8 w-8 flex items-center justify-center rounded bg-primary text-white text-sm font-bold">
+              {{ (p) }}
+            </button>
+            <button v-if="pageIndex !== p-1"
+                    @click="pageIndex = p-1"
+                    class="h-8 w-8 flex items-center justify-center rounded border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+              {{ (p) }}
+            </button>
+          </template>
+          <!--
+          <button
+              class="h-8 w-8 flex items-center justify-center rounded border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+            3
+          </button>
+          -->
+          <button
+              @click="pageIndex = pageIndex+1"
+              :disabled="pageIndex===pageMax-1"
+              class="h-8 w-8 flex items-center justify-center rounded border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors disabled:opacity-50">
+            <span class="material-symbols-outlined text-sm">chevron_right</span>
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Bottom Action Bar (Fixed/Sticky behavior simulated with margin) -->
@@ -323,7 +415,7 @@
 
         <button
             class="flex-1 md:flex-none h-12 px-10 bg-primary text-white disabled:text-white/60 disabled rounded-lg font-bold text-base enabled:shadow-lg enabled:shadow-primary/30 active:enabled:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:bg-zinc-800"
-            :disabled="mappings.length===0"
+            :disabled="mappingsAll.length===0"
             @click="goToExportPage">
           Continue to Export
           <span class="material-symbols-outlined">chevron_right</span>
@@ -334,7 +426,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, onMounted, ref, toRaw } from 'vue'
+import { inject, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
 import { DATA_SERVICE_KEY, DataService } from "@/data/data.service.ts";
@@ -345,21 +437,65 @@ import SaveToOption from "@/components/SaveToOption.vue";
 
 const router = useRouter();
 
-const mappings = ref<TorrentMapping[]>([]);
+let mappingsAll: TorrentMapping[] = [];
+const mappingsFiltered = ref<TorrentMapping[]>([]);
+const mappingsPaged = ref<TorrentMapping[]>([]);
+const pageIndex = ref<number>(0);
+const pageMax = ref<number>(0);
+const pageStat = ref<{ from: number, to: number, total: number }>({from: 0, to: 0, total: 0});
+const pageSize = 25;
+
 const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
+const searchModel = ref<string>('');
+
+
+watch(searchModel, () => {
+  const toSearch = (searchModel.value || '').toLowerCase();
+  mappingsFiltered.value = mappingsAll.filter(m => {
+    return (m.saveTo?.saveTo || '').toLowerCase().includes(toSearch)
+        || (m.torrentLocation || '').toLowerCase().includes(toSearch)
+  });
+  pageIndex.value = 0;
+  _onPageChanged();
+});
+watch(pageIndex, () => {
+  _onPageChanged();
+});
 
 onMounted(async () => {
-  mappings.value = await dataService.getUserMappings();
+  mappingsAll = await dataService.getUserMappings();
+  mappingsFiltered.value = mappingsAll;
+  _onPageChanged();
 });
+
+function selectOptionSource(map: TorrentMapping, option: string) {
+  map.torrentLocation = option;
+  dataService.saveUserMappings(mappingsAll || []);
+}
 
 function selectOption(map: TorrentMapping, option: TorrentMappingSaveLocation) {
   map.saveTo = option;
-  dataService.saveUserMappings(toRaw(mappings.value) || []);
+  dataService.saveUserMappings(mappingsAll || []);
 }
 
 function toggleEnabled(map: TorrentMapping, event: any) {
   map.isDisabled = !event.target.checked;
-  dataService.saveUserMappings(toRaw(mappings.value) || []);
+  dataService.saveUserMappings(mappingsAll || []);
+}
+
+function _onPageChanged() {
+  const from = pageIndex.value * pageSize;
+  const to = (pageIndex.value + 1) * pageSize;
+  const total = mappingsFiltered.value.length;
+
+  pageMax.value = Math.ceil(total / pageSize);
+  mappingsPaged.value = mappingsFiltered.value.slice(from, to);
+  pageStat.value = {
+    from: total > 0 ? from + 1 : 0,
+    to: Math.min(to, total),
+    total: total,
+  };
+  console.log(pageStat.value)
 }
 
 

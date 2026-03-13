@@ -16,10 +16,22 @@
 
 <script setup lang="ts">
 import type { TorrentMappingSaveLocation } from "../../../electron-core/core-lib/types.ts";
+import { ref, watch } from "vue";
+
+const opt = ref<TorrentMappingSaveLocation>(null);
 
 const props = defineProps<{
   opt: TorrentMappingSaveLocation;
 }>();
 
-const opt = props.opt;
+// react only to a specific property
+watch(
+    () => props.opt.saveTo,
+    (newSaveTo) => {
+      opt.value = props.opt;
+      console.log('saveTo changed', newSaveTo);
+    }
+);
+
+opt.value = props.opt;
 </script>
