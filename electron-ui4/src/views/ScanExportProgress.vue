@@ -165,8 +165,10 @@ onMounted(async () => {
   exportIsActive.value = true;
   hasError.value = false;
   _pushLog('Initializing...');
+
+  const params = await dataService.exportGetParameters('transmission');
   timeoutPromise(1000)
-      .then(() => dataService.exportStart())
+      .then(() => dataService.exportStart('transmission', params))
       .then(() => {
         _pushLog('Finished');
       })

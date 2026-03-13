@@ -29,7 +29,7 @@ export interface IElectronAPI {
     exportGetClients: MyCallable<void, ExportClient[]>;
     exportGetParameters: MyCallable<ExportClient, ExportOptions>;
     exportSetParameters: MyCallable2<ExportClient, ExportOptions, void>;
-    exportStart: MyCallable<void>;
+    exportStart: MyCallable2<ExportClient, ExportOptions, void>;
     onExportLog: MyEvent<string>;
     onExportProgress: MyEvent<{ total: number, completed: number }>;
 }

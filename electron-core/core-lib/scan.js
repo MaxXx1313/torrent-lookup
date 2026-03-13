@@ -192,7 +192,7 @@ export function scanLogic(ipcMain) {
         });
 
 
-        const mappingsActive = (_mappingCache || []).filter(m => !m.saveTo);
+        const mappingsActive = (_mappingCache || []).filter(m => !!m.saveTo && !m.isDisabled);
         if (!mappingsActive?.length) {
             return Promise.reject('Nothing to push');
         }

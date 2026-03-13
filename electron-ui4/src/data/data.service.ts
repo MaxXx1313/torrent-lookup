@@ -71,8 +71,8 @@ export class DataService {
         return window.electronAPI.exportSetParameters(client, options);
     }
 
-    exportStart(): Promise<void> {
-        return window.electronAPI.exportStart();
+    exportStart(client:ExportClient, options: TransmissionOptions): Promise<void> {
+        return window.electronAPI.exportStart(client, options);
     }
 
 }
