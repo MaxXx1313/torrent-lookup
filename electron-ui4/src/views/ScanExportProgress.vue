@@ -82,8 +82,9 @@
               <span class="material-symbols-outlined">warning</span>
             </div>
             <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Export Completed With Errors</h2>
-            <p class="text-slate-600 dark:text-[#92adc9] mb-2 max-w-md">All selected torrents have been successfully
-              mapped and added to your client. You can now start seeding.</p>
+            <p class="text-slate-600 dark:text-[#92adc9] mb-2 max-w-md">
+              The export process finished with errors. Please review the log to determine if any action is required
+            </p>
 
           </div>
         </div>
