@@ -76,5 +76,11 @@ export interface ExportOptions {
     port: number;
     startPaused?: boolean;
 
-    [key: string]: string | number | boolean;
+    [key: string]: string | number | boolean | undefined;
+}
+
+
+export interface LogMessage {
+    level: 'log' | 'error';
+    message: string;
 }

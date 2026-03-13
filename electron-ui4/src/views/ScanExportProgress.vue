@@ -156,7 +156,7 @@ const hasError = ref<boolean>(false);
 const logs = ref<LogData[]>([]);
 
 bindToComponent(dataService.exportLogs$).subscribe(log => {
-  _pushLog(log);
+  _pushLog(log.message, log.level === 'error');
 });
 
 
@@ -174,7 +174,7 @@ onMounted(async () => {
       })
       .then(() => timeoutPromise(1000))
       .then(() => {
-        exportIsActive.value = false;
+        // exportIsActive.value = false;
       })
       .catch((e: any) => {
         hasError.value = true;

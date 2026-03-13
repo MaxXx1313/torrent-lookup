@@ -1,4 +1,11 @@
-import { ExportClient, ExportOptions, ScanConfiguration, TorrentMapping, TorrentScannerStats, } from "./types";
+import {
+    ExportClient,
+    ExportOptions,
+    LogMessage,
+    ScanConfiguration,
+    TorrentMapping,
+    TorrentScannerStats,
+} from "./types";
 
 declare global {
     interface Window {
@@ -30,7 +37,7 @@ export interface IElectronAPI {
     exportGetParameters: MyCallable<ExportClient, ExportOptions>;
     exportSetParameters: MyCallable2<ExportClient, ExportOptions, void>;
     exportStart: MyCallable2<ExportClient, ExportOptions, void>;
-    onExportLog: MyEvent<string>;
+    onExportLog: MyEvent<LogMessage>;
     onExportProgress: MyEvent<{ total: number, completed: number }>;
 }
 

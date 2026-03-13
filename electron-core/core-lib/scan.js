@@ -185,10 +185,10 @@ export function scanLogic(ipcMain) {
         pushManager.setClient(client, transmissionOptions);
 
         pushManager.opStatus$.subscribe((msg) => {
-            ipcMain.emit('export:log', msg);
+            ipcMain.emit('export:log', {level: 'log', message: msg});
         });
         pushManager.opError$.subscribe((msg) => {
-            ipcMain.emit('export:log', msg);
+            ipcMain.emit('export:log', {level: 'error', message: msg});
         });
 
 
