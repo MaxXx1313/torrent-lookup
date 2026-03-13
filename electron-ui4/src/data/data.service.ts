@@ -38,6 +38,7 @@ export class DataService {
     selectFolder() {
         return window.electronAPI.selectFolders();
     }
+
     getDefaultLocations() {
         return window.electronAPI.getDefaultLocations();
     }
@@ -64,15 +65,21 @@ export class DataService {
     exportGetClients(): Promise<ExportClient[]> {
         return window.electronAPI.exportGetClients();
     }
-    exportGetParameters(client:ExportClient): Promise<TransmissionOptions> {
+
+    exportGetParameters(client: ExportClient): Promise<TransmissionOptions> {
         return window.electronAPI.exportGetParameters(client);
     }
 
-    exportSetParameters(client:ExportClient, options: TransmissionOptions): Promise<void> {
+    exportSetParameters(client: ExportClient, options: TransmissionOptions): Promise<void> {
         return window.electronAPI.exportSetParameters(client, options);
     }
 
-    exportStart(client:ExportClient, options: TransmissionOptions): Promise<void> {
+    exportVerifyParameters(client: ExportClient, options: TransmissionOptions): Promise<boolean> {
+        return window.electronAPI.exportVerifyParameters(client, options)
+            .catch(e => false);
+    }
+
+    exportStart(client: ExportClient, options: TransmissionOptions): Promise<void> {
         return window.electronAPI.exportStart(client, options);
     }
 

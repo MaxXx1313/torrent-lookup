@@ -64,7 +64,7 @@ export class TlookupTransmission implements ITorrentClient {
 
 
     async ping(): Promise<boolean> {
-        await this._rpcRequest('rpc-version', {});
+        await this._rpcRequest('session-get', {});
         return true;
     }
 

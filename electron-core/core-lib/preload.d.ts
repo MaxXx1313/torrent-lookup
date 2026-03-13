@@ -36,6 +36,7 @@ export interface IElectronAPI {
     exportGetClients: MyCallable<void, ExportClient[]>;
     exportGetParameters: MyCallable<ExportClient, ExportOptions>;
     exportSetParameters: MyCallable2<ExportClient, ExportOptions, void>;
+    exportVerifyParameters: MyCallable2<ExportClient, ExportOptions, boolean>;
     exportStart: MyCallable2<ExportClient, ExportOptions, void>;
     onExportLog: MyEvent<LogMessage>;
     onExportProgress: MyEvent<{ total: number, completed: number }>;

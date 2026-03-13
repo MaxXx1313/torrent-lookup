@@ -165,6 +165,25 @@ export function scanLogic(ipcMain) {
         return store.set(EXPORT_CONFIG_PREFIX + clientLc, options);
     });
 
+    /**
+     *
+     */
+    ipcMain.handle('export:verify-parameters', async (client, options) => {
+        if (!client) {
+            throw new Error('Client not passed');
+        }
+        pushManager = new PushManager({
+            workdir: WORKDIR,
+        });
+        const transmissionOptions = {
+            endpoint: `http://${options.username}:${options.password}@localhost:${options.port}`,
+        }
+
+        pushManager.setClient(client, transmissionOptions);
+
+        return pushManager.ping();
+    });
+
 
     /**
      * @type {PushManager | null}
