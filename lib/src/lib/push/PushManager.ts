@@ -17,6 +17,16 @@ export interface PusherOptions {
     clientOptions?: ClientOptions;
 }
 
+/**
+ *
+ */
+export interface PusherStatus {
+    total: number;
+    completed: number;
+    percentage: number;
+    currentTarget: string | null,
+}
+
 // TODO: not finished yet
 export type ClientOptions = { [key: string]: string | number | boolean }
 
@@ -29,6 +39,7 @@ export class PushManager {
 
     public readonly opStatus$: Subject<string> = new Subject();
     public readonly opError$: Subject<string> = new Subject();
+    public readonly status$: Subject<PusherStatus> = new Subject();
 
     public options: PusherOptions;
     public client: ITorrentClient;
@@ -73,8 +84,15 @@ export class PushManager {
     /**
      *
      */
+    ping(): Promise<boolean> {
+        return this.client.ping();
+    }
+
+    /**
+     *
+     */
     pushAll(): Promise<any> {
-        return this._pushAll(this.loadMapping());
+        return this.pushMapping(this.loadMapping());
     }
 
     /**
@@ -91,15 +109,44 @@ export class PushManager {
     }
 
     /**
+     *
+     */
+    pushMapping(matchArr: TorrentMapping[]): Promise<any> {
+        return this._pushAll(matchArr);
+    }
+
+    /**
      * @private
      */
     public async _pushAll(matchArr: TorrentMapping[]): Promise<any> {
-        for (const torrentMapping of matchArr) {
+        this.status$.next({
+            total: matchArr.length,
+            completed: 0,
+            percentage: 0,
+            currentTarget: null,
+        });
+
+        for (let i = 0; i < matchArr.length; i++) {
+            const torrentMapping = matchArr[i];
+
             if (!torrentMapping.saveTo) {
                 console.log('[Push] skip (no saveTo):', torrentMapping.torrentLocation);
                 continue;
             }
+            this.status$.next({
+                total: matchArr.length,
+                completed: i,
+                percentage: Math.round(i / matchArr.length * 100),
+                currentTarget: torrentMapping.torrentLocation,
+            });
             await this.push(torrentMapping.torrentLocation, torrentMapping.saveTo.saveTo, torrentMapping.saveTo.filesWanted);
+
+            this.status$.next({
+                total: matchArr.length,
+                completed: i + 1,
+                percentage: Math.round((i + 1) / matchArr.length * 100),
+                currentTarget: torrentMapping.torrentLocation,
+            });
         }
     }
 

@@ -3,6 +3,8 @@
  */
 export interface ITorrentClient {
 
+    ping(): Promise<boolean>;
+
     /**
      * @param {string} filename  absolute location of torrent file
      * @param {string} downloadDir   absolute location of download folder (without target filename)

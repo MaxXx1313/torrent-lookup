@@ -63,6 +63,12 @@ export class TlookupTransmission implements ITorrentClient {
     }
 
 
+    async ping(): Promise<boolean> {
+        await this._rpcRequest('rpc-version', {});
+        return true;
+    }
+
+
     /**
      * @implements ITorrentClient
      */

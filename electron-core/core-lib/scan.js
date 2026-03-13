@@ -191,30 +191,18 @@ export function scanLogic(ipcMain) {
             ipcMain.emit('export:log', {level: 'error', message: msg});
         });
 
+        pushManager.status$.subscribe((status) => {
+            ipcMain.emit('export:progress', status);
+        });
+
 
         const mappingsActive = (_mappingCache || []).filter(m => !!m.saveTo && !m.isDisabled);
         if (!mappingsActive?.length) {
             return Promise.reject('Nothing to push');
         }
 
-        //
-        ipcMain.emit('export:progress', {
-            total: mappingsActive.length,
-            completed: 0,
-            percentage: 0,
-            currentTarget: null,
-        });
-        for (let i = 0; i < mappingsActive.length; i++) {
-            const exportItem = mappingsActive[i];
-            await pushManager.push(exportItem.torrentLocation, exportItem.saveTo.saveTo, exportItem.saveTo.filesWanted);
-            ipcMain.emit('export:progress', {
-                total: mappingsActive.length,
-                completed: i + 1,
-                percentage: Math.round((i + 1) / mappingsActive.length * 100),
-                currentTarget: exportItem.torrentLocation,
-            });
-            // await timeoutPromise(500); // add some delay to not overwhelm the client
-        }
+
+        await pushManager.pushMapping(mappingsActive);
         ipcMain.emit('export:finished');
 
     });
