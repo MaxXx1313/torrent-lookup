@@ -76,7 +76,6 @@ export class TlookupTransmission implements ITorrentClient {
      */
     async push(torrentFile: string, downloadDir: string, filesWanted: string[]): Promise<PushResult> {
         const addResult = await this._torrentAdd(torrentFile, downloadDir, {paused: true});
-        console.log('torrentAdd', addResult);
         if (!addResult.isNew) {
             await this._torrentSetLocation(addResult.id, downloadDir);
         }
@@ -84,10 +83,10 @@ export class TlookupTransmission implements ITorrentClient {
         await this._setWantedFiles(addResult.id, filesWanted);
 
         // 'unpause' torrent
-        await this._rpcRequest('torrent-start', [addResult.id]);
+        await this._rpcRequest('torrent-start', {'ids': [addResult.id]});
 
         if (!addResult.isNew) {
-            await this._rpcRequest('torrent-verify', [addResult.id]);
+            await this._rpcRequest('torrent-verify', {'ids': [addResult.id]});
         }
 
         return addResult as PushResult;
@@ -268,7 +267,7 @@ export class TlookupTransmission implements ITorrentClient {
                 .then(self.__rpcResponse.bind(self))
                 .then((res: any) => {
                     // console.log(res.body);
-                    console.log('[DEBUG] (transmission) response:', res.body);
+                    console.log('[DEBUG] (transmission) response:', payload.method, res.body);
                     return res;
                 });
         }
@@ -281,6 +280,7 @@ export class TlookupTransmission implements ITorrentClient {
 
                 // CSRF Protection
                 if (res.statusCode === 409) {
+                    console.log('[DEBUG] (transmission) _collectCsrf:', payload.method);
                     self._collectCsrf(res);
                     return _makeRequest();
                 } else if (res.statusCode === 401) {
