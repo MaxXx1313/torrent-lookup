@@ -68,6 +68,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getSystemExcluded: callable('app:get-system-excluded'),
     selectFolders: callable('app:select-folders'),
 
+    resetSession: callable('session:reset'),
+
     // scanner
     scanStart: callable('scan:start'),
     onScanEntry: event('scan:entry'),

@@ -53,6 +53,24 @@ export function scanLogic(ipcMain) {
         workdir: WORKDIR,
     });
 
+    /**
+     * @type {PushManager | null}
+     */
+    let pushManager;
+
+    ipcMain.handle('session:reset', async (config) => {
+
+        if (scanner) {
+            await scanner.terminate();
+            scanner = null;
+        }
+        if (pushManager) {
+            await pushManager.terminate();
+            pushManager = null;
+        }
+
+    });
+
     /////////////////
     // Scan logic
     const MAP_CONFIG_KEY = 'mapping-config';
@@ -71,7 +89,13 @@ export function scanLogic(ipcMain) {
         const followSymLinks = !!config?.followSymlinks;
 
         if (scanner) {
-            await scanner.terminate();
+            console.log('scan already started');
+            if (!scanner.isRunning()) {
+                ipcMain.emit('scan:finished');
+            }
+            return;
+            ///////
+            // await scanner.terminate();
         }
 
         scanner = new TorrentScanner({
@@ -94,7 +118,6 @@ export function scanLogic(ipcMain) {
             })
             .finally(() => {
                 ipcMain.emit('scan:finished');
-                scanner = null;
             });
     });
 
@@ -104,7 +127,6 @@ export function scanLogic(ipcMain) {
     ipcMain.handle('scan:stop', async () => {
         if (scanner) {
             await scanner.terminate();
-            scanner = null;
         }
     });
 
@@ -114,11 +136,15 @@ export function scanLogic(ipcMain) {
      *
      */
     ipcMain.handle('export:get-mapping', async () => {
+        return _getMappingData();
+    });
+
+    function _getMappingData() {
         if (_mappingCache === null) {
             _mappingCache = store.get(MAP_CONFIG_KEY);
         }
         return _mappingCache;
-    });
+    }
 
     /**
      *
@@ -186,13 +212,15 @@ export function scanLogic(ipcMain) {
 
 
     /**
-     * @type {PushManager | null}
-     */
-    let pushManager;
-    /**
      *
      */
     ipcMain.handle('export:start', async (client, options) => {
+
+        if (pushManager) {
+            console.log('export already started');
+            return;
+            ///////
+        }
 
         pushManager = new PushManager({
             workdir: WORKDIR,
@@ -215,7 +243,7 @@ export function scanLogic(ipcMain) {
         });
 
 
-        const mappingsActive = (_mappingCache || []).filter(m => !!m.saveTo && !m.isDisabled);
+        const mappingsActive = (_getMappingData() || []).filter(m => !!m.saveTo && !m.isDisabled);
         if (!mappingsActive?.length) {
             return Promise.reject('Nothing to push');
         }

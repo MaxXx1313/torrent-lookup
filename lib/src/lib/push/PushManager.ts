@@ -44,6 +44,8 @@ export class PushManager {
     public options: PusherOptions;
     public client: ITorrentClient;
 
+    private _terminate = false;
+
     /**
      *
      */
@@ -91,21 +93,16 @@ export class PushManager {
     /**
      *
      */
-    pushAll(): Promise<any> {
-        return this.pushMapping(this.loadMapping());
+    terminate(): Promise<boolean> {
+        this._terminate = true;
+        return Promise.resolve(true);
     }
 
     /**
      *
      */
-    push(location: string, saveTo: string, filesWanted: string[]): Promise<void> {
-        this.opStatus$.next(`Exporting "${location}" to "${saveTo}" (${filesWanted.length} files)`);
-        return this.client.push(location, saveTo, filesWanted)
-            .then(result => {
-                this.opStatus$.next('  Torrent ' + (result.isNew ? 'added' : 'exists') + ': ' + result.id + ':\t' + location);
-            }).catch(e => {
-                this.opError$.next('  Error: ' + (e?.message || 'Unknown'));
-            })
+    pushAll(): Promise<any> {
+        return this.pushMapping(this.loadMapping());
     }
 
     /**
@@ -118,7 +115,16 @@ export class PushManager {
     /**
      * @private
      */
-    public async _pushAll(matchArr: TorrentMapping[]): Promise<any> {
+    protected loadMapping(): TorrentMapping[] {
+        const mapsFileName = path.join(this.options.workdir, FILES_MAPS);
+        console.log('[Push] loadMapping from', mapsFileName);
+        return JSON.parse(fs.readFileSync(mapsFileName, {encoding: 'utf-8'}).toString());
+    }
+
+    /**
+     * @private
+     */
+    private async _pushAll(matchArr: TorrentMapping[]): Promise<any> {
         this.status$.next({
             total: matchArr.length,
             completed: 0,
@@ -128,6 +134,12 @@ export class PushManager {
 
         for (let i = 0; i < matchArr.length; i++) {
             const torrentMapping = matchArr[i];
+
+            if (this._terminate) {
+                console.log('[Push] terminated');
+                return;
+                ///////
+            }
 
             if (!torrentMapping.saveTo) {
                 console.log('[Push] skip (no saveTo):', torrentMapping.torrentLocation);
@@ -139,7 +151,7 @@ export class PushManager {
                 percentage: Math.round(i / matchArr.length * 100),
                 currentTarget: torrentMapping.torrentLocation,
             });
-            await this.push(torrentMapping.torrentLocation, torrentMapping.saveTo.saveTo, torrentMapping.saveTo.filesWanted);
+            await this._pushOne(torrentMapping.torrentLocation, torrentMapping.saveTo.saveTo, torrentMapping.saveTo.filesWanted);
 
             this.status$.next({
                 total: matchArr.length,
@@ -150,14 +162,17 @@ export class PushManager {
         }
     }
 
-
     /**
-     * @private
+     *
      */
-    protected loadMapping(): TorrentMapping[] {
-        const mapsFileName = path.join(this.options.workdir, FILES_MAPS);
-        console.log('[Push] loadMapping from', mapsFileName);
-        return JSON.parse(fs.readFileSync(mapsFileName, {encoding: 'utf-8'}).toString());
+    private _pushOne(location: string, saveTo: string, filesWanted: string[]): Promise<void> {
+        this.opStatus$.next(`Exporting "${location}" to "${saveTo}" (${filesWanted.length} files)`);
+        return this.client.push(location, saveTo, filesWanted)
+            .then(result => {
+                this.opStatus$.next('  Torrent ' + (result.isNew ? 'added' : 'exists') + ': ' + result.id + ':\t' + location);
+            }).catch(e => {
+                this.opError$.next('  Error: ' + (e?.message || 'Unknown'));
+            })
     }
 
 } // -

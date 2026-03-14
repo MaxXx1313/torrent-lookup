@@ -43,6 +43,10 @@ export class DataService {
         return window.electronAPI.getDefaultLocations();
     }
 
+    resetSession() {
+        return window.electronAPI.resetSession();
+    }
+
 
     //
     startScan(config: ScanConfiguration) {

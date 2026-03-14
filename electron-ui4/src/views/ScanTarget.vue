@@ -301,8 +301,7 @@ onMounted(async () => {
 });
 
 async function startScanning() {
-  const config = await dataService.getConfig();
-  dataService.startScan(config);
+  await dataService.resetSession();
   router.replace('/progress');
 }
 

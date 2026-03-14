@@ -122,6 +122,9 @@ onMounted(async () => {
   bindToComponent(dataService.scanFinished$).subscribe(() => {
     router.replace('/results');
   });
+
+  const config = await dataService.getConfig();
+  dataService.startScan(config);
 });
 
 function stopScan() {
