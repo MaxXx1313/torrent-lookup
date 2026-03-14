@@ -13,7 +13,12 @@
     </div>
 
     <div class="p-2 mb-8 rounded-xl bg-slate/5 border border-slate-200 dark:border-slate-700 shadow-slate/5">
-      <div class="flex items-center justify-end gap-4">
+
+      <div class="flex items-center justify-between gap-4">
+        <div class="flex items-center gap-2 justify-between px-2 text-slate-300 dark:text-slate-600">
+          <span class="material-symbols-outlined ">data_table</span>
+          <p class="text-sm font-bold leading-tight">{{mappingsFiltered.length}} found</p>
+        </div>
 
         <label class="flex flex-col min-w-64 h-10 max-w-128">
           <div class="flex w-full flex-1 items-stretch rounded-lg h-full overflow-hidden relative">
@@ -362,26 +367,26 @@
 
 
       <!-- Footer of Table -->
-      <div v-if="pageMax>1"
+      <div v-if="paginator.pageMax>1"
            class="bg-slate-50 rounded-b-xl dark:bg-[#192633] px-6 py-4 border-t border-slate-200 dark:border-[#324d67] flex items-center justify-between">
-        <p class="text-xs text-slate-500 dark:text-[#92adc9] font-medium">Showing {{ pageStat.from }}-{{ pageStat.to }}
-          of {{ pageStat.total }} results</p>
+        <p class="text-xs text-slate-500 dark:text-[#92adc9] font-medium">Showing {{ paginator.itemsFrom }}-{{ paginator.itemsTo }}
+          of {{ paginator.itemsTotal }} results</p>
         <div class="flex gap-2">
           <button
-              @click="pageIndex = pageIndex-1"
+              @click="paginator.page = paginator.page-1"
               class="h-8 w-8 flex items-center justify-center rounded border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
-              :disabled="pageIndex===0">
+              :disabled="paginator.page===0">
             <span class="material-symbols-outlined text-sm">chevron_left</span>
           </button>
 
-          <template v-for="p in pageMax">
-            <button v-if="pageIndex === p-1"
-                    @click="pageIndex = p-1"
+          <template v-for="p in paginator.pageMax">
+            <button v-if="paginator.page === p-1"
+                    @click="paginator.page = p-1"
                     class="h-8 w-8 flex items-center justify-center rounded bg-primary text-white text-sm font-bold">
               {{ (p) }}
             </button>
-            <button v-if="pageIndex !== p-1"
-                    @click="pageIndex = p-1"
+            <button v-if="paginator.page !== p-1"
+                    @click="paginator.page = p-1"
                     class="h-8 w-8 flex items-center justify-center rounded border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
               {{ (p) }}
             </button>
@@ -393,8 +398,8 @@
           </button>
           -->
           <button
-              @click="pageIndex = pageIndex+1"
-              :disabled="pageIndex===pageMax-1"
+              @click="paginator.page = paginator.page+1"
+              :disabled="paginator.page===paginator.pageMax-1"
               class="h-8 w-8 flex items-center justify-center rounded border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors disabled:opacity-50">
             <span class="material-symbols-outlined text-sm">chevron_right</span>
           </button>
@@ -438,11 +443,16 @@ import SaveToOption from "@/components/SaveToOption.vue";
 const router = useRouter();
 
 let mappingsAll: TorrentMapping[] = [];
-const mappingsFiltered = ref<TorrentMapping[]>([]);
+let mappingsFiltered: TorrentMapping[] = [];
 const mappingsPaged = ref<TorrentMapping[]>([]);
-const pageIndex = ref<number>(0);
-const pageMax = ref<number>(0);
-const pageStat = ref<{ from: number, to: number, total: number }>({from: 0, to: 0, total: 0});
+
+const paginator = ref({
+  page: 0,
+  pageMax: 0,
+  itemsFrom: 0,
+  itemsTo: 0,
+  itemsTotal: 0,
+});
 const pageSize = 25;
 
 const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
@@ -451,20 +461,20 @@ const searchModel = ref<string>('');
 
 watch(searchModel, () => {
   const toSearch = (searchModel.value || '').toLowerCase();
-  mappingsFiltered.value = mappingsAll.filter(m => {
+  mappingsFiltered = mappingsAll.filter(m => {
     return (m.saveTo?.saveTo || '').toLowerCase().includes(toSearch)
         || (m.torrentLocation || '').toLowerCase().includes(toSearch)
   });
-  pageIndex.value = 0;
+  paginator.value.page = 0;
   _onPageChanged();
 });
-watch(pageIndex, () => {
+watch(()=>paginator.value.page, () => {
   _onPageChanged();
 });
 
 onMounted(async () => {
   mappingsAll = await dataService.getUserMappings();
-  mappingsFiltered.value = mappingsAll;
+  mappingsFiltered = mappingsAll;
   _onPageChanged();
 });
 
@@ -484,18 +494,18 @@ function toggleEnabled(map: TorrentMapping, event: any) {
 }
 
 function _onPageChanged() {
-  const from = pageIndex.value * pageSize;
-  const to = (pageIndex.value + 1) * pageSize;
-  const total = mappingsFiltered.value.length;
+  const from = paginator.value.page * pageSize;
+  const to = (paginator.value.page + 1) * pageSize;
+  const total = mappingsFiltered.length;
 
-  pageMax.value = Math.ceil(total / pageSize);
-  mappingsPaged.value = mappingsFiltered.value.slice(from, to);
-  pageStat.value = {
-    from: total > 0 ? from + 1 : 0,
-    to: Math.min(to, total),
-    total: total,
+  mappingsPaged.value = mappingsFiltered.slice(from, to);
+  paginator.value = {
+    page: paginator.value.page,
+    pageMax: Math.ceil(total / pageSize),
+    itemsFrom: total > 0 ? from + 1 : 0,
+    itemsTo: Math.min(to, total),
+    itemsTotal: total,
   };
-  console.log(pageStat.value)
 }
 
 
