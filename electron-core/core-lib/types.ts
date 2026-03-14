@@ -87,6 +87,7 @@ export interface ExportOptions {
 export interface LogMessage {
     level: 'log' | 'error';
     message: string;
+    ts: number;
 }
 
 export interface ExportStats {

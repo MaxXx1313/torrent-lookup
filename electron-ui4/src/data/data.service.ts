@@ -86,6 +86,9 @@ export class DataService {
     exportStart(client: ExportClient, options: TransmissionOptions): Promise<void> {
         return window.electronAPI.exportStart(client, options);
     }
+    exportGetLogs() {
+        return window.electronAPI.exportGetLogs();
+    }
 
 }
 

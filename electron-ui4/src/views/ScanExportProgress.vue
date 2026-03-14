@@ -43,12 +43,12 @@
       </div>
 
 
-
       <!-- Post-Export Success View (Hidden initially or contextually shown) -->
       <!-- Note: This would typically replace the elements above or appear below -->
       <main v-if="exportIsFinished && !hasError">
         <div class="max-w-4xl mx-auto w-full px-8 py-10">
-          <div class="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-8 flex flex-col items-center text-center">
+          <div
+              class="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-8 flex flex-col items-center text-center">
             <div
                 class="w-16 h-16 text-xl rounded-full bg-emerald-500 flex items-center justify-center text-white mb-4 shadow-lg shadow-emerald-500/20">
               <span class="material-symbols-outlined">check_circle</span>
@@ -117,7 +117,7 @@
         </div>
         <div class="p-4 h-48 overflow-y-auto custom-scrollbar font-mono text-xs flex flex-col gap-2">
           <div class="flex gap-3 " v-for="log of logs" :class="log.isError?'text-red-500':'text-emerald-500'">
-            <span>[{{ log.dateStr }}]</span>
+            <span v-if="log.dateStr">[{{ log.dateStr }}]</span>
             <span>{{ log.msg }}</span>
           </div>
 
@@ -146,9 +146,10 @@
     <!-- Actions -->
 
     <div class="mb-8 flex flex-col sm:flex-row gap-3 w-full justify-center">
-      <button class="bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-lg transition-all flex items-center justify-center gap-2"
-              v-if="hasError"
-              @click="gotoSettings">
+      <button
+          class="bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-lg transition-all flex items-center justify-center gap-2"
+          v-if="hasError"
+          @click="gotoSettings">
 
         <span class="material-symbols-outlined text-sm">arrow_back_ios</span>
         <span class="font-semibold">Back to settings</span>
@@ -170,7 +171,7 @@ import { useRouter } from "vue-router";
 import { inject, onMounted, ref } from "vue";
 import { DATA_SERVICE_KEY, DataService } from "@/data/data.service.ts";
 import { bindToComponent, timeoutPromise } from "../../tools/async.ts";
-import type { ExportStats } from "../../../electron-core/core-lib/types.ts";
+import { type ExportStats, LogMessage } from "../../../electron-core/core-lib/types.ts";
 
 const router = useRouter();
 
@@ -181,7 +182,7 @@ const logs = ref<LogData[]>([]);
 const stats = ref<ExportStats>();
 
 bindToComponent(dataService.exportLogs$).subscribe(_log => {
-  _pushLog(_log.message, _log.level === 'error');
+  _pushLog(_log);
   if (_log.level === 'error') {
     hasError.value = true;
   }
@@ -196,21 +197,20 @@ onMounted(async () => {
 
   exportIsFinished.value = false;
   hasError.value = false;
-  _pushLog('Initializing...');
+  _pushLog({message: 'Initializing...'});
+
+  const logs = await dataService.exportGetLogs();
+  _pushLogs(logs);
 
   const params = await dataService.exportGetParameters('transmission');
-  timeoutPromise(1000)
+  timeoutPromise(0)
       .then(() => dataService.exportStart('transmission', params))
-      .then(() => {
-        _pushLog('Finished');
-      })
-      .then(() => timeoutPromise(1000))
       .then(() => {
         exportIsFinished.value = true;
       })
       .catch((e: any) => {
         hasError.value = true;
-        _pushLog(e.message || e, true)
+        _pushLog({message: e.message || e, level: 'error'});
       });
 
 });
@@ -233,17 +233,23 @@ function formatDate(date: Date) {
   return timeFormatter.format(date);
 }
 
-function _pushLog(msg: string, isError = false) {
-  logs.value.push({
-    msg: msg,
-    dateStr: formatDate(new Date()),
-    isError,
-  });
+function _pushLog(msg: LogMessage) {
+  _pushLogs([msg]);
+}
+
+function _pushLogs(msgArr: LogMessage[]) {
+  logs.value.push(...msgArr.map(m => {
+    return {
+      msg: m.message,
+      dateStr: m.ts ? formatDate(new Date(m.ts)) : null,
+      isError: m.level === 'error',
+    };
+  }));
 }
 
 interface LogData {
   msg: string;
-  dateStr: string;
+  dateStr: string | null;
   isError: boolean;
 }
 

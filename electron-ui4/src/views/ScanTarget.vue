@@ -305,7 +305,8 @@ async function startScanning() {
   router.replace('/progress');
 }
 
-function goToResults() {
+async function goToResults() {
+  await dataService.resetSession();
   router.replace('/results');
 }
 

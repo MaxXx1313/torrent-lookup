@@ -86,6 +86,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     exportVerifyParameters: callable('export:verify-parameters'),
     exportStart: callable('export:start'),
     onExportLog: event('export:log'),
+    exportGetLogs: callable('export:get-logs'),
     onExportProgress: event('export:progress'),
     // onExportProgress: event('export:push-progress'), // TODO: incomplete
 });

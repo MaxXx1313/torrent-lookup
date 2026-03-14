@@ -57,7 +57,12 @@ export function scanLogic(ipcMain) {
      * @type {PushManager | null}
      */
     let pushManager;
+    let _exportLogs = [];
+    let _exportIsFinished = false;
 
+    /**
+     *
+     */
     ipcMain.handle('session:reset', async (config) => {
 
         if (scanner) {
@@ -68,7 +73,8 @@ export function scanLogic(ipcMain) {
             await pushManager.terminate();
             pushManager = null;
         }
-
+        _exportLogs = [];
+        _exportIsFinished = false;
     });
 
     /////////////////
@@ -210,7 +216,6 @@ export function scanLogic(ipcMain) {
         return pushManager.ping();
     });
 
-
     /**
      *
      */
@@ -218,10 +223,13 @@ export function scanLogic(ipcMain) {
 
         if (pushManager) {
             console.log('export already started');
+            if (_exportIsFinished) {
+                ipcMain.emit('export:finished');
+            }
             return;
             ///////
         }
-
+        _exportIsFinished = false;
         pushManager = new PushManager({
             workdir: WORKDIR,
         });
@@ -232,10 +240,14 @@ export function scanLogic(ipcMain) {
         pushManager.setClient(client, transmissionOptions);
 
         pushManager.opStatus$.subscribe((msg) => {
-            ipcMain.emit('export:log', {level: 'log', message: msg});
+            const logData = {level: 'log', message: msg, ts: Date.now()};
+            _exportLogs.push(logData);
+            ipcMain.emit('export:log', logData);
         });
         pushManager.opError$.subscribe((msg) => {
-            ipcMain.emit('export:log', {level: 'error', message: msg});
+            const logData = {level: 'error', message: msg, ts: Date.now()};
+            _exportLogs.push(logData);
+            ipcMain.emit('export:log', logData);
         });
 
         pushManager.status$.subscribe((status) => {
@@ -250,10 +262,20 @@ export function scanLogic(ipcMain) {
 
 
         await pushManager.pushMapping(mappingsActive);
+
+        // on complete
+        const logData = {level: 'log', message: 'Finished', ts: Date.now()};
+        _exportLogs.push(logData);
+        ipcMain.emit('export:log', logData);
+
         ipcMain.emit('export:finished');
+        _exportIsFinished = true;
 
     });
 
+    ipcMain.handle('export:get-logs', async () => {
+        return _exportLogs;
+    });
 }
 
 /**
