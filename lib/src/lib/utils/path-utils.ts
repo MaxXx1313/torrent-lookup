@@ -3,7 +3,7 @@ import * as path from 'node:path';
 
 export class PathUtils {
     /**
-     * Return correct path without ending slash or backslash for all platforms
+     * Return correct path which can be safely used with 'path.join'
      */
     static normalizePath(filepath: string) {
         // fix windows drive root

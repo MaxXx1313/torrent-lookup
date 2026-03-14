@@ -1,6 +1,7 @@
 import { describe, test } from "bun:test";
 import { TorrentScanner } from './TorrentScanner';
 import assert from 'node:assert';
+import os from "node:os";
 
 
 describe('TorrentScanner', function () {
@@ -24,6 +25,25 @@ describe('TorrentScanner', function () {
             ['/subfolder/.skippedfolder', true],
             ['/subfolder/node_modules/asd', true],
             ['/subfolder/nodemodules', false],
+        ];
+
+        for (const test of tests) {
+            assert.equal(scanner.isExcluded(test[0]), test[1], 'path failed: ' + test[0]);
+        }
+
+    });
+
+
+
+    test('isExcluded: home folder', function () {
+
+        const scanner = new TorrentScanner({
+            exclude: ['~/.skippedfolder'],
+        });
+
+        const tests: Array<[string, boolean]> = [
+            ['/subfolder/.skippedfolder', false],
+            [os.homedir() + '/.skippedfolder/asd', true],
         ];
 
         for (const test of tests) {

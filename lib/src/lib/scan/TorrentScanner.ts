@@ -133,8 +133,9 @@ export class TorrentScanner {
     addExclusion(excludeTemplate: string | string[]) {
         const templateArr = Array.isArray(excludeTemplate) ? excludeTemplate : [excludeTemplate];
         for (const tmpl of templateArr) {
-            if (this.isExcludeTemplateValid(tmpl)) {
-                this.options.exclude.push(tmpl);
+            const templateNormalized = PathUtils.normalizePath(tmpl);
+            if (this.isExcludeTemplateValid(templateNormalized)) {
+                this.options.exclude.push(templateNormalized);
             }
         }
     }
