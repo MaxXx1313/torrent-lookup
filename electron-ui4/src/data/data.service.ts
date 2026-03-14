@@ -43,12 +43,11 @@ export class DataService {
         return window.electronAPI.getDefaultLocations();
     }
 
-    resetSession() {
-        return window.electronAPI.resetSession();
+    //
+    scanReset() {
+        return window.electronAPI.scanReset();
     }
 
-
-    //
     startScan(config: ScanConfiguration) {
         window.electronAPI.scanStart(config);
     }
@@ -83,6 +82,9 @@ export class DataService {
             .catch(e => false);
     }
 
+    exportReset() {
+        return window.electronAPI.exportReset();
+    }
     exportStart(client: ExportClient, options: TransmissionOptions): Promise<void> {
         return window.electronAPI.exportStart(client, options);
     }

@@ -27,8 +27,7 @@ export interface IElectronAPI {
     getSystemExcluded: MyCallable<void, string[]>;
     selectFolders: MyCallable<void, string[] | null>;
 
-    resetSession: MyCallable;
-
+    scanReset: MyCallable;
     scanStart: (opts: ScanConfiguration) => MyCallable;
     onScanEntry: MyEvent<string>;
     onScanStats: MyEvent<TorrentScannerStats>;
@@ -42,6 +41,8 @@ export interface IElectronAPI {
     exportGetParameters: MyCallable<ExportClient, ExportOptions>;
     exportSetParameters: MyCallable2<ExportClient, ExportOptions, void>;
     exportVerifyParameters: MyCallable2<ExportClient, ExportOptions, boolean>;
+
+    exportReset: MyCallable;
     exportStart: MyCallable2<ExportClient, ExportOptions, void>;
     onExportLog: MyEvent<LogMessage>;
     exportGetLogs: MyCallable<void, LogMessage[]>;

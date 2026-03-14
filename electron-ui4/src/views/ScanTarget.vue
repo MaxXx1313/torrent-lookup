@@ -301,12 +301,11 @@ onMounted(async () => {
 });
 
 async function startScanning() {
-  await dataService.resetSession();
+  await dataService.scanReset();
   router.replace('/progress');
 }
 
 async function goToResults() {
-  await dataService.resetSession();
   router.replace('/results');
 }
 

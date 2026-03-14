@@ -54,27 +54,14 @@ export function scanLogic(ipcMain) {
     });
 
     /**
-     * @type {PushManager | null}
-     */
-    let pushManager;
-    let _exportLogs = [];
-    let _exportIsFinished = false;
-
-    /**
      *
      */
-    ipcMain.handle('session:reset', async (config) => {
+    ipcMain.handle('scan:reset', async (config) => {
 
         if (scanner) {
             await scanner.terminate();
             scanner = null;
         }
-        if (pushManager) {
-            await pushManager.terminate();
-            pushManager = null;
-        }
-        _exportLogs = [];
-        _exportIsFinished = false;
     });
 
     /////////////////
@@ -172,7 +159,6 @@ export function scanLogic(ipcMain) {
         return ['transmission'];
     });
 
-
     /**
      *
      */
@@ -204,16 +190,35 @@ export function scanLogic(ipcMain) {
         if (!client) {
             throw new Error('Client not passed');
         }
-        pushManager = new PushManager({
+        let pushManagerVerify = new PushManager({
             workdir: WORKDIR,
         });
         const transmissionOptions = {
             endpoint: `http://${options.username}:${options.password}@localhost:${options.port}`,
         }
 
-        pushManager.setClient(client, transmissionOptions);
+        pushManagerVerify.setClient(client, transmissionOptions);
 
-        return pushManager.ping();
+        return pushManagerVerify.ping();
+    });
+
+    /**
+     * @type {PushManager | null}
+     */
+    let pushManager;
+    let _exportLogs = [];
+    let _exportIsFinished = false;
+
+    /**
+     *
+     */
+    ipcMain.handle('export:reset', async (config) => {
+        if (pushManager) {
+            await pushManager.terminate();
+            pushManager = null;
+        }
+        _exportLogs = [];
+        _exportIsFinished = false;
     });
 
     /**

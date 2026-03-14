@@ -183,9 +183,6 @@ const stats = ref<ExportStats>();
 
 bindToComponent(dataService.exportLogs$).subscribe(_log => {
   _pushLog(_log);
-  if (_log.level === 'error') {
-    hasError.value = true;
-  }
 });
 
 bindToComponent(dataService.onExportProgress$).subscribe(_stats => {
@@ -239,6 +236,9 @@ function _pushLog(msg: LogMessage) {
 
 function _pushLogs(msgArr: LogMessage[]) {
   logs.value.push(...msgArr.map(m => {
+    if (m.level === 'error') {
+      hasError.value = true;
+    }
     return {
       msg: m.message,
       dateStr: m.ts ? formatDate(new Date(m.ts)) : null,

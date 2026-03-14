@@ -227,6 +227,7 @@ async function backToResults() {
 async function runExport() {
   // You can use a string path or a named route object
   await _saveParameters();
+  await dataService.exportReset();
   router.replace('/exportprogress');
 }
 

@@ -68,9 +68,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getSystemExcluded: callable('app:get-system-excluded'),
     selectFolders: callable('app:select-folders'),
 
-    resetSession: callable('session:reset'),
 
     // scanner
+    scanReset: callable('scan:reset'),
     scanStart: callable('scan:start'),
     onScanEntry: event('scan:entry'),
     onScanStats: event('scan:stats'),
@@ -84,6 +84,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     exportGetParameters: callable('export:get-parameters'),
     exportSetParameters: callable('export:set-parameters'),
     exportVerifyParameters: callable('export:verify-parameters'),
+
+    exportReset: callable('export:reset'),
     exportStart: callable('export:start'),
     onExportLog: event('export:log'),
     exportGetLogs: callable('export:get-logs'),
