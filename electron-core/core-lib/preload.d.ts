@@ -1,4 +1,5 @@
 import {
+    CurrentPage,
     ExportClient,
     ExportOptions,
     LogMessage,
@@ -18,6 +19,8 @@ export interface IElectronAPI {
     // appReady: () => void;
 
     // ui4
+    getCurrentPage: MyCallable<void, CurrentPage>;
+    setCurrentPage: MyCallable<CurrentPage>;
     getConfig: MyCallable<void, ScanConfiguration>;
     setConfig: MyCallable<ScanConfiguration>;
     getDefaultLocations: MyCallable<void, string[]>;

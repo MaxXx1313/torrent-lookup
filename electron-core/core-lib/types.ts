@@ -1,3 +1,7 @@
+
+
+export type CurrentPage = 'scan-target' | 'scan-progress' | 'scan-results' | 'export-config' | 'export-progress';
+
 /**
  * events:
  *   scan:get-config

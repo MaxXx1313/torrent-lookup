@@ -5,15 +5,23 @@ import * as child from 'node:child_process';
  * @param {MyEventBus} ipcMain
  */
 export function appLogic(ipcMain) {
+    let currentPage = null;
 
-    ipcMain.handle('app:select-folders', (event) => {
+    ipcMain.handle('app:select-folders', () => {
         return selectFolders();
     });
 
-    ipcMain.handle('app:get-default-locations', (event) => {
+    ipcMain.handle('app:get-default-locations', () => {
         return getDefaultLocations();
     });
 
+    ipcMain.handle('app:get-current-page', () => {
+        return currentPage;
+    });
+    ipcMain.handle('app:set-current-page', (page) => {
+        currentPage = page;
+        return currentPage;
+    });
 }
 
 

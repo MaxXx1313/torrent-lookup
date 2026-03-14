@@ -60,6 +60,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     openDevTools: callable('app:devtools'),
 
     // ui4
+    getCurrentPage: callable('app:get-current-page'),
+    setCurrentPage: callable('app:set-current-page'),
     getConfig: callable('app:get-scan-config'),
     setConfig: callable('app:set-scan-config'),
     getDefaultLocations: callable('app:get-default-locations'),
