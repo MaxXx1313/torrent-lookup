@@ -43,10 +43,15 @@ export function scanLogic(ipcMain) {
     // TODO: add method to verify exclusion and targets
     // TODO: (lib) add way to track single target progress
 
+    /////////////////
+    // Scan logic
+    const MAP_CONFIG_KEY = 'mapping-config';
+
     /**
      * @type {TorrentScanner | null}
      */
     let scanner;
+    let _scanFinsihed = false;
 
 
     const analyzer = new Analyzer({
@@ -54,25 +59,23 @@ export function scanLogic(ipcMain) {
     });
 
     /**
-     *
-     */
-    ipcMain.handle('scan:reset', async (config) => {
-
-        if (scanner) {
-            await scanner.terminate();
-            scanner = null;
-        }
-    });
-
-    /////////////////
-    // Scan logic
-    const MAP_CONFIG_KEY = 'mapping-config';
-
-    /**
      * @type {TorrentMapping[] | null}
      * @private
      */
     let _mappingCache = null;
+
+    /**
+     *
+     */
+    ipcMain.handle('scan:reset', async () => {
+        if (scanner) {
+            await scanner.terminate();
+            scanner = null;
+        }
+        _scanFinsihed = false;
+    });
+
+
     /**
      * Start scanning process
      */
@@ -83,12 +86,11 @@ export function scanLogic(ipcMain) {
 
         if (scanner) {
             console.log('scan already started');
-            if (!scanner.isRunning()) {
+            if (_scanFinsihed) {
                 ipcMain.emit('scan:finished');
             }
             return;
             ///////
-            // await scanner.terminate();
         }
 
         scanner = new TorrentScanner({
@@ -110,6 +112,7 @@ export function scanLogic(ipcMain) {
                 return store.set(MAP_CONFIG_KEY, mappings);
             })
             .finally(() => {
+                _scanFinsihed = true;
                 ipcMain.emit('scan:finished');
             });
     });
@@ -120,11 +123,12 @@ export function scanLogic(ipcMain) {
     ipcMain.handle('scan:stop', async () => {
         if (scanner) {
             await scanner.terminate();
+            _scanFinsihed = true;
         }
     });
 
     /////////////////
-    // Analyze logic
+    // Results logic
     /**
      *
      */
@@ -149,7 +153,7 @@ export function scanLogic(ipcMain) {
 
 
     /////////////////
-    // Export logic
+    // Export config logic
 
     const EXPORT_CONFIG_PREFIX = 'export-';
     /**
@@ -201,6 +205,10 @@ export function scanLogic(ipcMain) {
 
         return pushManagerVerify.ping();
     });
+
+
+    /////////////////
+    // Export logic
 
     /**
      * @type {PushManager | null}
