@@ -87,7 +87,7 @@
               type="number" min="0"
               v-model="port"/>
 
-          <div class="col-span-2 border-b border-slate-700"></div>
+          <div class="col-span-2 border-b border-slate-200 dark:border-slate-700"></div>
 
           <!-- row -->
           <label class="text-sm font-semibold text-slate-500">Username</label>
@@ -95,7 +95,7 @@
               class="bg-background-light dark:bg-[#101922] border-slate-300 dark:border-[#233648] rounded-lg px-4 py-2 focus:ring-primary focus:border-primary"
               type="text" v-model="username"/>
 
-          <div class="col-span-2 border-b border-slate-700"></div>
+          <div class="col-span-2 border-b border-slate-200 dark:border-slate-700"></div>
 
           <!-- row -->
           <label class="text-sm font-semibold text-slate-500">Password</label>
@@ -104,7 +104,7 @@
               type="text" v-model="password"/>
 
 
-          <div class="col-span-2 border-b border-slate-700"></div>
+          <div class="col-span-2 border-b border-slate-200 dark:border-slate-700"></div>
 
           <!-- row -->
           <label class="text-sm font-semibold text-slate-500">Check connection</label>

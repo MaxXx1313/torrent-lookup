@@ -45,7 +45,7 @@
             </div>
           </div>
           <!-- Live Path Display -->
-          <div class="bg-slate-100 dark:bg-[#111a22] rounded-lg p-4 border border-[#233648]">
+          <div class="bg-slate-100 dark:bg-[#111a22] rounded-lg p-4 border border-slate-200">
             <div class="flex items-start gap-3  text-[#233648] dark:text-[#92adc9]">
               <span class="material-symbols-outlined text-sm mt-1">folder_open</span>
               <div class="flex-1 overflow-hidden h-[42px]">

@@ -12,7 +12,7 @@
       </div>
     </div>
 
-    <div class="p-2 mb-8 rounded-xl bg-slate/5 border border-slate-700 shadow-slate/5">
+    <div class="p-2 mb-8 rounded-xl bg-slate/5 border border-slate-200 dark:border-slate-700 shadow-slate/5">
       <div class="flex items-center justify-end gap-4">
 
         <label class="flex flex-col min-w-64 h-10 max-w-128">

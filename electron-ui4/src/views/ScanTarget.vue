@@ -163,10 +163,10 @@
                 />
 
                 <button
-                    class="absolute right-0 top-0 bottom-0 px-2 py-1 text-primary enabled:hover:bg-primary/10 rounded-md transition-colors flex items-center disabled:opacity-20"
+                    class="absolute right-0 top-0 bottom-0 px-2 py-1 text-primary enabled:hover:bg-primary/10 rounded-md transition-colors flex items-center text-sm disabled:opacity-20"
                     :disabled="!exclusionAdd"
                     @click="addExclusion">
-                  <span class="material-symbols-outlined text-sm">keyboard_return</span>
+                  <span class="material-symbols-outlined pt-[2px]">keyboard_return</span>
                 </button>
               </div>
 
@@ -175,9 +175,9 @@
                 <div v-for="t in exclude"
                      class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full">
                   <span class="text-xs font-medium text-slate-600 dark:text-slate-300">{{ t }}</span>
-                  <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-100 flex items-center"
+                  <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-100 flex items-center text-sm"
                           @click="deleteExclusion(t)">
-                    <span class="material-symbols-outlined text-sm">close</span>
+                    <span class="material-symbols-outlined">close</span>
                   </button>
                 </div>
               </div>
