@@ -29,7 +29,6 @@ watch(
     () => props.opt?.saveTo,
     (newSaveTo) => {
       opt.value = props.opt;
-      console.log('saveTo changed', newSaveTo);
     }
 );
 
