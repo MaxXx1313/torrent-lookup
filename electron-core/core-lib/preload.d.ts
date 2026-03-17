@@ -1,4 +1,12 @@
-import { AppConfiguration, TorrentMapping, TorrentScannerStats, TransmissionOptions } from "./types";
+import {
+    CurrentPage,
+    ExportClient,
+    ExportOptions,
+    LogMessage,
+    ScanConfiguration,
+    TorrentMapping,
+    TorrentScannerStats,
+} from "./types";
 
 declare global {
     interface Window {
@@ -11,44 +19,53 @@ export interface IElectronAPI {
     // appReady: () => void;
 
     // ui4
-    getConfig: MyCallable<AppConfiguration>;
-    setConfig: MyCallable<AppConfiguration>;
-    getSystemExcluded: MyCallable<string[]>;
-    selectFolder: () => Promise<string[] | null>;
+    getCurrentPage: MyCallable<void, CurrentPage>;
+    setCurrentPage: MyCallable<CurrentPage>;
+    getConfig: MyCallable<void, ScanConfiguration>;
+    setConfig: MyCallable<ScanConfiguration>;
+    getDefaultLocations: MyCallable<void, string[]>;
+    getSystemExcluded: MyCallable<void, string[]>;
+    selectFolders: MyCallable<void, string[] | null>;
 
-    scanStart: (opts: { targets: string[], exclude?: string[] }) => Promise<void>;
+    scanIsActive: MyCallable<void, boolean>;
+    scanStart: (opts: ScanConfiguration) => MyCallable;
     onScanEntry: MyEvent<string>;
     onScanStats: MyEvent<TorrentScannerStats>;
     onScanFinished: MyEventOnce<void>;
-    scanStop: MyCallable<void>;
+    scanStop: MyCallable;
 
-    setUserMappings: MyCallable<TorrentMapping[], void>;
-    getUserMappings: MyCallable<TorrentMapping[]>;
+    getMappings: MyCallable<void, TorrentMapping[]>;
+    setMappings: MyCallable<TorrentMapping[], void>;
 
-    exportGetParameters: MyCallable<TransmissionOptions>;
-    exportSetParameters: MyCallable<TransmissionOptions, void>;
-    exportStart: MyCallable<void>;
-    onExportLog: MyEvent<string>;
+    exportGetClients: MyCallable<void, ExportClient[]>;
+    exportGetParameters: MyCallable<ExportClient, ExportOptions>;
+    exportSetParameters: MyCallable2<ExportClient, ExportOptions, void>;
+    exportVerifyParameters: MyCallable2<ExportClient, ExportOptions, boolean>;
+
+    exportReset: MyCallable;
+    exportStart: MyCallable2<ExportClient, ExportOptions, void>;
+    onExportLog: MyEvent<LogMessage>;
+    exportGetLogs: MyCallable<void, LogMessage[]>;
+    onExportProgress: MyEvent<{ total: number, completed: number }>;
 }
 
 
 /**
  * return unsubscribe function
  */
-type MyEvent<T> = (callback: (arg: T) => void) => () => void;
+export type MyEvent<T> = (callback: (arg: T) => void) => () => void;
 /**
  * return unsubscribe function
  * Event happens just once
  */
-type MyEventOnce<T> = (callback: (arg: T) => void) => () => void;
+export type MyEventOnce<T> = (callback: (arg: T) => void) => () => void;
 
-interface MyCallable {
-    <O>(): Promise<O>;
+/**
+ *
+ */
+export type MyCallable<T = void, R = void> = (arg1: T) => Promise<R>;
+export type MyCallable2<T1, T2, R = void> = (arg1: T1, arg2: T2) => Promise<R>;
 
-    <T1, O>(arg1: T1): Promise<O>;
-
-    <T1, T2, O>(arg1: T1, arg2: T2): Promise<O>;
-}
 
 
 

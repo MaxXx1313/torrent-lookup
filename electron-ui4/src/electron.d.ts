@@ -1,2 +1,2 @@
 /// <reference types="vite/client" />
-/// <reference types="../../electron-core/core-lib/preload" />
+/// <reference path="../../electron-core/core-lib/preload.d.ts" />

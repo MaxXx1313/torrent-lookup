@@ -1,10 +1,7 @@
 import { Observable, shareReplay } from 'rxjs';
-import type { AppConfiguration, TorrentMapping, TorrentScannerStats, TransmissionOptions } from "@/data/types.ts";
-
-
-export interface ScanOptions {
-    targets: string[];
-}
+import type { ScanConfiguration, TorrentMapping, TorrentScannerStats, TransmissionOptions } from "@/data/types.ts";
+import type { MyEvent } from "../../../electron-core/core-lib/preload";
+import type { ExportClient, ExportStats, LogMessage } from "../../../electron-core/core-lib/types.ts";
 
 
 export const DATA_SERVICE_KEY = Symbol();
@@ -16,7 +13,9 @@ export class DataService {
 
     readonly scanEntry$ = _observableFromElectron<string>(window.electronAPI.onScanEntry);
     readonly scanStats$ = _observableFromElectron<TorrentScannerStats>(window.electronAPI.onScanStats);
-    readonly exportLogs$ = _observableFromElectron<string>(window.electronAPI.onExportLog);
+    readonly scanFinished$ = _observableFromElectron<void>(window.electronAPI.onScanFinished);
+    readonly exportLogs$ = _observableFromElectron<LogMessage>(window.electronAPI.onExportLog);
+    readonly onExportProgress$ = _observableFromElectron<ExportStats>(window.electronAPI.onExportProgress);
 
     constructor() {
 
@@ -28,7 +27,7 @@ export class DataService {
         return window.electronAPI.getConfig();
     }
 
-    setConfig(config: AppConfiguration) {
+    setConfig(config: ScanConfiguration) {
         return window.electronAPI.setConfig(config);
     }
 
@@ -37,47 +36,65 @@ export class DataService {
     }
 
     selectFolder() {
-        return window.electronAPI.selectFolder();
+        return window.electronAPI.selectFolders();
     }
 
-    startScan(config: AppConfiguration) {
-        window.electronAPI.scanStart({targets: config.targets || [], exclude: config.exclude});
+    getDefaultLocations() {
+        return window.electronAPI.getDefaultLocations();
     }
 
-    stopScan() {
+    // Scan
+    scanIsActive() {
+        return window.electronAPI.scanIsActive();
+    }
+
+    startScan(config: ScanConfiguration) {
+        window.electronAPI.scanStart(config);
+    }
+
+    scanStop() {
         return window.electronAPI.scanStop();
     }
 
-    onScanFinished(cb: () => void) {
-        return window.electronAPI.onScanFinished(cb);
-    }
-
     getUserMappings(): Promise<TorrentMapping[]> {
-        return window.electronAPI.getUserMappings();
+        return window.electronAPI.getMappings();
     }
 
     saveUserMappings(m: TorrentMapping[]) {
-        return window.electronAPI.setUserMappings(m);
+        return window.electronAPI.setMappings(m);
     }
 
 
-    exportGetParameters(): Promise<TransmissionOptions> {
-        return window.electronAPI.exportGetParameters();
+    exportGetClients(): Promise<ExportClient[]> {
+        return window.electronAPI.exportGetClients();
     }
 
-    exportSetParameters(options: TransmissionOptions): Promise<void> {
-        return window.electronAPI.exportSetParameters(options);
+    exportGetParameters(client: ExportClient): Promise<TransmissionOptions> {
+        return window.electronAPI.exportGetParameters(client);
     }
 
-    exportStart(): Promise<void> {
-        return window.electronAPI.exportStart();
+    exportSetParameters(client: ExportClient, options: TransmissionOptions): Promise<void> {
+        return window.electronAPI.exportSetParameters(client, options);
+    }
+
+    exportVerifyParameters(client: ExportClient, options: TransmissionOptions): Promise<boolean> {
+        return window.electronAPI.exportVerifyParameters(client, options)
+            .catch(e => false);
+    }
+
+    exportReset() {
+        return window.electronAPI.exportReset();
+    }
+    exportStart(client: ExportClient, options: TransmissionOptions): Promise<void> {
+        return window.electronAPI.exportStart(client, options);
+    }
+    exportGetLogs() {
+        return window.electronAPI.exportGetLogs();
     }
 
 }
 
 ////
-type MyEvent<T> = (callback: (arg: T) => void) => () => void;
-
 function _observableFromElectron<T>(electronMethod: MyEvent<T>): Observable<T> {
     return new Observable<T>(subject => {
         const releaseFn = electronMethod(entry => {

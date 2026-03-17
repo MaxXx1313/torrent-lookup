@@ -1,15 +1,22 @@
 // preload.js
 const {contextBridge, ipcRenderer} = require('electron/renderer');
 
+// this script runs on web environmnt
 
+let _callId = 0;
+/**
+ * Callable is used to run an action and return a result.
+ * @return Promise<T>
+ */
 function callable(name) {
     return function () {
+        const uid = _callId++;
         const argsArray = Array.from(arguments);
-        console.log('[callable] <\t', name, argsArray);
+        console.log(`[invoke-${uid}] \t`, name, argsArray);
         return Promise.resolve()
             .then(() => ipcRenderer.invoke.apply(ipcRenderer, [name, ...argsArray]))
             .then((result) => {
-                console.log('[callable] >>\t', name, result);
+                console.log(`[result-${uid}] \t`, name, result);
 
                 return result;
             }).catch(e => {
@@ -20,13 +27,12 @@ function callable(name) {
 }
 
 /**
- * return unsubscribe function.
- * This is
+ * @return {()=>void} unsubscribe function
  */
 function event(eventName) {
     return (callback) => {
         const _cb = (_event, value) => {
-            console.log('[event] >\t', eventName, value);
+            console.log('[event] >>\t', eventName, value);
             callback(value);
         }
         ipcRenderer.on(eventName, _cb);
@@ -35,10 +41,13 @@ function event(eventName) {
     }
 }
 
+/**
+ * @return {()=>void} unsubscribe function
+ */
 function eventOnce(eventName) {
     return (callback) => {
         const _cb = (_event, value) => {
-            console.log('[event] >\t', eventName, value);
+            console.log('[event] >>\t', eventName, value);
             callback(value);
         }
         ipcRenderer.once(eventName, _cb);
@@ -51,23 +60,35 @@ contextBridge.exposeInMainWorld('electronAPI', {
     openDevTools: callable('app:devtools'),
 
     // ui4
-    getConfig: callable('app:get-config'),
-    setConfig: callable('app:set-config'),
+    getCurrentPage: callable('app:get-current-page'),
+    setCurrentPage: callable('app:set-current-page'),
+    getConfig: callable('app:get-scan-config'),
+    setConfig: callable('app:set-scan-config'),
+    getDefaultLocations: callable('app:get-default-locations'),
     getSystemExcluded: callable('app:get-system-excluded'),
+    selectFolders: callable('app:select-folders'),
 
-    selectFolder: callable('app:select-folder'),
 
+    // scanner
+    scanIsActive: callable('scan:is-active'),
     scanStart: callable('scan:start'),
+    scanStop: callable('scan:stop'),
     onScanEntry: event('scan:entry'),
     onScanStats: event('scan:stats'),
     onScanFinished: eventOnce('scan:finished'),
-    scanStop: callable('scan:stop'),
 
-    getUserMappings: callable('export:get-user-decision'),
-    setUserMappings: callable('export:set-user-decision'),
+    getMappings: callable('export:get-mapping'),
+    setMappings: callable('export:set-mapping'),
 
+    exportGetClients: callable('export:get-clients'),
     exportGetParameters: callable('export:get-parameters'),
     exportSetParameters: callable('export:set-parameters'),
-    exportStart: callable('export:push'),
+    exportVerifyParameters: callable('export:verify-parameters'),
+
+    exportReset: callable('export:reset'),
+    exportStart: callable('export:start'),
     onExportLog: event('export:log'),
+    exportGetLogs: callable('export:get-logs'),
+    onExportProgress: event('export:progress'),
+    // onExportProgress: event('export:push-progress'), // TODO: incomplete
 });

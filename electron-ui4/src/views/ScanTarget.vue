@@ -84,15 +84,15 @@
                 <div class="flex items-center gap-4">
                   <div
                       class="size-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
-                    <span class="material-symbols-outlined">folder</span>
+                    <span class="material-symbols-outlined">{{getTargetIcon(t)}}</span>
                   </div>
                   <div>
                     <p class="text-sm font-medium text-slate-900 dark:text-slate-200">{{ t }}</p>
-                    <p class="text-xs text-slate-500">New directory added</p>
+<!--                    <p class="text-xs text-slate-500">New directory added</p>-->
                   </div>
                 </div>
                 <button
-                    class="p-2 text-slate-400 hover:text-red-500 transition-colors group-hover:opacity-100"
+                    class="p-2 text-slate-400 hover:text-red-500 flex items-center transition-colors group-hover:opacity-100"
                     @click="deleteTarget(t)">
                   <span class="material-symbols-outlined">delete</span>
                 </button>
@@ -104,6 +104,29 @@
                 </div>
               </div>
 
+            </div>
+          </div>
+
+
+          <!-- Scan Options -->
+          <div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-3">
+              <span class="material-symbols-outlined text-primary">settings_suggest</span>
+              Advanced Options
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label
+                  class="flex items-center gap-3 p-3 rounded-lg border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+                <input v-model="followSymlinks"
+                       class="rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-primary bg-transparent"
+                       type="checkbox"/>
+                <div>
+                  <p class="text-sm font-medium">Follow symlinks</p>
+                  <p class="text-[10px] text-slate-500 tracking-tighter">
+                    Include files from symbolic links during scan
+                  </p>
+                </div>
+              </label>
             </div>
           </div>
         </div>
@@ -140,9 +163,10 @@
                 />
 
                 <button
-                    class="absolute right-0 top-0 bottom-0 px-2 py-1 text-primary hover:bg-primary/10 rounded-md transition-colors flex items-center"
+                    class="absolute right-0 top-0 bottom-0 px-2 py-1 text-primary enabled:hover:bg-primary/10 rounded-md transition-colors flex items-center text-sm disabled:opacity-20"
+                    :disabled="!exclusionAdd"
                     @click="addExclusion">
-                  <span class="material-symbols-outlined text-sm">keyboard_return</span>
+                  <span class="material-symbols-outlined pt-[2px]">keyboard_return</span>
                 </button>
               </div>
 
@@ -151,9 +175,9 @@
                 <div v-for="t in exclude"
                      class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full">
                   <span class="text-xs font-medium text-slate-600 dark:text-slate-300">{{ t }}</span>
-                  <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-100 flex items-center"
+                  <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-100 flex items-center text-sm"
                           @click="deleteExclusion(t)">
-                    <span class="material-symbols-outlined text-sm">close</span>
+                    <span class="material-symbols-outlined">close</span>
                   </button>
                 </div>
               </div>
@@ -206,28 +230,30 @@
   <!-- -->
   <el-dialog>
     <dialog id="dialog" aria-labelledby="dialog-title"
-            class="fixed inset-0 size-auto max-w-none max-h-[80vh] overflow-y-auto bg-transparent backdrop:bg-transparent">
+            class="fixed inset-0 size-auto max-w-none overflow-hidden bg-transparent backdrop:bg-transparent">
       <el-dialog-backdrop
-          class="fixed inset-0 bg-gray-500/75 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in dark:bg-gray-900/50"/>
+          class="fixed inset-0 bg-gray-500/75 transition-opacity dark:bg-gray-900/50"/>
 
       <div tabindex="0"
            class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0">
         <el-dialog-panel
-            class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95 dark:bg-gray-800 dark:outline dark:-outline-offset-1 dark:outline-white/10">
-          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 dark:bg-gray-800">
-            <div class="sm:flex sm:items-start">
-              <div class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full sm:mx-0 sm:size-10">
-                <span class="material-symbols-outlined">do_not_disturb_on</span>
-              </div>
-              <div class="mt-3 sm:mt-0 sm:ml-4 sm:text-left">
-                <h3 class="text-base font-semibold text-gray-900 dark:text-white">System exclusion</h3>
-                <div class="mt-2">
-                  <p class="text-sm text-gray-500 dark:text-gray-400" v-html="sysExcluded || 'Loading...'"></p>
+            class="relative max-h-[80vh] overflow-hidden flex flex-col rounded-lg bg-white text-left shadow-xl sm:my-8 sm:w-full sm:max-w-lg dark:bg-gray-800 dark:outline dark:-outline-offset-1 dark:outline-white/10">
+
+          <div class="bg-gray-50 px-4 pt-3 pb-2 flex flex-row gap-3 items-center flex-c dark:bg-gray-700/25">
+            <div class="mx-auto flex size-8 sm:mx-0 size-4 shrink-0 items-center justify-center">
+              <span class="material-symbols-outlined">do_not_disturb_on</span>
+            </div>
+            <h3 class="text-base font-semibold text-gray-900 dark:text-white">System exclusion</h3>
+          </div>
+
+          <div class="overflow-y-auto">
+            <div class="bg-white px-4 py-4 dark:bg-gray-800">
+                <div class="mt-3 sm:mt-0 sm:ml-4 sm:text-left">
+                    <p class="text-sm text-gray-500 dark:text-gray-400" v-html="sysExcluded || 'Loading...'"></p>
                 </div>
-              </div>
             </div>
           </div>
-          <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 dark:bg-gray-700/25">
+          <div class="bg-gray-50 px-4 py-3 flex flex-row-reverse px-6 dark:bg-gray-700/25">
             <button type="button" command="close" commandfor="dialog"
                     class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs inset-ring inset-ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto dark:bg-white/10 dark:text-white dark:shadow-none dark:inset-ring-white/5 dark:hover:bg-white/20">
               Close
@@ -242,14 +268,15 @@
 <!-- -->
 <script setup lang="ts">
 
-import { inject, onMounted, ref } from 'vue';
+import { inject, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { DATA_SERVICE_KEY, DataService } from '@/data/data.service';
-import type { AppConfiguration } from "../../../electron-core/core-lib/types";
+import type { ScanConfiguration } from "../../../electron-core/core-lib/types";
 
 
-const targets = ref<AppConfiguration['targets']>([]);
-const exclude = ref<AppConfiguration['exclude']>([]);
+const targets = ref<ScanConfiguration['targets']>([]);
+const exclude = ref<ScanConfiguration['exclude']>([]);
+const followSymlinks = ref<boolean>(false);
 const sysExcluded = ref<string>('');
 const addInProgress = ref<boolean>(false);
 const hasPreviousResults = ref<boolean>(false);
@@ -260,35 +287,42 @@ const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
 
 const router = useRouter();
 
+watch(followSymlinks, () => {
+  _saveConfig();
+});
+
 onMounted(async () => {
   const config = await dataService.getConfig();
   targets.value = config?.targets || [];
   exclude.value = config?.exclude || [];
+  followSymlinks.value = !!config?.followSymlinks;
 
   hasPreviousResults.value = (await dataService.getUserMappings())?.length > 0;
 });
 
-function startScanning() {
-  // You can use a string path or a named route object
-  _saveConfig();
+async function startScanning() {
+  await dataService.scanStop();
 
-  const config = {
-    targets: (targets.value || []).slice(),
-    exclude: (exclude.value || []).slice(),
-  }
+  const config = await dataService.getConfig();
   dataService.startScan(config);
-  router.replace('/progress');
-};
 
-function goToResults() {
+  router.replace('/progress');
+}
+
+async function goToResults() {
   router.replace('/results');
 }
 
-// bindToComponent(dataService.getTargets()).subscribe(data => {
-//   // TODO: didn't found how to replace an array
-//   targets.value.splice(0);
-//   targets.value.push(...data);
-// });
+
+function getTargetIcon(target: string) {
+  if (target == '~'){
+    return 'home';
+  }
+  if (target.match(/^[a-z]:\\$/i)){
+    return 'hard_disk';
+  }
+  return 'folder';
+}
 
 function addTarget() {
   if (addInProgress.value) {
@@ -306,10 +340,9 @@ function addTarget() {
   });
 }
 
-const homeFolder = '~';
-
-function addTargetsDefault() {
-  _addTargets([homeFolder]);
+async function addTargetsDefault() {
+  const toAdd = await dataService.getDefaultLocations()
+  _addTargets(toAdd);
   _saveConfig();
 }
 
@@ -332,7 +365,12 @@ function deleteTarget(target: string) {
 }
 
 function addExclusion() {
-  (exclude.value as string[]).push(exclusionAdd.value);
+  const toAdd = exclusionAdd.value;
+  if (!toAdd) {
+    return;
+  }
+  exclude.value = (exclude.value || []).filter(t => t !== toAdd);
+  (exclude.value as string[]).push(toAdd);
   exclusionAdd.value = '';
   _saveConfig();
 }
@@ -354,6 +392,7 @@ function _saveConfig() {
   dataService.setConfig({
     targets: (targets.value || []).slice(),
     exclude: (exclude.value || []).slice(),
+    followSymlinks: !!followSymlinks.value,
   });
 }
 

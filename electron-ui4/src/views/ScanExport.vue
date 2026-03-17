@@ -21,9 +21,10 @@
           Select Target Client
         </h3>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+
           <!-- Client Option 1 (Selected) -->
-          <div
-              class="group relative cursor-pointer flex flex-col items-center justify-center p-6 rounded-xl border-2 border-primary bg-primary/10 transition-all shadow-lg shadow-primary/5">
+          <div v-for="client of clients"
+               class="group relative cursor-pointer flex flex-col items-center justify-center p-6 rounded-xl border-2 border-primary bg-primary/10 transition-all shadow-lg shadow-primary/5">
             <div class="size-12 mb-3 bg-slate-800 rounded-lg flex items-center justify-center overflow-hidden">
               <IconTransmission/>
             </div>
@@ -77,26 +78,45 @@
           <span class="flex items-center justify-center bg-primary text-white size-6 rounded-full text-xs">2</span>
           Transmission Configuration
         </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="flex flex-col gap-2 col-span-2">
-            <label class="text-sm font-semibold text-slate-500">API Port</label>
-            <input
-                class="bg-background-light dark:bg-[#101922] border-slate-300 dark:border-[#233648] rounded-lg px-4 py-2 focus:ring-primary focus:border-primary"
-                type="number" min="0"
-                v-model="port"/>
-          </div>
-          <div class="flex flex-col gap-2">
-            <label class="text-sm font-semibold text-slate-500">Username</label>
-            <input
-                class="bg-background-light dark:bg-[#101922] border-slate-300 dark:border-[#233648] rounded-lg px-4 py-2 focus:ring-primary focus:border-primary"
-                type="text" v-model="username"/>
-          </div>
-          <div class="flex flex-col gap-2">
-            <label class="text-sm font-semibold text-slate-500">Password</label>
-            <input
-                class="bg-background-light dark:bg-[#101922] border-slate-300 dark:border-[#233648] rounded-lg px-4 py-2 focus:ring-primary focus:border-primary"
-                type="text" v-model="password"/>
-          </div>
+        <div class="grid grid-cols-2 gap-x-6 gap-y-2 items-center">
+
+          <!-- row -->
+          <label class="text-sm font-semibold text-slate-500">API Port</label>
+          <input
+              class="bg-background-light dark:bg-[#101922] border-slate-300 dark:border-[#233648] rounded-lg px-4 py-2 focus:ring-primary focus:border-primary"
+              type="number" min="0"
+              v-model="port"/>
+
+          <div class="col-span-2 border-b border-slate-200 dark:border-slate-700"></div>
+
+          <!-- row -->
+          <label class="text-sm font-semibold text-slate-500">Username</label>
+          <input
+              class="bg-background-light dark:bg-[#101922] border-slate-300 dark:border-[#233648] rounded-lg px-4 py-2 focus:ring-primary focus:border-primary"
+              type="text" v-model="username"/>
+
+          <div class="col-span-2 border-b border-slate-200 dark:border-slate-700"></div>
+
+          <!-- row -->
+          <label class="text-sm font-semibold text-slate-500">Password</label>
+          <input
+              class="bg-background-light dark:bg-[#101922] border-slate-300 dark:border-[#233648] rounded-lg px-4 py-2 focus:ring-primary focus:border-primary"
+              type="text" v-model="password"/>
+
+
+          <div class="col-span-2 border-b border-slate-200 dark:border-slate-700"></div>
+
+          <!-- row -->
+          <label class="text-sm font-semibold text-slate-500">Check connection</label>
+          <button
+              class="px-6 py-3 border border-slate-300 dark:border-[#233648] font-bold rounded-lg hover:bg-slate-100 dark:hover:bg-[#233648] transition-colors flex items-center gap-2"
+              @click="verifyParameters">
+            <span class="material-symbols-outlined">network_check</span>
+            <span v-if="verifyStatus === 'success'" class="text-emerald-500">Success</span>
+            <span v-if="verifyStatus === 'error'" class="text-amber-500">Error</span>
+            <span v-if="verifyStatus === 'none'" class="text-slate">Run Check</span>
+            <span v-if="verifyStatus === 'pending'" class="text-slate">Checking...</span>
+          </button>
         </div>
 
         <!--
@@ -135,19 +155,15 @@
           class="mt-1 p-6 rounded-xl bg-primary/5 border border-primary/20 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl shadow-primary/5">
         <div class="flex flex-col"></div>
         <div class="flex items-center gap-4 w-full md:w-auto">
+
+
+
           <button
               class="flex-1 md:flex-none h-12 px-8 bg-white dark:bg-[#233648] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
               @click="backToResults">
             Back to Results
           </button>
 
-          <!--
-          <button
-              class="px-6 py-3 border border-slate-300 dark:border-[#233648] font-bold rounded-lg hover:bg-slate-100 dark:hover:bg-[#233648] transition-colors flex items-center gap-2">
-            <span class="material-symbols-outlined">network_check</span>
-            Test
-          </button>
-          -->
 
           <button
               class="flex-1 md:flex-none h-12 px-10 bg-primary text-white disabled:text-white/60 disabled rounded-lg font-bold text-base enabled:shadow-lg enabled:shadow-primary/30 active:enabled:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:bg-zinc-800"
@@ -181,17 +197,23 @@ import IconTransmission from "@/components/icons/IconTransmission.vue";
 import { inject, onMounted, ref } from "vue";
 import { DATA_SERVICE_KEY, DataService } from "@/data/data.service.ts";
 import ExportHelp from "@/views/ExportHelp.vue";
+import type { ExportClient, ExportOptions } from "../../../electron-core/core-lib/types.ts";
 
 const router = useRouter();
+
+const clients = ref<ExportClient[]>([]);
 
 const port = ref<number>(0);
 const username = ref<string>('');
 const password = ref<string>('');
 const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
 
+const verifyStatus = ref<'none'|'success'|'error'|'pending'>('none');
+
 
 onMounted(async () => {
-  const params = await dataService.exportGetParameters();
+  clients.value = await dataService.exportGetClients();
+  const params = await dataService.exportGetParameters('transmission');
   port.value = params.port;
   username.value = params.username;
   password.value = params.password;
@@ -205,14 +227,27 @@ async function backToResults() {
 async function runExport() {
   // You can use a string path or a named route object
   await _saveParameters();
+  await dataService.exportReset();
   router.replace('/exportprogress');
 }
 
 function _saveParameters() {
-  return dataService.exportSetParameters({
+  return dataService.exportSetParameters('transmission', _getParameters());
+}
+
+function _getParameters(): ExportOptions {
+  return {
     port: port.value * 1,
     username: username.value,
     password: password.value,
-  });
+  };
 }
+
+
+async function verifyParameters() {
+  verifyStatus.value = 'pending';
+  const verificationSuccess = await dataService.exportVerifyParameters('transmission', _getParameters());
+  verifyStatus.value = verificationSuccess ? 'success' : 'error';
+}
+
 </script>

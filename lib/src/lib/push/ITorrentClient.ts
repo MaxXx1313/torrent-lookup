@@ -3,11 +3,14 @@
  */
 export interface ITorrentClient {
 
+    ping(): Promise<boolean>;
+
     /**
      * @param {string} filename  absolute location of torrent file
-     * @param downloadDir   absolute location of download folder (without target filename)
+     * @param {string} downloadDir   absolute location of download folder (without target filename)
+     * @param {string[]} filesWanted   relative path to files from 'downloadDir', which should be marked as files to download
      */
-    push(filename: string, downloadDir: string): Promise<PushResult>;
+    push(filename: string, downloadDir: string, filesWanted: string[]): Promise<PushResult>;
 
     /**
      * @return true if the torrent client is available (still might be not configured properly)

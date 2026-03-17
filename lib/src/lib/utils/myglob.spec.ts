@@ -1,53 +1,68 @@
 import { describe, test } from "bun:test";
 import assert from 'node:assert';
-import { matchCustom } from './myglob';
+import { MyGlob } from './myglob';
 
 
-describe('matchCustom.spec', () => {
+describe('MyGlob', () => {
+    describe('match', () => {
 
-    test('template match', () => {
-        assert.equal(matchCustom('/root/.npm/project/lib/somefile.js', '.npm'), true);
-        assert.equal(matchCustom('/root/.npmz/project/lib/somefile.js', ".npm"), false);
-    });
+        test('should match sample name', () => {
+            assert.equal(MyGlob.match('/root/.npm/project/lib/somefile.js', '.npm'), true);
+            assert.equal(MyGlob.match('/root/.npmz/project/lib/somefile.js', ".npm"), false);
+            assert.equal(MyGlob.match('/root/no.npm/project/lib/somefile.js', ".npm"), false);
+        });
 
-    test('absolute path', () => {
-        assert.equal(matchCustom('/root/.npm/project/lib/somefile.js', '/root/.npm'), true);
-        assert.equal(matchCustom('/root/lib/.npm/project/lib/somefile.js', '/root/.npm'), false);
-    });
+        describe('posix', () => {
 
-    test('single wildcard', () => {
-        assert.equal(matchCustom('/root/.npm/project/lib/somefile.js', '*.js'), true);
-        assert.equal(matchCustom('/root/.npm/project/lib/somefile.js', '*.json'), false);
-    });
+            test('linux path', () => {
+                assert.equal(MyGlob.match('/root/.npm/project/lib/somefile.js', '/root/.npm'), true);
+                assert.equal(MyGlob.match('/root/lib/.npm/project/lib/somefile.js', '/root/.npm'), false);
+                assert.equal(MyGlob.match('/test/root/lib/.npm/project/lib/somefile.js', '/root/.npm'), false);
+            });
 
-    test('trailing slash in file', function () {
-        assert.equal(matchCustom('/root/.npm', '.npm'), true);
-        assert.equal(matchCustom('/root/.npm/', '.npm'), true);
-    });
+            test('single wildcard', () => {
+                assert.equal(MyGlob.match('/root/.npm/project/lib/somefile.js', '*.js'), true);
+                assert.equal(MyGlob.match('/root/.npm/project/lib/somefile.js', '*.json'), false);
+            });
 
-    test('trailing slash in pattern', function () {
-        assert.equal(matchCustom('/root/.npm', '.npm/'), true);
-        assert.equal(matchCustom('/root/.npm/', '.npm'), true);
-    });
+            test('trailing slash in filename', function () {
+                assert.equal(MyGlob.match('/root/.npm', '.npm'), true);
+                assert.equal(MyGlob.match('/root/.npm/', '.npm'), true);
+            });
 
-    test('windows path', function () {
-        assert.equal(matchCustom('C:\\Windows\\system32\\myfile.js', 'C:\\Windows', {platform: 'win32'}), true);
-    });
-
-    test('windows case', () => {
-        assert.equal(matchCustom('C:/Windows/system32/myfile.js', 'C:\\windows', {platform: 'win32'}), true);
-        assert.equal(matchCustom('C:/WINDOWS/system32/myfile.js', 'C:\\windows', {platform: 'win32'}), true);
-        assert.equal(matchCustom('C:/WiNdOwS/system32/myfile.js', 'C:\\windows', {platform: 'win32'}), true);
-        assert.equal(matchCustom('C:/windows/system32/myfile.js', 'C:\\WINDOWS', {platform: 'win32'}), true);
-    });
+            test('trailing slash in pattern', function () {
+                assert.equal(MyGlob.match('/root/.npm', '.npm/'), true);
+                assert.equal(MyGlob.match('/root/.npm/', '.npm'), true);
+            });
 
 
-    test('linux case', () => {
-        assert.equal(matchCustom('/root/.NPM/project/lib/somefile.js', ".npm", {platform: 'posix'}), false);
-    });
+            test('character case should matter', () => {
+                assert.equal(MyGlob.match('/root/.NPM/project/lib/somefile.js', ".npm", {platform: 'posix'}), false);
+                assert.equal(MyGlob.match('/root/.NPM/project/lib/somefile.js', ".NPM", {platform: 'posix'}), true);
+            });
 
 
-    test('windows example', function () {
-        assert.equal(matchCustom('C:\\Windows\\system32\\myfile.js', '.swp', {platform: 'win32'}), false);
+        });
+
+        describe('windows', () => {
+            test('windows example', function () {
+                assert.equal(MyGlob.match('C:\\Windows\\system32\\myfile.js', '.swp', {platform: 'win32'}), false);
+            });
+
+            test('windows path', function () {
+                assert.equal(MyGlob.match('C:\\Windows\\system32\\myfile.js', 'C:\\Windows', {platform: 'win32'}), true);
+                assert.equal(MyGlob.match('C:\\Windows\\system32\\myfile.js', 'C:/Windows', {platform: 'win32'}), true);
+                assert.equal(MyGlob.match('C:/Windows/system32/myfile.js', 'C:/Windows', {platform: 'win32'}), true);
+                assert.equal(MyGlob.match('C:/Windows/system32/myfile.js', 'C:\\Windows', {platform: 'win32'}), true);
+            });
+
+            test('character case should not matter', () => {
+                assert.equal(MyGlob.match('C:/Windows/system32/myfile.js', 'C:\\windows', {platform: 'win32'}), true);
+                assert.equal(MyGlob.match('C:/WINDOWS/system32/myfile.js', 'C:\\windows', {platform: 'win32'}), true);
+                assert.equal(MyGlob.match('C:/WiNdOwS/system32/myfile.js', 'C:\\windows', {platform: 'win32'}), true);
+                assert.equal(MyGlob.match('C:/windows/system32/myfile.js', 'C:\\WINDOWS', {platform: 'win32'}), true);
+                assert.equal(MyGlob.match('C:/windows/system32/myfile.js', 'C:\\WiNdOwS', {platform: 'win32'}), true);
+            });
+        });
     });
 });

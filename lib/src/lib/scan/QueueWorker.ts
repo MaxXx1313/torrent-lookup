@@ -51,8 +51,8 @@ export class QueueWorker<T, R = any> {
      * @param {Array<T>} jobItems
      * @param {boolean} prepend
      */
-    addJobs(jobItems: T[], prepend: boolean = false): void {
-        if (!prepend) {
+    addJobs(jobItems: T[], opts?: { prepend?: boolean }): void {
+        if (!opts?.prepend) {
             this._queue.push.apply(this._queue, jobItems);
         } else {
             this._queue.unshift.apply(this._queue, jobItems);
@@ -69,6 +69,7 @@ export class QueueWorker<T, R = any> {
         if (this._queue.length === 0) {
             console.warn('QueueWorker: empty queue');
         }
+        this._terminateFlag = false;
         this._digest();
         return this.onStop.pipe(take(1)).toPromise().then(e => {
             if (e) {

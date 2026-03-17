@@ -8,4 +8,19 @@ const app = createApp(App)
 
 app.use(router)
 
+
+// Add global afterEach guard
+router.afterEach((to, from) => {
+    console.log('routeInfo', to.fullPath);
+
+    return window.electronAPI.setCurrentPage(to.fullPath);
+});
+
+// restore previous route
+window.electronAPI.getCurrentPage().then(lastRoute => {
+    if (lastRoute) {
+        router.replace(lastRoute);
+    }
+});
+
 app.mount('#app')

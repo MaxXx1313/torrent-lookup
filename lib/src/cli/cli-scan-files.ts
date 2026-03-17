@@ -19,21 +19,21 @@ export function cliScanFiles(options: CliOptions): Promise<any> {
     //
     const scanner = new TorrentScanner({
         workdir: options.tmp,
-        target: options.target,
         maxFps: options.fps,
         onEntry: (entry: TorrentScannerEntry) => {
             if (entry.isTorrent) {
                 logger.log('Torrent file found:', entry.location);
             } else {
-                logger.logLOP(entry.location);
-                // logDebounced(entry.location);
+                const fpsPrefix = scanner.stats.filesPerSecond >= 0 ? `(${scanner.stats.filesPerSecond} f/s) ` : '';
+                logger.logLOP(fpsPrefix + entry.location);
+                // logger.log(`(${scanner.stats.filesPerSecond} f/s) ` + entry.location);
             }
         },
     });
 
     // SCAN
     logger.startLOP();
-    return scanner.run().then(() => {
+    return scanner.run(options.target).then(() => {
         logger.stopLOP();
         logger.log('Scanned %s files, found %s torrent files', scanner.stats.files, scanner.stats.torrents);
     }).catch((e) => {

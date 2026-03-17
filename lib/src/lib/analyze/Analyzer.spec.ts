@@ -1,4 +1,4 @@
-import { describe, test, beforeEach } from "bun:test";
+import { beforeEach, describe, test } from "bun:test";
 import { Analyzer } from './Analyzer';
 import path from 'path';
 import assert from 'node:assert';
@@ -26,30 +26,40 @@ describe('Analyzer.spec', function () {
             {name: '/firstpath/sourcefolder/file1.txt', size: 13},
             {name: '/secondpath/sourcefolder/file1.txt', size: 13},
             {name: '/otherpath/wrongfolder/file1.txt', size: 13},
+            {name: '/firstpath/sourcefolder/file2.txt', size: 14},
         ];
 
-        const torrentLocation = assetsPath + '/t2/fixture2 - sourcefolder.torrent';
+        const torrentFile1 = assetsPath + '/t1/fixture1 - test1.txt.torrent';
+        const torrentFile1Copy = assetsPath + '/t1/fixture1 - test1.txt-copy.torrent';
+        const torrentFile2 = assetsPath + '/t2/fixture2 - sourcefolder.torrent';
+
+        const torrent1Hash = '38f94a70451b361e7e83af8888447aad';
+        const torrent2Hash = 'afc459db274e2b15c88af762a258ab44';
+
         const inputArr = [
             {
-                name: 'file1.txt',
-                dir: 'sourcefolder',
-                length: 13,
-                torrentFileLocation: torrentLocation,
-                match: [],
+                tFilename: 'file1.txt',
+                tFolder: ['sourcefolder'],
+                tSize: 13,
+                torrentFileLocation: torrentFile2,
+                torrentContentHash: torrent2Hash,
+                pathMatch: [],
             },
             {
-                name: 'file2.txt',
-                dir: 'sourcefolder',
-                length: 14,
-                torrentFileLocation: torrentLocation,
-                match: [],
+                tFilename: 'file2.txt',
+                tFolder: ['sourcefolder'],
+                tSize: 14,
+                torrentFileLocation: torrentFile2,
+                torrentContentHash: torrent2Hash,
+                pathMatch: [],
             },
             {
-                name: 'file3.txt',
-                dir: 'sourcefolder',
-                length: 14,
-                torrentFileLocation: torrentLocation,
-                match: [],
+                tFilename: 'file3.txt',
+                tFolder: ['sourcefolder'],
+                tSize: 14,
+                torrentFileLocation: torrentFile2,
+                torrentContentHash: torrent2Hash,
+                pathMatch: [],
             },
         ];
 
@@ -60,47 +70,108 @@ describe('Analyzer.spec', function () {
                 'file2.txt:14': [inputArr[1]],
                 'file3.txt:14': [inputArr[2]],
             };
-            analyzer.__loadTorrentFile(torrentLocation);
-            assert.deepEqual(analyzer._hash, expected);
+            analyzer.__loadTorrentFile(torrentFile2);
+            assert.deepEqual(analyzer._hashByFileSize, expected);
         });
 
 
         test('matchFile', function () {
-            analyzer.__loadTorrentFile(torrentLocation);
+            analyzer.__loadTorrentFile(torrentFile2);
             const expected = {
                 ...inputArr[0],
-                match: ['/firstpath', '/secondpath'],
+                pathMatch: [
+                    {
+                        basepath: '/firstpath',
+                        filepath: 'sourcefolder/file1.txt'
+                    },
+                    {
+                        basepath: '/secondpath',
+                        filepath: 'sourcefolder/file1.txt'
+                    },
+                ],
             };
 
             for (const fileInfo of filesToMatch) {
                 analyzer.__matchFile(fileInfo.name, fileInfo.size);
             }
-            assert.deepEqual(analyzer._hash['file1.txt:13'], [expected]);
+            assert.deepEqual(analyzer._hashByFileSize['file1.txt:13'][0], expected);
 
         });
 
 
         test('analyzeCacheData', function () {
 
-            analyzer.__loadTorrentFile(torrentLocation);
+            analyzer.__loadTorrentFile(torrentFile1);
+            analyzer.__loadTorrentFile(torrentFile1Copy);
+            analyzer.__loadTorrentFile(torrentFile2);
             for (const fileInfo of filesToMatch) {
                 analyzer.__matchFile(fileInfo.name, fileInfo.size);
             }
 
             ///
-            const expected = [
-                {
-                    torrent: torrentLocation,
+            const expected1 = {
+                torrentContentHash: torrent1Hash,
+                torrentLocation: torrentFile1,
+                torrentAlternateLocations: [torrentFile1, torrentFile1Copy],
+                saveTo: null,
+                saveToOptions: [],
+            };
+
+            const expected2 = {
+                torrentContentHash: torrent2Hash,
+                torrentLocation: torrentFile2,
+                torrentAlternateLocations: [torrentFile2],
+
+                saveTo: {
                     saveTo: '/firstpath',
-                    saveToOptions: [
-                        '/firstpath',
-                        '/secondpath'
+                    score: 2,
+                    filesWanted: [
+                        'sourcefolder/file1.txt',
+                        'sourcefolder/file2.txt',
+                    ],
+                    filesUnwanted: [
+                        'sourcefolder/file3.txt'
                     ],
                 },
-            ];
+                saveToOptions: [
+                    {
+                        saveTo: '/firstpath',
+                        score: 2,
+                        filesWanted: [
+                            'sourcefolder/file1.txt',
+                            'sourcefolder/file2.txt',
+                        ],
+                        filesUnwanted: [
+                            'sourcefolder/file3.txt'
+                        ],
+                    },
+                    {
+                        saveTo: '/secondpath',
+                        score: 1,
+                        filesWanted: [
+                            'sourcefolder/file1.txt',
+                        ],
+                        filesUnwanted: [
+                            'sourcefolder/file2.txt',
+                            'sourcefolder/file3.txt'
+                        ],
+                    },
+                ],
+            };
 
             analyzer._makeDecision();
-            assert.deepEqual(analyzer._decision, expected);
+
+            // console.log(analyzer._decision[0]);
+
+            //
+            const mapping2Result = analyzer._decision.find(d => d.torrentLocation === torrentFile2);
+            assert.deepEqual(mapping2Result.saveToOptions, expected2.saveToOptions);
+            assert.deepEqual(mapping2Result.saveToOptions[0], expected2.saveToOptions[0]); // make sure order is matters!
+            assert.deepEqual(mapping2Result, expected2);
+
+            //
+            const mapping1Result = analyzer._decision.find(d => d.torrentLocation === torrentFile1);
+            assert.deepEqual(mapping1Result, expected1);
         });
     });
 

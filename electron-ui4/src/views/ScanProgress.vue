@@ -19,22 +19,23 @@
           <h1 class="text-4xl text-black tracking-tight text-slate-900 dark:text-white">
             Scanning Filesystem...</h1>
           <p class="text-[#92adc9] text-sm font-normal leading-normal max-w-lg mx-auto">
-            Matching local files with torrent metadata. This may take a while depending on your disk speed and volume
-            size.
+            Scanning your filesystem and linking files to their torrent metadata.
+            This may take some time, depending on your disk speed and how many files you have.
           </p>
         </div>
       </div>
 
       <!-- Progress & Path Display Card -->
-      <div class="w-full max-w-[720px]  bg-[#1b2a38] rounded-xl p-6 md:p-8 border border-slate-200 dark:border-[#233648] bg-white dark:bg-background-dark shadow-2xl">
+      <div
+          class="w-full max-w-[720px]  bg-[#1b2a38] rounded-xl p-6 md:p-8 border border-slate-200 dark:border-[#233648] bg-white dark:bg-background-dark shadow-2xl">
         <div class="flex flex-col gap-6">
           <!-- Current Activity Label -->
           <div class="flex justify-between items-end">
             <div class="space-y-1">
               <p class="text-black-900 dark:text-white text-lg font-medium">Scanning directory contents</p>
             </div>
-            <div class="text-right">
-              <p class="text-[#92adc9] text-base">{{ formatNumber(filesPerSecond) }} files/sec</p>
+            <div class="text-right" v-if="stats.filesPerSecond>=0">
+              <p class="text-[#92adc9] text-base">{{ formatNumber(stats.filesPerSecond) }} files/sec</p>
             </div>
           </div>
           <!-- Indeterminate Progress Bar -->
@@ -45,7 +46,7 @@
             </div>
           </div>
           <!-- Live Path Display -->
-          <div class="bg-slate-100 dark:bg-[#111a22] rounded-lg p-4 border border-[#233648]">
+          <div class="bg-slate-100 dark:bg-[#111a22] rounded-lg p-4 border border-slate-200">
             <div class="flex items-start gap-3  text-[#233648] dark:text-[#92adc9]">
               <span class="material-symbols-outlined text-sm mt-1">folder_open</span>
               <div class="flex-1 overflow-hidden h-[42px]">
@@ -67,12 +68,16 @@
           <!-- Counter Metadata -->
           <div class="flex justify-center items-center gap-8 py-2">
             <div class="text-center text-black-900 ">
-              <span class="block text-black-900 dark:text-white text-xl font-bold">{{ formatNumber(filesTorrent) }}</span>
+              <span class="block text-black-900 dark:text-white text-xl font-bold">{{
+                  formatNumber(stats.torrents)
+                }}</span>
               <span class="text-[#92adc9] text-xs uppercase tracking-wide">Torrents Found</span>
             </div>
             <div class="w-px h-8 bg-[#233648]"></div>
             <div class="text-center">
-              <span class="block text-black-900 dark:text-white text-xl font-bold">{{ formatNumber(filesRegular) }}</span>
+              <span class="block text-black-900 dark:text-white text-xl font-bold">{{
+                  formatNumber(stats.files)
+                }}</span>
               <span class="text-[#92adc9] text-xs uppercase tracking-wide">Files Found</span>
             </div>
           </div>
@@ -87,7 +92,7 @@
           <span class="font-semibold">Cancel Scan</span>
         </button>
         <p class="text-[#92adc9]/60 text-xs text-center italic">
-          Scanning will pause and keep current progress if cancelled.
+          Scanning will stop and keep current progress if cancelled.
         </p>
       </div>
     </div>
@@ -100,11 +105,10 @@ import { useRouter } from 'vue-router';
 import { inject, onMounted, ref } from "vue";
 import { DATA_SERVICE_KEY, DataService } from "@/data/data.service.ts";
 import { bindToComponent } from "../../tools/async.ts";
+import type { TorrentScannerStats } from "../../../electron-core/core-lib/types.ts";
 
 const currentTarget = ref<string>('');
-const filesTorrent = ref<number>(0);
-const filesRegular = ref<number>(0);
-const filesPerSecond = ref<number>(0);
+const stats = ref<TorrentScannerStats>({filesPerSecond: 0, files: 0, torrents: 0});
 
 const dataService = inject<DataService>(DATA_SERVICE_KEY)!;
 const router = useRouter();
@@ -113,20 +117,23 @@ onMounted(async () => {
   bindToComponent<string>(dataService.scanEntry$).subscribe(entry => {
     currentTarget.value = entry;
   });
-  bindToComponent(dataService.scanStats$).subscribe(stats => {
-    filesTorrent.value = stats.torrents;
-    filesRegular.value = stats.files;
-    filesPerSecond.value = stats.filesPerSecond;
+  bindToComponent(dataService.scanStats$).subscribe(_stats => {
+    stats.value = _stats;
   });
 
-  dataService.onScanFinished(() => {
+  bindToComponent(dataService.scanFinished$).subscribe(() => {
     router.replace('/results');
   });
+
+  //
+  const isActive = await dataService.scanIsActive();
+  if (!isActive) {
+    router.replace('/results');
+  }
 });
 
 function stopScan() {
-  dataService.stopScan();
-  // You can use a string path or a named route object
+  dataService.scanStop();
   router.replace('/results');
 }
 

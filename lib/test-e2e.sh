@@ -1,0 +1,1 @@
+npx bun test ./src/lib/scan/TorrentScanner.e2e.ts

@@ -14,7 +14,6 @@ export const SCAN_EXCLUDE_DEFAULT = [
     '*.swp',
     '*.swo',
     '*~',
-    '.DS_Store',
     '.Spotlight-V100',
     '.Trashes',
     '$RECYCLE.BIN',
@@ -52,6 +51,7 @@ export const SCAN_EXCLUDE_DEFAULT = [
 
 // Custom, all platforms
     '.npm',
+    '.rvm',
     '.yarn',
     'node_modules',
     'jspm_packages',
