@@ -14,6 +14,9 @@ const config: ForgeConfig = {
         // instead of just the symlink reference.
         derefSymlinks: true,
         // icon: './resources/torrent-icon-256.png', // Electron Forge will automatically add the correct extension (.ico or .icns)
+        osxSign: {
+            identity: 'maxxx1313'
+        } // object must exist even if empty
     },
     rebuildConfig: {},
     makers: [
@@ -23,6 +26,8 @@ const config: ForgeConfig = {
             // setupExe: 'TLookup-1.0.0.exe',
         }),
         new MakerDMG({
+            icon: path.join(__dirname, './resources/torrent-icon-256.icns'), // Icon for the installer
+            iconSize: 256,
         }),
         // new MakerZIP({}, ['darwin']),
         // new MakerZIP({}),
