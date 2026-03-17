@@ -26,7 +26,7 @@ const props = defineProps<{
 
 // react only to a specific property
 watch(
-    () => props.opt.saveTo,
+    () => props.opt?.saveTo,
     (newSaveTo) => {
       opt.value = props.opt;
       console.log('saveTo changed', newSaveTo);

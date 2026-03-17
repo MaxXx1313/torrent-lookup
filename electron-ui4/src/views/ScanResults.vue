@@ -17,7 +17,8 @@
       <div class="flex items-center justify-between gap-4">
         <div class="flex items-center gap-2 justify-between px-2 text-slate-300 dark:text-slate-600">
           <span class="material-symbols-outlined ">data_table</span>
-          <p class="text-sm font-bold leading-tight">{{mappingsFiltered.length}} found</p>
+          <p class="text-sm font-bold leading-tight">{{ mappingsFiltered.length }} matched<span
+              v-if="skipped>0">, {{ skipped }} skipped (not matched)</span></p>
         </div>
 
         <label class="flex flex-col min-w-64 h-10 max-w-128">
@@ -369,7 +370,9 @@
       <!-- Footer of Table -->
       <div v-if="paginator.pageMax>1"
            class="bg-slate-50 rounded-b-xl dark:bg-[#192633] px-6 py-4 border-t border-slate-200 dark:border-[#324d67] flex items-center justify-between">
-        <p class="text-xs text-slate-500 dark:text-[#92adc9] font-medium">Showing {{ paginator.itemsFrom }}-{{ paginator.itemsTo }}
+        <p class="text-xs text-slate-500 dark:text-[#92adc9] font-medium">Showing {{
+            paginator.itemsFrom
+          }}-{{ paginator.itemsTo }}
           of {{ paginator.itemsTotal }} results</p>
         <div class="flex gap-2">
           <button
@@ -445,6 +448,7 @@ const router = useRouter();
 let mappingsAll: TorrentMapping[] = [];
 let mappingsFiltered: TorrentMapping[] = [];
 const mappingsPaged = ref<TorrentMapping[]>([]);
+const skipped = ref<number>(0);
 
 const paginator = ref({
   page: 0,
@@ -468,12 +472,14 @@ watch(searchModel, () => {
   paginator.value.page = 0;
   _onPageChanged();
 });
-watch(()=>paginator.value.page, () => {
+watch(() => paginator.value.page, () => {
   _onPageChanged();
 });
 
 onMounted(async () => {
-  mappingsAll = await dataService.getUserMappings();
+  const _mappingsAll = await dataService.getUserMappings();
+  mappingsAll = _mappingsAll.filter(m => !!m.saveTo);
+  skipped.value = _mappingsAll.length - mappingsAll.length;
   mappingsFiltered = mappingsAll;
   _onPageChanged();
 });
