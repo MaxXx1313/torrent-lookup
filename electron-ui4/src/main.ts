@@ -13,7 +13,7 @@ app.use(router)
 router.afterEach((to, from) => {
     console.log('routeInfo', to.fullPath);
 
-    return window.electronAPI.setCurrentPage(to.fullPath);
+    return window.electronAPI.setCurrentPage(to.fullPath as any);
 });
 
 // restore previous route

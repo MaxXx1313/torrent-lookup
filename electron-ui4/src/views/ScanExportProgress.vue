@@ -171,7 +171,7 @@ import { useRouter } from "vue-router";
 import { inject, onMounted, ref } from "vue";
 import { DATA_SERVICE_KEY, DataService } from "@/data/data.service.ts";
 import { bindToComponent, timeoutPromise } from "../../tools/async.ts";
-import { type ExportStats, LogMessage } from "../../../electron-core/core-lib/types.ts";
+import type { ExportStats, LogMessage } from "../../../electron-core/core-lib/types.ts";
 
 const router = useRouter();
 
@@ -194,7 +194,7 @@ onMounted(async () => {
 
   exportIsFinished.value = false;
   hasError.value = false;
-  _pushLog({message: 'Initializing...'});
+  _pushLog({message: 'Initializing...', level: 'log', ts: Date.now()});
 
   const logs = await dataService.exportGetLogs();
   _pushLogs(logs);
@@ -207,7 +207,7 @@ onMounted(async () => {
       })
       .catch((e: any) => {
         hasError.value = true;
-        _pushLog({message: e.message || e, level: 'error'});
+        _pushLog({message: e.message || e, level: 'error', ts: Date.now()});
       });
 
 });
