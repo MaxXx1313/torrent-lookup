@@ -3,6 +3,7 @@ import type { ForgeConfig } from '@electron-forge/shared-types';
 // import { MakerZIP } from '@electron-forge/maker-zip';
 import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
+import { MakerDMG } from '@electron-forge/maker-dmg';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
 import AutoUnpackNativesPlugin from "@electron-forge/plugin-auto-unpack-natives";
 
@@ -20,6 +21,8 @@ const config: ForgeConfig = {
             setupIcon: path.join(__dirname, './resources/torrent-icon-96.ico'), // Icon for the setup.exe installer
             productName: 'TLookup', // < it's exist!
             // setupExe: 'TLookup-1.0.0.exe',
+        }),
+        new MakerDMG({
         }),
         // new MakerZIP({}, ['darwin']),
         // new MakerZIP({}),
