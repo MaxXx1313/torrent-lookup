@@ -43,16 +43,16 @@ export class DataService {
         return window.electronAPI.getDefaultLocations();
     }
 
-    //
-    scanReset() {
-        return window.electronAPI.scanReset();
+    // Scan
+    scanIsActive() {
+        return window.electronAPI.scanIsActive();
     }
 
     startScan(config: ScanConfiguration) {
         window.electronAPI.scanStart(config);
     }
 
-    stopScan() {
+    scanStop() {
         return window.electronAPI.scanStop();
     }
 

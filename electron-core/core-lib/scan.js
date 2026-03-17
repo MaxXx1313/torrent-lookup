@@ -51,7 +51,6 @@ export function scanLogic(ipcMain) {
      * @type {TorrentScanner | null}
      */
     let scanner;
-    let _scanFinsihed = false;
 
 
     const analyzer = new Analyzer({
@@ -67,12 +66,8 @@ export function scanLogic(ipcMain) {
     /**
      *
      */
-    ipcMain.handle('scan:reset', async () => {
-        if (scanner) {
-            await scanner.terminate();
-            scanner = null;
-        }
-        _scanFinsihed = false;
+    ipcMain.handle('scan:is-active', async () => {
+        return !!scanner;
     });
 
 
@@ -85,12 +80,7 @@ export function scanLogic(ipcMain) {
         const followSymLinks = !!config?.followSymlinks;
 
         if (scanner) {
-            console.log('scan already started');
-            if (_scanFinsihed) {
-                ipcMain.emit('scan:finished');
-            }
-            return;
-            ///////
+            throw new Error('Scanning already started');
         }
 
         scanner = new TorrentScanner({
@@ -98,6 +88,7 @@ export function scanLogic(ipcMain) {
             exclude,
             skipSystemExclude: false,
             followSymLinks,
+            // maxFps: 100,
         });
 
         scanner.onEntry.subscribe((entry) => {
@@ -112,7 +103,7 @@ export function scanLogic(ipcMain) {
                 return store.set(MAP_CONFIG_KEY, mappings);
             })
             .finally(() => {
-                _scanFinsihed = true;
+                scanner = null;
                 ipcMain.emit('scan:finished');
             });
     });
@@ -123,7 +114,7 @@ export function scanLogic(ipcMain) {
     ipcMain.handle('scan:stop', async () => {
         if (scanner) {
             await scanner.terminate();
-            _scanFinsihed = true;
+            scanner = null;
         }
     });
 

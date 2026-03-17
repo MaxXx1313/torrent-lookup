@@ -70,12 +70,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
 
     // scanner
-    scanReset: callable('scan:reset'),
+    scanIsActive: callable('scan:is-active'),
     scanStart: callable('scan:start'),
+    scanStop: callable('scan:stop'),
     onScanEntry: event('scan:entry'),
     onScanStats: event('scan:stats'),
     onScanFinished: eventOnce('scan:finished'),
-    scanStop: callable('scan:stop'),
 
     getMappings: callable('export:get-mapping'),
     setMappings: callable('export:set-mapping'),
