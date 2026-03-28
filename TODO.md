@@ -10,8 +10,8 @@
 # 1.2
 - qBittorrent support
 - other clients? (utorrent?)
-- e2e tests
 
 # 1.3
 - torrent export/migrate
 - files organize
+- detect partially downloaded files
