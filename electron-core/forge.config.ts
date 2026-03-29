@@ -13,7 +13,9 @@ const config: ForgeConfig = {
         // This tells the packager to copy the actual files
         // instead of just the symlink reference.
         derefSymlinks: true,
-        // icon: './resources/torrent-icon-256.png', // Electron Forge will automatically add the correct extension (.ico or .icns)
+        // This icon is used for the packaged app bundle (.app on macOS).
+        // Electron Forge will automatically add the correct extension (.ico or .icns)
+        icon: path.join(__dirname, './resources/torrent-icon-256'),
         osxSign: {
             identity: 'maxxx1313'
         } // object must exist even if empty
