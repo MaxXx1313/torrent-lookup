@@ -2,7 +2,7 @@
   "name": "electron-core",
   "productName": "TLookup",
   "description": "Scan filesystem, find torrent file ans associate it with the downloaded files",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "type": "module",
   "main": "index.js",
   "scripts": {
