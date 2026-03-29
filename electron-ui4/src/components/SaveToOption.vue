@@ -18,7 +18,7 @@
 import type { TorrentMappingSaveLocation } from "../../../electron-core/core-lib/types.ts";
 import { ref, watch } from "vue";
 
-const opt = ref<TorrentMappingSaveLocation>(null);
+const opt = ref<TorrentMappingSaveLocation | null>(null);
 
 const props = defineProps<{
   opt: TorrentMappingSaveLocation;

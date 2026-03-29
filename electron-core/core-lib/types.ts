@@ -94,5 +94,5 @@ export interface ExportStats {
     total: number;
     completed: number;
     percentage: number;
-    currentTarget: string;
+    currentTarget: string | null;
 }

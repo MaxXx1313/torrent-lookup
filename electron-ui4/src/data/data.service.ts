@@ -1,7 +1,14 @@
 import { Observable, shareReplay } from 'rxjs';
-import type { ScanConfiguration, TorrentMapping, TorrentScannerStats, TransmissionOptions } from "@/data/types.ts";
 import type { MyEvent } from "../../../electron-core/core-lib/preload";
-import type { ExportClient, ExportStats, LogMessage } from "../../../electron-core/core-lib/types.ts";
+import type {
+    ExportClient,
+    ExportStats,
+    LogMessage,
+    ScanConfiguration,
+    TorrentMapping,
+    TorrentScannerStats,
+    ExportOptions
+} from "../../../electron-core/core-lib/types";
 
 
 export const DATA_SERVICE_KEY = Symbol();
@@ -69,15 +76,15 @@ export class DataService {
         return window.electronAPI.exportGetClients();
     }
 
-    exportGetParameters(client: ExportClient): Promise<TransmissionOptions> {
+    exportGetParameters(client: ExportClient): Promise<ExportOptions> {
         return window.electronAPI.exportGetParameters(client);
     }
 
-    exportSetParameters(client: ExportClient, options: TransmissionOptions): Promise<void> {
+    exportSetParameters(client: ExportClient, options: ExportOptions): Promise<void> {
         return window.electronAPI.exportSetParameters(client, options);
     }
 
-    exportVerifyParameters(client: ExportClient, options: TransmissionOptions): Promise<boolean> {
+    exportVerifyParameters(client: ExportClient, options: ExportOptions): Promise<boolean> {
         return window.electronAPI.exportVerifyParameters(client, options)
             .catch(e => false);
     }
@@ -85,9 +92,11 @@ export class DataService {
     exportReset() {
         return window.electronAPI.exportReset();
     }
-    exportStart(client: ExportClient, options: TransmissionOptions): Promise<void> {
+
+    exportStart(client: ExportClient, options: ExportOptions): Promise<void> {
         return window.electronAPI.exportStart(client, options);
     }
+
     exportGetLogs() {
         return window.electronAPI.exportGetLogs();
     }
