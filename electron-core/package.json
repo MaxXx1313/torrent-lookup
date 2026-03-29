@@ -13,7 +13,8 @@
     "prebuild:win": "sh ./prebuild.sh",
     "build:win": "npx electron-forge make --platform=win32",
     "prebuild:mac": "sh ./prebuild.sh",
-    "build:mac": "npx electron-forge make --platform=darwin"
+    "build:mac": "npx electron-forge make --platform=darwin --arch=x64",
+    "postbuild:mac": "sh ./postbuild.sh"
   },
   "keywords": [
     "torrent"
