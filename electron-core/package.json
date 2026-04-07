@@ -2,7 +2,7 @@
   "name": "electron-core",
   "productName": "TLookup",
   "description": "Scan filesystem, find torrent file ans associate it with the downloaded files",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "type": "module",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,10 @@
     "prebuild:linux": "sh ./prebuild.sh",
     "build:linux": "npx electron-builder --linux",
     "prebuild:win": "sh ./prebuild.sh",
-    "build:win": "npx electron-forge make --platform=win32"
+    "build:win": "npx electron-forge make --platform=win32",
+    "prebuild:mac": "sh ./prebuild.sh",
+    "build:mac": "npx electron-forge make --platform=darwin --arch=x64",
+    "postbuild:mac": "sh ./postbuild.sh"
   },
   "keywords": [
     "torrent"
@@ -24,6 +27,7 @@
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.11.1",
+    "@electron-forge/maker-dmg": "^7.11.1",
     "@electron-forge/maker-squirrel": "^7.11.1",
     "@electron-forge/plugin-auto-unpack-natives": "^7.11.1",
     "@electron-forge/plugin-fuses": "^7.11.1",

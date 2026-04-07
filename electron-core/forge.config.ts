@@ -3,6 +3,7 @@ import type { ForgeConfig } from '@electron-forge/shared-types';
 // import { MakerZIP } from '@electron-forge/maker-zip';
 import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
+import { MakerDMG } from '@electron-forge/maker-dmg';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
 import AutoUnpackNativesPlugin from "@electron-forge/plugin-auto-unpack-natives";
 
@@ -12,7 +13,12 @@ const config: ForgeConfig = {
         // This tells the packager to copy the actual files
         // instead of just the symlink reference.
         derefSymlinks: true,
-        // icon: './resources/torrent-icon-256.png', // Electron Forge will automatically add the correct extension (.ico or .icns)
+        // This icon is used for the packaged app bundle (.app on macOS).
+        // Electron Forge will automatically add the correct extension (.ico or .icns)
+        icon: path.join(__dirname, './resources/torrent-icon-256'),
+        osxSign: {
+            identity: 'maxxx1313'
+        } // object must exist even if empty
     },
     rebuildConfig: {},
     makers: [
@@ -20,6 +26,10 @@ const config: ForgeConfig = {
             setupIcon: path.join(__dirname, './resources/torrent-icon-96.ico'), // Icon for the setup.exe installer
             productName: 'TLookup', // < it's exist!
             // setupExe: 'TLookup-1.0.0.exe',
+        }),
+        new MakerDMG({
+            icon: path.join(__dirname, './resources/torrent-icon-256.icns'), // Icon for the installer
+            iconSize: 256,
         }),
         // new MakerZIP({}, ['darwin']),
         // new MakerZIP({}),
